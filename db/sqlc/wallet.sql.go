@@ -51,7 +51,7 @@ VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING id, name, address, status, user_id
 type CreateWalletParams struct {
 	Name          string        `json:"name"`
 	Address       string        `json:"address"`
-	Status        string        `json:"status"`
+	Status        WalletStatus  `json:"status"`
 	UserID        int64         `json:"user_id"`
 	BankAccountID sql.NullInt64 `json:"bank_account_id"`
 	Balance       int64         `json:"balance"`

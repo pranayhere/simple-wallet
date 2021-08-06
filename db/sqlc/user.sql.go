@@ -20,11 +20,11 @@ $1, $2, $3, $4, $5
 `
 
 type CreateUserParams struct {
-	Username       string `json:"username"`
-	HashedPassword string `json:"hashed_password"`
-	Status         string `json:"status"`
-	FullName       string `json:"full_name"`
-	Email          string `json:"email"`
+	Username       string     `json:"username"`
+	HashedPassword string     `json:"hashed_password"`
+	Status         UserStatus `json:"status"`
+	FullName       string     `json:"full_name"`
+	Email          string     `json:"email"`
 }
 
 func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) (User, error) {

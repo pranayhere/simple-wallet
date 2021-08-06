@@ -17,11 +17,11 @@ VALUES ($1, $2, $3, $4, $5) RETURNING id, account_no, ifsc, bank_name, status, c
 `
 
 type CreateBankAccountParams struct {
-	AccountNo string `json:"account_no"`
-	Ifsc      string `json:"ifsc"`
-	BankName  string `json:"bank_name"`
-	Currency  string `json:"currency"`
-	Status    string `json:"status"`
+	AccountNo string            `json:"account_no"`
+	Ifsc      string            `json:"ifsc"`
+	BankName  string            `json:"bank_name"`
+	Currency  string            `json:"currency"`
+	Status    BankAccountStatus `json:"status"`
 }
 
 func (q *Queries) CreateBankAccount(ctx context.Context, arg CreateBankAccountParams) (BankAccount, error) {
@@ -76,8 +76,8 @@ RETURNING id, account_no, ifsc, bank_name, status, currency, created_at, updated
 `
 
 type UpdateBankAccountStatusParams struct {
-	Status string `json:"status"`
-	ID     int64  `json:"id"`
+	Status BankAccountStatus `json:"status"`
+	ID     int64             `json:"id"`
 }
 
 func (q *Queries) UpdateBankAccountStatus(ctx context.Context, arg UpdateBankAccountStatusParams) (BankAccount, error) {

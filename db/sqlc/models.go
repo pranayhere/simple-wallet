@@ -4,18 +4,78 @@ package db
 
 import (
 	"database/sql"
+	"fmt"
 	"time"
 )
 
+type BankAccountStatus string
+
+const (
+	BankAccountStatusINVERIFICATION     BankAccountStatus = "IN_VERIFICATION"
+	BankAccountStatusVERIFIED           BankAccountStatus = "VERIFIED"
+	BankAccountStatusVERIFICATIONFAILED BankAccountStatus = "VERIFICATION_FAILED"
+)
+
+func (e *BankAccountStatus) Scan(src interface{}) error {
+	switch s := src.(type) {
+	case []byte:
+		*e = BankAccountStatus(s)
+	case string:
+		*e = BankAccountStatus(s)
+	default:
+		return fmt.Errorf("unsupported scan type for BankAccountStatus: %T", src)
+	}
+	return nil
+}
+
+type UserStatus string
+
+const (
+	UserStatusACTIVE  UserStatus = "ACTIVE"
+	UserStatusBLOCKED UserStatus = "BLOCKED"
+)
+
+func (e *UserStatus) Scan(src interface{}) error {
+	switch s := src.(type) {
+	case []byte:
+		*e = UserStatus(s)
+	case string:
+		*e = UserStatus(s)
+	default:
+		return fmt.Errorf("unsupported scan type for UserStatus: %T", src)
+	}
+	return nil
+}
+
+type WalletStatus string
+
+const (
+	WalletStatusACTIVE   WalletStatus = "ACTIVE"
+	WalletStatusINACTIVE WalletStatus = "INACTIVE"
+	WalletStatusBLOCKED  WalletStatus = "BLOCKED"
+)
+
+func (e *WalletStatus) Scan(src interface{}) error {
+	switch s := src.(type) {
+	case []byte:
+		*e = WalletStatus(s)
+	case string:
+		*e = WalletStatus(s)
+	default:
+		return fmt.Errorf("unsupported scan type for WalletStatus: %T", src)
+	}
+	return nil
+}
+
 type BankAccount struct {
-	ID        int64     `json:"id"`
-	AccountNo string    `json:"account_no"`
-	Ifsc      string    `json:"ifsc"`
-	BankName  string    `json:"bank_name"`
-	Status    string    `json:"status"`
-	Currency  string    `json:"currency"`
-	CreatedAt time.Time `json:"created_at"`
-	UpdatedAt time.Time `json:"updated_at"`
+	ID        int64             `json:"id"`
+	AccountNo string            `json:"account_no"`
+	Ifsc      string            `json:"ifsc"`
+	BankName  string            `json:"bank_name"`
+	Status    BankAccountStatus `json:"status"`
+	Currency  string            `json:"currency"`
+	CreatedAt time.Time         `json:"created_at"`
+	UpdatedAt time.Time         `json:"updated_at"`
 }
 
 type Currency struct {
@@ -40,22 +100,22 @@ type Transfer struct {
 }
 
 type User struct {
-	ID                int64     `json:"id"`
-	Username          string    `json:"username"`
-	HashedPassword    string    `json:"hashed_password"`
-	Status            string    `json:"status"`
-	FullName          string    `json:"full_name"`
-	Email             string    `json:"email"`
-	PasswordChangedAt time.Time `json:"password_changed_at"`
-	CreatedAt         time.Time `json:"created_at"`
-	UpdatedAt         time.Time `json:"updated_at"`
+	ID                int64      `json:"id"`
+	Username          string     `json:"username"`
+	HashedPassword    string     `json:"hashed_password"`
+	Status            UserStatus `json:"status"`
+	FullName          string     `json:"full_name"`
+	Email             string     `json:"email"`
+	PasswordChangedAt time.Time  `json:"password_changed_at"`
+	CreatedAt         time.Time  `json:"created_at"`
+	UpdatedAt         time.Time  `json:"updated_at"`
 }
 
 type Wallet struct {
 	ID            int64         `json:"id"`
 	Name          string        `json:"name"`
 	Address       string        `json:"address"`
-	Status        string        `json:"status"`
+	Status        WalletStatus  `json:"status"`
 	UserID        int64         `json:"user_id"`
 	BankAccountID sql.NullInt64 `json:"bank_account_id"`
 	Balance       int64         `json:"balance"`
