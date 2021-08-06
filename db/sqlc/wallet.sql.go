@@ -11,7 +11,7 @@ import (
 const addWalletBalance = `-- name: AddWalletBalance :one
 UPDATE wallets
 SET balance = balance + $1
-WHERE id = $2 RETURNING id, name, address, status, user_id, bank_account_id, balance, currency, created_at
+WHERE id = $2 RETURNING id, name, address, status, user_id, bank_account_id, balance, currency, created_at, updated_at
 `
 
 type AddWalletBalanceParams struct {
@@ -32,6 +32,7 @@ func (q *Queries) AddWalletBalance(ctx context.Context, arg AddWalletBalancePara
 		&i.Balance,
 		&i.Currency,
 		&i.CreatedAt,
+		&i.UpdatedAt,
 	)
 	return i, err
 }
@@ -44,7 +45,7 @@ INSERT INTO wallets (name,
                      bank_account_id,
                      balance,
                      currency)
-VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING id, name, address, status, user_id, bank_account_id, balance, currency, created_at
+VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING id, name, address, status, user_id, bank_account_id, balance, currency, created_at, updated_at
 `
 
 type CreateWalletParams struct {
@@ -78,12 +79,13 @@ func (q *Queries) CreateWallet(ctx context.Context, arg CreateWalletParams) (Wal
 		&i.Balance,
 		&i.Currency,
 		&i.CreatedAt,
+		&i.UpdatedAt,
 	)
 	return i, err
 }
 
 const getWallet = `-- name: GetWallet :one
-SELECT id, name, address, status, user_id, bank_account_id, balance, currency, created_at
+SELECT id, name, address, status, user_id, bank_account_id, balance, currency, created_at, updated_at
 FROM wallets
 WHERE id = $1 LIMIT 1
 `
@@ -101,12 +103,13 @@ func (q *Queries) GetWallet(ctx context.Context, id int64) (Wallet, error) {
 		&i.Balance,
 		&i.Currency,
 		&i.CreatedAt,
+		&i.UpdatedAt,
 	)
 	return i, err
 }
 
 const getWalletByAddress = `-- name: GetWalletByAddress :one
-SELECT id, name, address, status, user_id, bank_account_id, balance, currency, created_at
+SELECT id, name, address, status, user_id, bank_account_id, balance, currency, created_at, updated_at
 FROM wallets
 WHERE address = $1 LIMIT 1
 `
@@ -124,12 +127,13 @@ func (q *Queries) GetWalletByAddress(ctx context.Context, address string) (Walle
 		&i.Balance,
 		&i.Currency,
 		&i.CreatedAt,
+		&i.UpdatedAt,
 	)
 	return i, err
 }
 
 const getWalletByAddressForUpdate = `-- name: GetWalletByAddressForUpdate :one
-SELECT id, name, address, status, user_id, bank_account_id, balance, currency, created_at
+SELECT id, name, address, status, user_id, bank_account_id, balance, currency, created_at, updated_at
 FROM wallets
 WHERE address = $1 LIMIT 1
 FOR NO KEY
@@ -149,12 +153,13 @@ func (q *Queries) GetWalletByAddressForUpdate(ctx context.Context, address strin
 		&i.Balance,
 		&i.Currency,
 		&i.CreatedAt,
+		&i.UpdatedAt,
 	)
 	return i, err
 }
 
 const getWalletForUpdate = `-- name: GetWalletForUpdate :one
-SELECT id, name, address, status, user_id, bank_account_id, balance, currency, created_at
+SELECT id, name, address, status, user_id, bank_account_id, balance, currency, created_at, updated_at
 FROM wallets
 WHERE id = $1 LIMIT 1
 FOR NO KEY
@@ -174,12 +179,13 @@ func (q *Queries) GetWalletForUpdate(ctx context.Context, id int64) (Wallet, err
 		&i.Balance,
 		&i.Currency,
 		&i.CreatedAt,
+		&i.UpdatedAt,
 	)
 	return i, err
 }
 
 const listWallets = `-- name: ListWallets :many
-SELECT id, name, address, status, user_id, bank_account_id, balance, currency, created_at
+SELECT id, name, address, status, user_id, bank_account_id, balance, currency, created_at, updated_at
 FROM wallets
 WHERE user_id = $1
 ORDER BY id LIMIT $2
@@ -211,6 +217,7 @@ func (q *Queries) ListWallets(ctx context.Context, arg ListWalletsParams) ([]Wal
 			&i.Balance,
 			&i.Currency,
 			&i.CreatedAt,
+			&i.UpdatedAt,
 		); err != nil {
 			return nil, err
 		}

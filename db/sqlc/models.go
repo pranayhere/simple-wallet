@@ -12,9 +12,10 @@ type BankAccount struct {
 	AccountNo string    `json:"account_no"`
 	Ifsc      string    `json:"ifsc"`
 	BankName  string    `json:"bank_name"`
-	Currency  string    `json:"currency"`
 	Status    string    `json:"status"`
+	Currency  string    `json:"currency"`
 	CreatedAt time.Time `json:"created_at"`
+	UpdatedAt time.Time `json:"updated_at"`
 }
 
 type Currency struct {
@@ -47,6 +48,7 @@ type User struct {
 	Email             string    `json:"email"`
 	PasswordChangedAt time.Time `json:"password_changed_at"`
 	CreatedAt         time.Time `json:"created_at"`
+	UpdatedAt         time.Time `json:"updated_at"`
 }
 
 type Wallet struct {
@@ -59,4 +61,5 @@ type Wallet struct {
 	Balance       int64         `json:"balance"`
 	Currency      string        `json:"currency"`
 	CreatedAt     time.Time     `json:"created_at"`
+	UpdatedAt     time.Time     `json:"updated_at"`
 }

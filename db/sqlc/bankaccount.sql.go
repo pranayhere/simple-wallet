@@ -13,7 +13,7 @@ INSERT INTO bank_accounts (account_no,
                            bank_name,
                            currency,
                            status)
-VALUES ($1, $2, $3, $4, $5) RETURNING id, account_no, ifsc, bank_name, currency, status, created_at
+VALUES ($1, $2, $3, $4, $5) RETURNING id, account_no, ifsc, bank_name, status, currency, created_at, updated_at
 `
 
 type CreateBankAccountParams struct {
@@ -38,15 +38,16 @@ func (q *Queries) CreateBankAccount(ctx context.Context, arg CreateBankAccountPa
 		&i.AccountNo,
 		&i.Ifsc,
 		&i.BankName,
-		&i.Currency,
 		&i.Status,
+		&i.Currency,
 		&i.CreatedAt,
+		&i.UpdatedAt,
 	)
 	return i, err
 }
 
 const getBankAccount = `-- name: GetBankAccount :one
-SELECT id, account_no, ifsc, bank_name, currency, status, created_at
+SELECT id, account_no, ifsc, bank_name, status, currency, created_at, updated_at
 from bank_accounts
 where id = $1 LIMIT 1
 `
@@ -59,9 +60,10 @@ func (q *Queries) GetBankAccount(ctx context.Context, id int64) (BankAccount, er
 		&i.AccountNo,
 		&i.Ifsc,
 		&i.BankName,
-		&i.Currency,
 		&i.Status,
+		&i.Currency,
 		&i.CreatedAt,
+		&i.UpdatedAt,
 	)
 	return i, err
 }
@@ -70,7 +72,7 @@ const updateBankAccountStatus = `-- name: UpdateBankAccountStatus :one
 UPDATE bank_accounts
 set Status = $1
 where id = $2
-RETURNING id, account_no, ifsc, bank_name, currency, status, created_at
+RETURNING id, account_no, ifsc, bank_name, status, currency, created_at, updated_at
 `
 
 type UpdateBankAccountStatusParams struct {
@@ -86,9 +88,10 @@ func (q *Queries) UpdateBankAccountStatus(ctx context.Context, arg UpdateBankAcc
 		&i.AccountNo,
 		&i.Ifsc,
 		&i.BankName,
-		&i.Currency,
 		&i.Status,
+		&i.Currency,
 		&i.CreatedAt,
+		&i.UpdatedAt,
 	)
 	return i, err
 }
