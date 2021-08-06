@@ -26,7 +26,7 @@ CREATE TABLE "bank_accounts" (
   "account_no" varchar NOT NULL,
   "ifsc" varchar NOT NULL,
   "bank_name" varchar NOT NULL,
-  "currency" bigint NOT NULL,
+  "currency" varchar NOT NULL,
   "status" varchar NOT NULL,
   "created_at" timestamp NOT NULL DEFAULT 'now()'
 );

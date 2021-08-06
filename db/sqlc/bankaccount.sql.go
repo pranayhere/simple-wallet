@@ -20,7 +20,7 @@ type CreateBankAccountParams struct {
 	AccountNo string `json:"account_no"`
 	Ifsc      string `json:"ifsc"`
 	BankName  string `json:"bank_name"`
-	Currency  int64  `json:"currency"`
+	Currency  string `json:"currency"`
 	Status    string `json:"status"`
 }
 
