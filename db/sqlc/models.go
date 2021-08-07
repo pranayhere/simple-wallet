@@ -73,6 +73,7 @@ type BankAccount struct {
 	Ifsc      string            `json:"ifsc"`
 	BankName  string            `json:"bank_name"`
 	Status    BankAccountStatus `json:"status"`
+	UserID    int64             `json:"user_id"`
 	Currency  string            `json:"currency"`
 	CreatedAt time.Time         `json:"created_at"`
 	UpdatedAt time.Time         `json:"updated_at"`
@@ -112,14 +113,14 @@ type User struct {
 }
 
 type Wallet struct {
-	ID            int64         `json:"id"`
-	Name          string        `json:"name"`
-	Address       string        `json:"address"`
-	Status        WalletStatus  `json:"status"`
-	UserID        int64         `json:"user_id"`
-	BankAccountID sql.NullInt64 `json:"bank_account_id"`
-	Balance       int64         `json:"balance"`
-	Currency      string        `json:"currency"`
-	CreatedAt     time.Time     `json:"created_at"`
-	UpdatedAt     time.Time     `json:"updated_at"`
+	ID            int64        `json:"id"`
+	Name          string       `json:"name"`
+	Address       string       `json:"address"`
+	Status        WalletStatus `json:"status"`
+	UserID        int64        `json:"user_id"`
+	BankAccountID int64        `json:"bank_account_id"`
+	Balance       int64        `json:"balance"`
+	Currency      string       `json:"currency"`
+	CreatedAt     time.Time    `json:"created_at"`
+	UpdatedAt     time.Time    `json:"updated_at"`
 }

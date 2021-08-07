@@ -12,3 +12,9 @@ $1, $2, $3, $4, $5
 -- name: GetUser :one
 SELECT * from users
 where username = $1 LIMIT 1;
+
+-- name: UpdateUserStatus :one
+UPDATE users
+set Status = $1
+where id = $2
+RETURNING *;

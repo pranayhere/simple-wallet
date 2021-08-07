@@ -18,3 +18,15 @@ migratedown:
 
 sqlc:
 	sqlc generate
+
+test:
+	go test -v -cover ./...
+
+sleep:
+	sleep 5s
+
+reinit: postgresdrop postgres sleep createdb migrateup
+
+init: postgres sleep createdb migrateup sqlc
+
+.PHONY: postgres createdb dropdb migrateup migratedown sqlc test

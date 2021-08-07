@@ -23,10 +23,12 @@ type Querier interface {
 	GetWalletByAddress(ctx context.Context, address string) (Wallet, error)
 	GetWalletByAddressForUpdate(ctx context.Context, address string) (Wallet, error)
 	GetWalletForUpdate(ctx context.Context, id int64) (Wallet, error)
+	ListBankAccounts(ctx context.Context, arg ListBankAccountsParams) ([]BankAccount, error)
 	ListEntries(ctx context.Context, arg ListEntriesParams) ([]Entry, error)
 	ListTransfers(ctx context.Context, arg ListTransfersParams) ([]Transfer, error)
 	ListWallets(ctx context.Context, arg ListWalletsParams) ([]Wallet, error)
 	UpdateBankAccountStatus(ctx context.Context, arg UpdateBankAccountStatusParams) (BankAccount, error)
+	UpdateUserStatus(ctx context.Context, arg UpdateUserStatusParams) (User, error)
 }
 
 var _ Querier = (*Queries)(nil)

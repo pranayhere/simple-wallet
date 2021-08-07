@@ -71,3 +71,32 @@ func (q *Queries) GetUser(ctx context.Context, username string) (User, error) {
 	)
 	return i, err
 }
+
+const updateUserStatus = `-- name: UpdateUserStatus :one
+UPDATE users
+set Status = $1
+where id = $2
+RETURNING id, username, hashed_password, status, full_name, email, password_changed_at, created_at, updated_at
+`
+
+type UpdateUserStatusParams struct {
+	Status UserStatus `json:"status"`
+	ID     int64      `json:"id"`
+}
+
+func (q *Queries) UpdateUserStatus(ctx context.Context, arg UpdateUserStatusParams) (User, error) {
+	row := q.db.QueryRowContext(ctx, updateUserStatus, arg.Status, arg.ID)
+	var i User
+	err := row.Scan(
+		&i.ID,
+		&i.Username,
+		&i.HashedPassword,
+		&i.Status,
+		&i.FullName,
+		&i.Email,
+		&i.PasswordChangedAt,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+	)
+	return i, err
+}

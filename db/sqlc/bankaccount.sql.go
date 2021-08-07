@@ -12,8 +12,9 @@ INSERT INTO bank_accounts (account_no,
                            ifsc,
                            bank_name,
                            currency,
+                           user_id,
                            status)
-VALUES ($1, $2, $3, $4, $5) RETURNING id, account_no, ifsc, bank_name, status, currency, created_at, updated_at
+VALUES ($1, $2, $3, $4, $5, $6) RETURNING id, account_no, ifsc, bank_name, status, user_id, currency, created_at, updated_at
 `
 
 type CreateBankAccountParams struct {
@@ -21,6 +22,7 @@ type CreateBankAccountParams struct {
 	Ifsc      string            `json:"ifsc"`
 	BankName  string            `json:"bank_name"`
 	Currency  string            `json:"currency"`
+	UserID    int64             `json:"user_id"`
 	Status    BankAccountStatus `json:"status"`
 }
 
@@ -30,6 +32,7 @@ func (q *Queries) CreateBankAccount(ctx context.Context, arg CreateBankAccountPa
 		arg.Ifsc,
 		arg.BankName,
 		arg.Currency,
+		arg.UserID,
 		arg.Status,
 	)
 	var i BankAccount
@@ -39,6 +42,7 @@ func (q *Queries) CreateBankAccount(ctx context.Context, arg CreateBankAccountPa
 		&i.Ifsc,
 		&i.BankName,
 		&i.Status,
+		&i.UserID,
 		&i.Currency,
 		&i.CreatedAt,
 		&i.UpdatedAt,
@@ -47,7 +51,7 @@ func (q *Queries) CreateBankAccount(ctx context.Context, arg CreateBankAccountPa
 }
 
 const getBankAccount = `-- name: GetBankAccount :one
-SELECT id, account_no, ifsc, bank_name, status, currency, created_at, updated_at
+SELECT id, account_no, ifsc, bank_name, status, user_id, currency, created_at, updated_at
 from bank_accounts
 where id = $1 LIMIT 1
 `
@@ -61,6 +65,7 @@ func (q *Queries) GetBankAccount(ctx context.Context, id int64) (BankAccount, er
 		&i.Ifsc,
 		&i.BankName,
 		&i.Status,
+		&i.UserID,
 		&i.Currency,
 		&i.CreatedAt,
 		&i.UpdatedAt,
@@ -68,11 +73,58 @@ func (q *Queries) GetBankAccount(ctx context.Context, id int64) (BankAccount, er
 	return i, err
 }
 
+const listBankAccounts = `-- name: ListBankAccounts :many
+SELECT id, account_no, ifsc, bank_name, status, user_id, currency, created_at, updated_at
+FROM bank_accounts
+WHERE user_id = $1
+ORDER BY id LIMIT $2
+OFFSET $3
+`
+
+type ListBankAccountsParams struct {
+	UserID int64 `json:"user_id"`
+	Limit  int32 `json:"limit"`
+	Offset int32 `json:"offset"`
+}
+
+func (q *Queries) ListBankAccounts(ctx context.Context, arg ListBankAccountsParams) ([]BankAccount, error) {
+	rows, err := q.db.QueryContext(ctx, listBankAccounts, arg.UserID, arg.Limit, arg.Offset)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	items := []BankAccount{}
+	for rows.Next() {
+		var i BankAccount
+		if err := rows.Scan(
+			&i.ID,
+			&i.AccountNo,
+			&i.Ifsc,
+			&i.BankName,
+			&i.Status,
+			&i.UserID,
+			&i.Currency,
+			&i.CreatedAt,
+			&i.UpdatedAt,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const updateBankAccountStatus = `-- name: UpdateBankAccountStatus :one
 UPDATE bank_accounts
 set Status = $1
 where id = $2
-RETURNING id, account_no, ifsc, bank_name, status, currency, created_at, updated_at
+RETURNING id, account_no, ifsc, bank_name, status, user_id, currency, created_at, updated_at
 `
 
 type UpdateBankAccountStatusParams struct {
@@ -89,6 +141,7 @@ func (q *Queries) UpdateBankAccountStatus(ctx context.Context, arg UpdateBankAcc
 		&i.Ifsc,
 		&i.BankName,
 		&i.Status,
+		&i.UserID,
 		&i.Currency,
 		&i.CreatedAt,
 		&i.UpdatedAt,

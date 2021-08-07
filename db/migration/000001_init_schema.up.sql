@@ -33,7 +33,7 @@ CREATE TABLE "wallets" (
     "address" varchar NOT NULL,
     "status" wallet_status NOT NULL,
     "user_id" bigint NOT NULL,
-    "bank_account_id" bigint,
+    "bank_account_id" bigint NOT NULL,
     "balance" bigint NOT NULL,
     "currency" varchar NOT NULL,
     "created_at" timestamp NOT NULL DEFAULT 'now()',
@@ -46,6 +46,7 @@ CREATE TABLE "bank_accounts" (
     "ifsc" varchar NOT NULL,
     "bank_name" varchar NOT NULL,
     "status" bank_account_status NOT NULL,
+    "user_id" bigint NOT NULL,
     "currency" varchar NOT NULL,
     "created_at" timestamp NOT NULL DEFAULT 'now()',
     "updated_at" timestamp NOT NULL DEFAULT 'now()'
@@ -78,6 +79,8 @@ ALTER TABLE "wallets" ADD FOREIGN KEY ("bank_account_id") REFERENCES "bank_accou
 
 ALTER TABLE "wallets" ADD FOREIGN KEY ("currency") REFERENCES "currencies" ("code");
 
+ALTER TABLE "bank_accounts" ADD FOREIGN KEY ("user_id") REFERENCES "users" ("id");
+
 ALTER TABLE "bank_accounts" ADD FOREIGN KEY ("currency") REFERENCES "currencies" ("code");
 
 ALTER TABLE "entries" ADD FOREIGN KEY ("wallet_id") REFERENCES "wallets" ("id");
@@ -95,6 +98,8 @@ CREATE INDEX ON "wallets" ("user_id");
 CREATE UNIQUE INDEX ON "wallets" ("address");
 
 CREATE UNIQUE INDEX ON "wallets" ("bank_account_id");
+
+CREATE INDEX ON "bank_accounts" ("user_id");
 
 CREATE UNIQUE INDEX ON "bank_accounts" ("account_no", "ifsc");
 
