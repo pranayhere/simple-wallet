@@ -47,3 +47,9 @@ UPDATE wallets
 SET balance = balance + sqlc.arg(amount)
 WHERE id = sqlc.arg(id)
 RETURNING *;
+
+-- name: UpdateWalletStatus :one
+UPDATE wallets
+set Status = $1
+where id = $2
+RETURNING *;

@@ -14,6 +14,9 @@ type WalletRepo interface {
     GetWalletByAddress(ctx context.Context, address string) (domains.Wallet, error)
     GetWalletByAddressForUpdate(ctx context.Context, address string) (domains.Wallet, error)
     ListWallets(ctx context.Context, arg ListWalletsParams) ([]domains.Wallet, error)
+    UpdateWalletStatus(ctx context.Context, arg UpdateWalletStatusParams) (domains.Wallet, error)
+    GetWalletByBankAccountID(ctx context.Context, bankAccountID int64) (domains.Wallet, error)
+    GetWalletByBankAccountIDForUpdate(ctx context.Context, bankAccountID int64) (domains.Wallet, error)
 }
 
 type walletRepository struct {
@@ -248,4 +251,84 @@ func (q *walletRepository) ListWallets(ctx context.Context, arg ListWalletsParam
         return nil, err
     }
     return items, nil
+}
+
+const updateWalletStatus = `-- name: UpdateWalletStatus :one
+UPDATE wallets
+set Status = $1
+where id = $2
+RETURNING id, name, address, status, user_id, bank_account_id, balance, currency, created_at, updated_at
+`
+
+type UpdateWalletStatusParams struct {
+    Status domains.WalletStatus `json:"status"`
+    ID     int64                `json:"id"`
+}
+
+func (q *walletRepository) UpdateWalletStatus(ctx context.Context, arg UpdateWalletStatusParams) (domains.Wallet, error) {
+    row := q.db.QueryRowContext(ctx, updateWalletStatus, arg.Status, arg.ID)
+    var i domains.Wallet
+    err := row.Scan(
+        &i.ID,
+        &i.Name,
+        &i.Address,
+        &i.Status,
+        &i.UserID,
+        &i.BankAccountID,
+        &i.Balance,
+        &i.Currency,
+        &i.CreatedAt,
+        &i.UpdatedAt,
+    )
+    return i, err
+}
+
+const getWalletByBankAccountID = `-- name: GetWalletByBankAccountID :one
+SELECT id, name, address, status, user_id, bank_account_id, balance, currency, created_at, updated_at
+FROM wallets
+WHERE bank_account_id = $1 LIMIT 1
+`
+
+func (q *walletRepository) GetWalletByBankAccountID(ctx context.Context, bankAccountID int64) (domains.Wallet, error) {
+    row := q.db.QueryRowContext(ctx, getWalletByBankAccountID, bankAccountID)
+    var i domains.Wallet
+    err := row.Scan(
+        &i.ID,
+        &i.Name,
+        &i.Address,
+        &i.Status,
+        &i.UserID,
+        &i.BankAccountID,
+        &i.Balance,
+        &i.Currency,
+        &i.CreatedAt,
+        &i.UpdatedAt,
+    )
+    return i, err
+}
+
+const getWalletByBankAccountIDForUpdate = `-- name: GetWalletByBankAccountIDForUpdate :one
+SELECT id, name, address, status, user_id, bank_account_id, balance, currency, created_at, updated_at
+FROM wallets
+WHERE bank_account_id = $1 LIMIT 1
+FOR NO KEY
+UPDATE
+`
+
+func (q *walletRepository) GetWalletByBankAccountIDForUpdate(ctx context.Context, bankAccountID int64) (domains.Wallet, error) {
+    row := q.db.QueryRowContext(ctx, getWalletByBankAccountIDForUpdate, bankAccountID)
+    var i domains.Wallet
+    err := row.Scan(
+        &i.ID,
+        &i.Name,
+        &i.Address,
+        &i.Status,
+        &i.UserID,
+        &i.BankAccountID,
+        &i.Balance,
+        &i.Currency,
+        &i.CreatedAt,
+        &i.UpdatedAt,
+    )
+    return i, err
 }

@@ -8,7 +8,8 @@ import (
 
 type UserRepo interface {
     CreateUser(ctx context.Context, arg CreateUserParams) (domains.User, error)
-    GetUser(ctx context.Context, username string) (domains.User, error)
+    GetUser(ctx context.Context, id int64) (domains.User, error)
+    GetUserByUsername(ctx context.Context, username string) (domains.User, error)
     UpdateUserStatus(ctx context.Context, arg UpdateUserStatusParams) (domains.User, error)
 }
 
@@ -65,13 +66,35 @@ func (q *userRepository) CreateUser(ctx context.Context, arg CreateUserParams) (
     return i, err
 }
 
-const getUser = `-- name: GetUser :one
+const getUserByUsername = `-- name: getUserByUsername :one
 SELECT id, username, hashed_password, status, full_name, email, password_changed_at, created_at, updated_at from users
 where username = $1 LIMIT 1
 `
 
-func (q *userRepository) GetUser(ctx context.Context, username string) (domains.User, error) {
-    row := q.db.QueryRowContext(ctx, getUser, username)
+func (q *userRepository) GetUserByUsername(ctx context.Context, username string) (domains.User, error) {
+    row := q.db.QueryRowContext(ctx, getUserByUsername, username)
+    var i domains.User
+    err := row.Scan(
+        &i.ID,
+        &i.Username,
+        &i.HashedPassword,
+        &i.Status,
+        &i.FullName,
+        &i.Email,
+        &i.PasswordChangedAt,
+        &i.CreatedAt,
+        &i.UpdatedAt,
+    )
+    return i, err
+}
+
+const getUser = `-- name: getUser :one
+SELECT id, username, hashed_password, status, full_name, email, password_changed_at, created_at, updated_at from users
+where id = $1 LIMIT 1
+`
+
+func (q *userRepository) GetUser(ctx context.Context, id int64) (domains.User, error) {
+    row := q.db.QueryRowContext(ctx, getUser, id)
     var i domains.User
     err := row.Scan(
         &i.ID,

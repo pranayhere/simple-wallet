@@ -3,7 +3,9 @@ package store
 import (
     "context"
     "database/sql"
+    "fmt"
     "github.com/pranayhere/simple-wallet/domains"
+    "strings"
 )
 
 type BankAccountRepo interface {
@@ -11,15 +13,22 @@ type BankAccountRepo interface {
     GetBankAccount(ctx context.Context, id int64) (domains.BankAccount, error)
     ListBankAccounts(ctx context.Context, arg ListBankAccountsParams) ([]domains.BankAccount, error)
     UpdateBankAccountStatus(ctx context.Context, arg UpdateBankAccountStatusParams) (domains.BankAccount, error)
+    CreateBankAccountWithWallet(ctx context.Context, arg CreateBankAccountWithWalletParams) (BankAccountWithWalletResult, error)
+    BankAccountVarificationSuccess(ctx context.Context, arg BankAccountVarificationParams) (BankAccountWithWalletResult, error)
+    BankAccountVarificationFailed(ctx context.Context, arg BankAccountVarificationParams) (BankAccountWithWalletResult, error)
 }
 
 type bankAccountRepository struct {
-    db *sql.DB
+    db         *sql.DB
+    walletRepo WalletRepo
+    userRepo   UserRepo
 }
 
-func NewBankAccountRepo(client *sql.DB) BankAccountRepo {
+func NewBankAccountRepo(db *sql.DB, walletRepo WalletRepo, userRepo UserRepo) BankAccountRepo {
     return &bankAccountRepository{
-        db: client,
+        db:         db,
+        walletRepo: walletRepo,
+        userRepo:   userRepo,
     }
 }
 
@@ -163,4 +172,117 @@ func (q *bankAccountRepository) UpdateBankAccountStatus(ctx context.Context, arg
         &i.UpdatedAt,
     )
     return i, err
+}
+
+type CreateBankAccountWithWalletParams struct {
+    AccountNo string `json:"account_no"`
+    Ifsc      string `json:"ifsc"`
+    BankName  string `json:"bank_name"`
+    Currency  string `json:"currency"`
+    UserID    int64  `json:"user_id"`
+}
+
+type BankAccountWithWalletResult struct {
+    BankAccount domains.BankAccount `json:"bank_account"`
+    Wallet      domains.Wallet      `json:"wallet"`
+}
+
+func (q *bankAccountRepository) CreateBankAccountWithWallet(ctx context.Context, arg CreateBankAccountWithWalletParams) (BankAccountWithWalletResult, error) {
+    var result BankAccountWithWalletResult
+
+    err := WithTransaction(q.db, func(tx Transaction) error {
+        var err error
+
+        user, err := q.userRepo.GetUser(ctx, arg.UserID)
+
+        if err != nil {
+            return err
+        }
+
+        result.BankAccount, err = q.CreateBankAccount(ctx, CreateBankAccountParams{
+            UserID:    user.ID,
+            AccountNo: arg.AccountNo,
+            Ifsc:      arg.Ifsc,
+            BankName:  arg.BankName,
+            Currency:  arg.Currency,
+            Status:    domains.BankAccountStatusINVERIFICATION,
+        })
+
+        if err != nil {
+            return err
+        }
+
+        walletAddress := strings.Split(user.Email, "@")[0]
+        walletAddress = fmt.Sprintf("%s@my.wallet", walletAddress)
+
+        result.Wallet, err = q.walletRepo.CreateWallet(ctx, CreateWalletParams{
+            UserID:        user.ID,
+            Currency:      arg.Currency,
+            Balance:       0,
+            Address:       walletAddress,
+            BankAccountID: result.BankAccount.ID,
+            Status:        domains.WalletStatusINACTIVE,
+        })
+
+        if err != nil {
+            return err
+        }
+
+        return nil
+    })
+
+    return result, err
+}
+
+type BankAccountVarificationParams struct {
+    BankAccountID int64 `json:"bank_account_id"`
+}
+
+func (q *bankAccountRepository) BankAccountVarificationSuccess(ctx context.Context, arg BankAccountVarificationParams) (BankAccountWithWalletResult, error) {
+    var result BankAccountWithWalletResult
+
+    err := WithTransaction(q.db, func(tx Transaction) error {
+        var err error
+
+        result.BankAccount, err = q.UpdateBankAccountStatus(ctx, UpdateBankAccountStatusParams{
+            ID:     arg.BankAccountID,
+            Status: domains.BankAccountStatusVERIFIED,
+        })
+        if err != nil {
+            return err
+        }
+
+        wallet, err := q.walletRepo.GetWalletByBankAccountIDForUpdate(ctx, result.BankAccount.ID)
+        if err != nil {
+            return err
+        }
+
+        result.Wallet, err = q.walletRepo.UpdateWalletStatus(ctx, UpdateWalletStatusParams{
+            ID:     wallet.ID,
+            Status: domains.WalletStatusACTIVE,
+        })
+        if err != nil {
+            return err
+        }
+
+        return nil
+    })
+
+    return result, err
+}
+
+func (q *bankAccountRepository) BankAccountVarificationFailed(ctx context.Context, arg BankAccountVarificationParams) (BankAccountWithWalletResult, error) {
+    var result BankAccountWithWalletResult
+
+    var err error
+
+    result.BankAccount, err = q.UpdateBankAccountStatus(ctx, UpdateBankAccountStatusParams{
+        ID:     arg.BankAccountID,
+        Status: domains.BankAccountStatusVERIFICATIONFAILED,
+    })
+    if err != nil {
+        return result, err
+    }
+
+    return result, err
 }
