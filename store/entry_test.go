@@ -14,7 +14,7 @@ func createRandomEntry(t *testing.T, wallet domains.Wallet) domains.Entry {
     entryRepo := store.NewEntryRepo(testDb)
     args := store.CreateEntryParams{
         WalletID: wallet.ID,
-        Amount:    util.RandomMoney(),
+        Amount:   util.RandomMoney(),
     }
 
     entry, err := entryRepo.CreateEntry(context.Background(), args)
@@ -60,8 +60,8 @@ func TestListEntries(t *testing.T) {
 
     arg := store.ListEntriesParams{
         WalletID: account.ID,
-        Limit:     5,
-        Offset:    5,
+        Limit:    5,
+        Offset:   5,
     }
 
     entries, err := entryRepo.ListEntries(context.Background(), arg)

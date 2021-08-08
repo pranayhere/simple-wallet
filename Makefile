@@ -16,14 +16,17 @@ migrateup:
 migratedown:
 	migrate -path db/migration -database "postgresql://root:secret@localhost:5555/simple_wallet?sslmode=disable" -verbose down
 
+sqlc:
+	sqlc generate
+
 test:
 	go test -v -cover ./...
 
 sleep:
 	sleep 5s
 
-reinit: postgresdrop postgres sleep createdb migrateup
+reinit: postgresdrop postgres sleep createdb migrateup sqlc
 
-init: postgres sleep createdb migrateup
+init: postgres sleep createdb migrateup sqlc
 
-.PHONY: postgres createdb dropdb migrateup migratedown test
+.PHONY: postgres createdb dropdb migrateup migratedown sqlc test

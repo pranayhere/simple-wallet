@@ -102,7 +102,7 @@ func TestListWallet(t *testing.T) {
 
     args := store.ListWalletsParams{
         UserID: lastWallet.UserID,
-        Limit: 5,
+        Limit:  5,
         Offset: 0,
     }
 
@@ -121,7 +121,7 @@ func TestAddWalletBalance(t *testing.T) {
     wallet1 := createRandomWallet(t)
 
     args := store.AddWalletBalanceParams{
-        ID: wallet1.ID,
+        ID:     wallet1.ID,
         Amount: 100,
     }
 
@@ -129,5 +129,5 @@ func TestAddWalletBalance(t *testing.T) {
     require.NoError(t, err)
     require.NotEmpty(t, wallet2)
 
-    require.Equal(t, wallet1.Balance + args.Amount, wallet2.Balance)
+    require.Equal(t, wallet1.Balance+args.Amount, wallet2.Balance)
 }

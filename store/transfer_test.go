@@ -14,7 +14,7 @@ func createRandomTransfer(t *testing.T, wallet1, wallet2 domains.Wallet) domains
     arg := store.CreateTransferParams{
         FromWalletID: wallet1.ID,
         ToWalletID:   wallet2.ID,
-        Amount:        util.RandomMoney(),
+        Amount:       util.RandomMoney(),
     }
 
     transfer, err := transferRepo.CreateTransfer(context.Background(), arg)
@@ -66,8 +66,8 @@ func TestListTransfer(t *testing.T) {
     arg := store.ListTransfersParams{
         FromWalletID: wallet1.ID,
         ToWalletID:   wallet1.ID,
-        Limit:         5,
-        Offset:        5,
+        Limit:        5,
+        Offset:       5,
     }
 
     transfers, err := transferRepo.ListTransfers(context.Background(), arg)

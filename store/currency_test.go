@@ -12,8 +12,8 @@ import (
 func createRandomCurrency(t *testing.T, code string) domains.Currency {
     currencyRepo := store.NewCurrencyRepo(testDb)
     args := store.CreateCurrencyParams{
-        Code: code,
-        Fraction: util.RandomInt(1,3),
+        Code:     code,
+        Fraction: util.RandomInt(1, 3),
     }
 
     currency, err := currencyRepo.CreateCurrency(context.Background(), args)
