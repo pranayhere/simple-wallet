@@ -1,33 +1,36 @@
-package db_test
+package store_test
 
 import (
     "context"
     "fmt"
-    db "github.com/pranayhere/simple-wallet/db/sqlc"
+    "github.com/pranayhere/simple-wallet/domains"
+    "github.com/pranayhere/simple-wallet/store"
     "github.com/pranayhere/simple-wallet/util"
     "github.com/stretchr/testify/require"
     "strings"
     "testing"
 )
 
-func createRandomWallet(t *testing.T) db.Wallet {
+func createRandomWallet(t *testing.T) domains.Wallet {
+    walletRepo := store.NewWalletRepo(testDb)
+
     user := createRandomUser(t)
     bankAccount := createRandomBankAccount(t)
     currency := createRandomCurrency(t, util.RandomString(3))
     walletAddress := strings.Split(user.Email, "@")[0]
     walletAddress = fmt.Sprintf("%s@my.wallet", walletAddress)
 
-    args := db.CreateWalletParams{
-        Name: util.RandomString(6),
-        Status: db.WalletStatusINACTIVE,
-        UserID: user.ID,
+    args := store.CreateWalletParams{
+        Name:          util.RandomString(6),
+        Status:        domains.WalletStatusINACTIVE,
+        UserID:        user.ID,
         BankAccountID: bankAccount.ID,
-        Balance: 0,
-        Currency: currency.Code,
-        Address: walletAddress,
+        Balance:       0,
+        Currency:      currency.Code,
+        Address:       walletAddress,
     }
 
-    wallet, err := testQueries.CreateWallet(context.Background(), args)
+    wallet, err := walletRepo.CreateWallet(context.Background(), args)
     require.NoError(t, err)
     require.NotEmpty(t, wallet)
 
@@ -51,9 +54,10 @@ func TestCreateWallet(t *testing.T) {
 }
 
 func TestGetWallet(t *testing.T) {
+    walletRepo := store.NewWalletRepo(testDb)
     wallet1 := createRandomWallet(t)
 
-    wallet2, err := testQueries.GetWallet(context.Background(), wallet1.ID)
+    wallet2, err := walletRepo.GetWallet(context.Background(), wallet1.ID)
     require.NoError(t, err)
     require.NotEmpty(t, wallet2)
 
@@ -70,9 +74,10 @@ func TestGetWallet(t *testing.T) {
 }
 
 func TestGetWalletByAddress(t *testing.T) {
+    walletRepo := store.NewWalletRepo(testDb)
     wallet1 := createRandomWallet(t)
 
-    wallet2, err := testQueries.GetWalletByAddress(context.Background(), wallet1.Address)
+    wallet2, err := walletRepo.GetWalletByAddress(context.Background(), wallet1.Address)
     require.NoError(t, err)
     require.NotEmpty(t, wallet2)
 
@@ -89,18 +94,19 @@ func TestGetWalletByAddress(t *testing.T) {
 }
 
 func TestListWallet(t *testing.T) {
-    var lastWallet db.Wallet
+    walletRepo := store.NewWalletRepo(testDb)
+    var lastWallet domains.Wallet
     for i := 0; i < 5; i++ {
         lastWallet = createRandomWallet(t)
     }
 
-    args := db.ListWalletsParams{
+    args := store.ListWalletsParams{
         UserID: lastWallet.UserID,
         Limit: 5,
         Offset: 0,
     }
 
-    wallets, err := testQueries.ListWallets(context.Background(), args)
+    wallets, err := walletRepo.ListWallets(context.Background(), args)
     require.NoError(t, err)
     require.NotEmpty(t, wallets)
 
@@ -111,14 +117,15 @@ func TestListWallet(t *testing.T) {
 }
 
 func TestAddWalletBalance(t *testing.T) {
+    walletRepo := store.NewWalletRepo(testDb)
     wallet1 := createRandomWallet(t)
 
-    args := db.AddWalletBalanceParams{
+    args := store.AddWalletBalanceParams{
         ID: wallet1.ID,
         Amount: 100,
     }
 
-    wallet2, err := testQueries.AddWalletBalance(context.Background(), args)
+    wallet2, err := walletRepo.AddWalletBalance(context.Background(), args)
     require.NoError(t, err)
     require.NotEmpty(t, wallet2)
 

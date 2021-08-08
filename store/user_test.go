@@ -1,27 +1,30 @@
-package db_test
+package store_test
 
 import (
     "context"
-    db "github.com/pranayhere/simple-wallet/db/sqlc"
+    "github.com/pranayhere/simple-wallet/domains"
+    "github.com/pranayhere/simple-wallet/store"
     "github.com/pranayhere/simple-wallet/util"
     "github.com/stretchr/testify/require"
     "testing"
     "time"
 )
 
-func createRandomUser(t *testing.T) db.User {
+func createRandomUser(t *testing.T) domains.User {
+    userRepo := store.NewUserRepo(testDb)
+
     hashedPassword, err := util.HashPassword(util.RandomString(6))
     require.NoError(t, err)
 
-    args := db.CreateUserParams{
-        Username: util.RandomUser(),
-        Status: db.UserStatusACTIVE,
-        FullName: util.RandomUser(),
-        Email: util.RandomEmail(),
+    args := store.CreateUserParams{
+        Username:       util.RandomUser(),
+        Status:         domains.UserStatusACTIVE,
+        FullName:       util.RandomUser(),
+        Email:          util.RandomEmail(),
         HashedPassword: hashedPassword,
     }
 
-    user, err := testQueries.CreateUser(context.Background(), args)
+    user, err := userRepo.CreateUser(context.Background(), args)
     require.NoError(t, err)
     require.NotEmpty(t, user)
 
@@ -41,8 +44,9 @@ func TestCreateUser(t *testing.T) {
 }
 
 func TestGetUser(t *testing.T) {
+    userRepo := store.NewUserRepo(testDb)
     user1 := createRandomUser(t)
-    user2, err := testQueries.GetUser(context.Background(), user1.Username)
+    user2, err := userRepo.GetUser(context.Background(), user1.Username)
     require.NoError(t, err)
     require.NotEmpty(t, user2)
 
@@ -57,19 +61,20 @@ func TestGetUser(t *testing.T) {
 }
 
 func TestUpdateUserStatus(t *testing.T) {
+    userRepo := store.NewUserRepo(testDb)
     user1 := createRandomUser(t)
 
-    args := db.UpdateUserStatusParams{
-        ID: user1.ID,
-        Status: db.UserStatusBLOCKED,
+    args := store.UpdateUserStatusParams{
+        ID:     user1.ID,
+        Status: domains.UserStatusBLOCKED,
     }
-    user2, err := testQueries.UpdateUserStatus(context.Background(), args)
+    user2, err := userRepo.UpdateUserStatus(context.Background(), args)
     require.NoError(t, err)
     require.NotEmpty(t, user2)
 
     require.Equal(t, user1.Username, user2.Username)
     require.Equal(t, user1.Email, user2.Email)
-    require.Equal(t, db.UserStatusBLOCKED, user2.Status)
+    require.Equal(t, domains.UserStatusBLOCKED, user2.Status)
     require.Equal(t, user1.HashedPassword, user2.HashedPassword)
     require.Equal(t, user1.FullName, user2.FullName)
 

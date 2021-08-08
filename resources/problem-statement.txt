@@ -1,8 +1,0 @@
-Develop a “Wallet-As-A-Service”, which can be used in any business, to perform the following operations:
-1. You should be able to create one or more wallets, for a user.
-2. User registration is mandatory in the system, with minimal KYC details.
-3. You should be able to credit an amount into a user’s wallet.
-4. You should be able to debit an amount from a user’s wallet.
-5. You should be able to block a user’s wallet on demand, and unblock on demand.
-6. You should be able to download a daily report at 9AM, in a CSV format, with the following data of the previous day only:
-    <userid>,<username>,<txnid>,<txntype - debit/credit>,<amount>

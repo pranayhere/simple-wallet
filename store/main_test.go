@@ -1,8 +1,7 @@
-package db_test
+package store_test
 
 import (
     "database/sql"
-    db "github.com/pranayhere/simple-wallet/db/sqlc"
     "log"
     "os"
     "testing"
@@ -15,7 +14,6 @@ const (
     dbSource = "postgresql://root:secret@localhost:5555/simple_wallet?sslmode=disable"
 )
 
-var testQueries *db.Queries
 var testDb *sql.DB
 
 func TestMain(m *testing.M) {
@@ -25,8 +23,6 @@ func TestMain(m *testing.M) {
     if err != nil {
         log.Fatal("cannot connect to db")
     }
-
-    testQueries = db.New(testDb)
 
     os.Exit(m.Run())
 }

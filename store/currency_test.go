@@ -1,20 +1,22 @@
-package db_test
+package store_test
 
 import (
     "context"
-    db "github.com/pranayhere/simple-wallet/db/sqlc"
+    "github.com/pranayhere/simple-wallet/domains"
+    "github.com/pranayhere/simple-wallet/store"
     "github.com/pranayhere/simple-wallet/util"
     "github.com/stretchr/testify/require"
     "testing"
 )
 
-func createRandomCurrency(t *testing.T, code string) db.Currency {
-    args := db.CreateCurrencyParams{
+func createRandomCurrency(t *testing.T, code string) domains.Currency {
+    currencyRepo := store.NewCurrencyRepo(testDb)
+    args := store.CreateCurrencyParams{
         Code: code,
         Fraction: util.RandomInt(1,3),
     }
 
-    currency, err := testQueries.CreateCurrency(context.Background(), args)
+    currency, err := currencyRepo.CreateCurrency(context.Background(), args)
     require.NoError(t, err)
     require.NotEmpty(t, currency)
 
@@ -30,8 +32,10 @@ func TestCreateCurrency(t *testing.T) {
 }
 
 func TestGetCurrency(t *testing.T) {
+    currencyRepo := store.NewCurrencyRepo(testDb)
+
     currency1 := createRandomCurrency(t, util.RandomString(3))
-    currency2, err := testQueries.GetCurrency(context.Background(), currency1.Code)
+    currency2, err := currencyRepo.GetCurrency(context.Background(), currency1.Code)
 
     require.NoError(t, err)
     require.NotEmpty(t, currency2)

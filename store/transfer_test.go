@@ -1,21 +1,23 @@
-package db_test
+package store_test
 
 import (
     "context"
-    db "github.com/pranayhere/simple-wallet/db/sqlc"
+    "github.com/pranayhere/simple-wallet/domains"
+    "github.com/pranayhere/simple-wallet/store"
     "github.com/pranayhere/simple-wallet/util"
     "github.com/stretchr/testify/require"
     "testing"
 )
 
-func createRandomTransfer(t *testing.T, wallet1, wallet2 db.Wallet) db.Transfer {
-    arg := db.CreateTransferParams{
+func createRandomTransfer(t *testing.T, wallet1, wallet2 domains.Wallet) domains.Transfer {
+    transferRepo := store.NewTransferRepo(testDb)
+    arg := store.CreateTransferParams{
         FromWalletID: wallet1.ID,
         ToWalletID:   wallet2.ID,
         Amount:        util.RandomMoney(),
     }
 
-    transfer, err := testQueries.CreateTransfer(context.Background(), arg)
+    transfer, err := transferRepo.CreateTransfer(context.Background(), arg)
     require.NoError(t, err)
     require.NotEmpty(t, transfer)
 
@@ -36,11 +38,12 @@ func TestCreateTransfer(t *testing.T) {
 }
 
 func TestGetTransfer(t *testing.T) {
+    transferRepo := store.NewTransferRepo(testDb)
     wallet1 := createRandomWallet(t)
     wallet2 := createRandomWallet(t)
     transfer1 := createRandomTransfer(t, wallet1, wallet2)
 
-    transfer2, err := testQueries.GetTransfer(context.Background(), transfer1.ID)
+    transfer2, err := transferRepo.GetTransfer(context.Background(), transfer1.ID)
     require.NoError(t, err)
     require.NotEmpty(t, transfer2)
 
@@ -51,6 +54,7 @@ func TestGetTransfer(t *testing.T) {
 }
 
 func TestListTransfer(t *testing.T) {
+    transferRepo := store.NewTransferRepo(testDb)
     wallet1 := createRandomWallet(t)
     wallet2 := createRandomWallet(t)
 
@@ -59,14 +63,14 @@ func TestListTransfer(t *testing.T) {
         createRandomTransfer(t, wallet2, wallet1)
     }
 
-    arg := db.ListTransfersParams{
+    arg := store.ListTransfersParams{
         FromWalletID: wallet1.ID,
         ToWalletID:   wallet1.ID,
         Limit:         5,
         Offset:        5,
     }
 
-    transfers, err := testQueries.ListTransfers(context.Background(), arg)
+    transfers, err := transferRepo.ListTransfers(context.Background(), arg)
     require.NoError(t, err)
     require.Len(t, transfers, 5)
 

@@ -70,7 +70,7 @@ CREATE TABLE "transfers" (
     "from_wallet_id" bigint NOT NULL,
     "to_wallet_id" bigint NOT NULL,
     "amount" bigint NOT NULL,
-    "created_at" timestamp DEFAULT 'now()'
+    "created_at" timestamp NOT NULL DEFAULT 'now()'
 );
 
 ALTER TABLE "wallets" ADD FOREIGN KEY ("user_id") REFERENCES "users" ("id");

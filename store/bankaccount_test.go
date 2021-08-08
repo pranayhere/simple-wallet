@@ -1,27 +1,30 @@
-package db_test
+package store_test
 
 import (
     "context"
-    db "github.com/pranayhere/simple-wallet/db/sqlc"
+    "github.com/pranayhere/simple-wallet/domains"
+    "github.com/pranayhere/simple-wallet/store"
     "github.com/pranayhere/simple-wallet/util"
     "github.com/stretchr/testify/require"
     "testing"
 )
 
-func createRandomBankAccount(t *testing.T) db.BankAccount {
+func createRandomBankAccount(t *testing.T) domains.BankAccount {
+    bankAcctRepo := store.NewBankAccountRepo(testDb)
+
     user := createRandomUser(t)
     currency := createRandomCurrency(t, util.RandomString(3))
 
-    arg := db.CreateBankAccountParams{
+    arg := store.CreateBankAccountParams{
         AccountNo: util.RandomString(10),
-        Ifsc: util.RandomString(7),
-        BankName: util.RandomString(5),
-        UserID: user.ID,
-        Status: db.BankAccountStatusINVERIFICATION,
-        Currency: currency.Code,
+        Ifsc:      util.RandomString(7),
+        BankName:  util.RandomString(5),
+        UserID:    user.ID,
+        Status:    domains.BankAccountStatusINVERIFICATION,
+        Currency:  currency.Code,
     }
 
-    bankAcct, err := testQueries.CreateBankAccount(context.Background(), arg)
+    bankAcct, err := bankAcctRepo.CreateBankAccount(context.Background(), arg)
     require.NoError(t, err)
     require.NotEmpty(t, bankAcct)
 
@@ -43,8 +46,10 @@ func TestCreateBankAccount(t *testing.T) {
 }
 
 func TestGetBankAccount(t *testing.T) {
+    bankAcctRepo := store.NewBankAccountRepo(testDb)
+
     bankAcct1 := createRandomBankAccount(t)
-    bankAcct2, err := testQueries.GetBankAccount(context.Background(), bankAcct1.ID)
+    bankAcct2, err := bankAcctRepo.GetBankAccount(context.Background(), bankAcct1.ID)
     require.NoError(t, err)
     require.NotEmpty(t, bankAcct2)
 
@@ -58,14 +63,15 @@ func TestGetBankAccount(t *testing.T) {
 }
 
 func TestUpdateBankAccountStatus(t *testing.T) {
+    bankAcctRepo := store.NewBankAccountRepo(testDb)
     bankAcct1 := createRandomBankAccount(t)
 
-    args := db.UpdateBankAccountStatusParams {
-        ID: bankAcct1.ID,
-        Status: db.BankAccountStatusVERIFIED,
+    args := store.UpdateBankAccountStatusParams{
+        ID:     bankAcct1.ID,
+        Status: domains.BankAccountStatusVERIFIED,
     }
 
-    bankAcct2, err := testQueries.UpdateBankAccountStatus(context.Background(), args)
+    bankAcct2, err := bankAcctRepo.UpdateBankAccountStatus(context.Background(), args)
     require.NoError(t, err)
     require.NotEmpty(t, bankAcct2)
 
@@ -73,24 +79,26 @@ func TestUpdateBankAccountStatus(t *testing.T) {
     require.Equal(t, bankAcct1.Ifsc, bankAcct2.Ifsc)
     require.Equal(t, bankAcct1.UserID, bankAcct2.UserID)
     require.Equal(t, bankAcct1.BankName, bankAcct2.BankName)
-    require.Equal(t, db.BankAccountStatusVERIFIED, bankAcct2.Status)
+    require.Equal(t, domains.BankAccountStatusVERIFIED, bankAcct2.Status)
     require.Equal(t, bankAcct1.Currency, bankAcct2.Currency)
     require.Equal(t, bankAcct1.ID, bankAcct2.ID)
 }
 
 func TestListBankAccounts(t *testing.T) {
-    var lastBankAccount db.BankAccount
+    bankAcctRepo := store.NewBankAccountRepo(testDb)
+
+    var lastBankAccount domains.BankAccount
     for i := 0; i < 5; i++ {
         lastBankAccount = createRandomBankAccount(t)
     }
 
-    args := db.ListBankAccountsParams{
+    args := store.ListBankAccountsParams{
         UserID: lastBankAccount.UserID,
         Limit:  5,
         Offset: 0,
     }
 
-    accounts, err := testQueries.ListBankAccounts(context.Background(), args)
+    accounts, err := bankAcctRepo.ListBankAccounts(context.Background(), args)
     require.NoError(t, err)
     require.NotEmpty(t, accounts)
 
