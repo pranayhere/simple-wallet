@@ -14,8 +14,8 @@ type BankAccountRepo interface {
     ListBankAccounts(ctx context.Context, arg ListBankAccountsParams) ([]domains.BankAccount, error)
     UpdateBankAccountStatus(ctx context.Context, arg UpdateBankAccountStatusParams) (domains.BankAccount, error)
     CreateBankAccountWithWallet(ctx context.Context, arg CreateBankAccountWithWalletParams) (BankAccountWithWalletResult, error)
-    BankAccountVarificationSuccess(ctx context.Context, arg BankAccountVarificationParams) (BankAccountWithWalletResult, error)
-    BankAccountVarificationFailed(ctx context.Context, arg BankAccountVarificationParams) (BankAccountWithWalletResult, error)
+    BankAccountVerificationSuccess(ctx context.Context, arg BankAccountVerificationParams) (BankAccountVerificationResult, error)
+    BankAccountVerificationFailed(ctx context.Context, arg BankAccountVerificationParams) (BankAccountVerificationResult, error)
 }
 
 type bankAccountRepository struct {
@@ -234,12 +234,17 @@ func (q *bankAccountRepository) CreateBankAccountWithWallet(ctx context.Context,
     return result, err
 }
 
-type BankAccountVarificationParams struct {
+type BankAccountVerificationParams struct {
     BankAccountID int64 `json:"bank_account_id"`
 }
 
-func (q *bankAccountRepository) BankAccountVarificationSuccess(ctx context.Context, arg BankAccountVarificationParams) (BankAccountWithWalletResult, error) {
-    var result BankAccountWithWalletResult
+type BankAccountVerificationResult struct {
+    BankAccount domains.BankAccount `json:"bank_account"`
+    Wallet      domains.Wallet      `json:"wallet"`
+}
+
+func (q *bankAccountRepository) BankAccountVerificationSuccess(ctx context.Context, arg BankAccountVerificationParams) (BankAccountVerificationResult, error) {
+    var result BankAccountVerificationResult
 
     err := WithTransaction(q.db, func(tx Transaction) error {
         var err error
@@ -271,8 +276,8 @@ func (q *bankAccountRepository) BankAccountVarificationSuccess(ctx context.Conte
     return result, err
 }
 
-func (q *bankAccountRepository) BankAccountVarificationFailed(ctx context.Context, arg BankAccountVarificationParams) (BankAccountWithWalletResult, error) {
-    var result BankAccountWithWalletResult
+func (q *bankAccountRepository) BankAccountVerificationFailed(ctx context.Context, arg BankAccountVerificationParams) (BankAccountVerificationResult, error) {
+    var result BankAccountVerificationResult
 
     var err error
 

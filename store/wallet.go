@@ -20,12 +20,16 @@ type WalletRepo interface {
 }
 
 type walletRepository struct {
-    db *sql.DB
+    db           *sql.DB
+    transferRepo TransferRepo
+    entryRepo    EntryRepo
 }
 
-func NewWalletRepo(client *sql.DB) WalletRepo {
+func NewWalletRepo(client *sql.DB, transferRepo TransferRepo, entryRepo EntryRepo) WalletRepo {
     return &walletRepository{
-        db: client,
+        db:           client,
+        transferRepo: transferRepo,
+        entryRepo:    entryRepo,
     }
 }
 
@@ -331,4 +335,26 @@ func (q *walletRepository) GetWalletByBankAccountIDForUpdate(ctx context.Context
         &i.UpdatedAt,
     )
     return i, err
+}
+
+type DepositeToWalletParams struct {
+    WalletID int64 `json:"wallet_id"`
+    Amount   int64 `json:"amount"`
+    UserId   int64 `json:"user_id"`
+}
+
+// DepositToWallet transfer money from linked bank account to the wallet
+func (q *walletRepository) DepositToWallet(ctx context.Context, arg DepositeToWalletParams) {
+
+}
+
+type WithdrawFromWalletParams struct {
+    WalletID int64 `json:"wallet_id"`
+    Amount   int64 `json:"amount"`
+    UserId   int64 `json:"user_id"`
+}
+
+// WithdrawFromWallet transfer money from wallet to the linked bank account
+func (q *walletRepository) WithdrawFromWallet(ctx context.Context, arg WithdrawFromWalletParams) {
+
 }

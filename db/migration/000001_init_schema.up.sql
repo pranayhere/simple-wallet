@@ -15,6 +15,14 @@ CREATE TYPE "bank_account_status" AS ENUM (
   'VERIFICATION_FAILED'
 );
 
+CREATE TYPE "transfer_type" AS ENUM (
+  'DEPOSIT_TO_BANK',
+  'WITHDRAW_FROM_BANK',
+  'SEND_MONEY',
+  'PURCHASE',
+  'REFUND'
+);
+
 CREATE TABLE "users"
 (
     "id"                  bigserial PRIMARY KEY,
@@ -73,10 +81,11 @@ CREATE TABLE "entries"
 CREATE TABLE "transfers"
 (
     "id"             bigserial PRIMARY KEY,
-    "from_wallet_id" bigint    NOT NULL,
-    "to_wallet_id"   bigint    NOT NULL,
-    "amount"         bigint    NOT NULL,
-    "created_at"     timestamp NOT NULL DEFAULT 'now()'
+    "type"           transfer_type NOT NULL,
+    "from_wallet_id" bigint,
+    "to_wallet_id"   bigint,
+    "amount"         bigint        NOT NULL,
+    "created_at"     timestamp     NOT NULL DEFAULT 'now()'
 );
 
 ALTER TABLE "wallets"

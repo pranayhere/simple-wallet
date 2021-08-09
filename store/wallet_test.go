@@ -11,8 +11,16 @@ import (
     "testing"
 )
 
+func InitWalletRepo(t *testing.T) store.WalletRepo {
+    transferRepo := store.NewTransferRepo(testDb)
+    entryRepo := store.NewEntryRepo(testDb)
+    walletRepo := store.NewWalletRepo(testDb, transferRepo, entryRepo)
+
+    return walletRepo
+}
+
 func createRandomWallet(t *testing.T) domains.Wallet {
-    walletRepo := store.NewWalletRepo(testDb)
+    walletRepo := InitWalletRepo(t)
 
     user := createRandomUser(t)
     bankAccount := createRandomBankAccount(t)
@@ -54,7 +62,7 @@ func TestCreateWallet(t *testing.T) {
 }
 
 func TestGetWallet(t *testing.T) {
-    walletRepo := store.NewWalletRepo(testDb)
+    walletRepo := InitWalletRepo(t)
     wallet1 := createRandomWallet(t)
 
     wallet2, err := walletRepo.GetWallet(context.Background(), wallet1.ID)
@@ -74,7 +82,7 @@ func TestGetWallet(t *testing.T) {
 }
 
 func TestGetWalletByAddress(t *testing.T) {
-    walletRepo := store.NewWalletRepo(testDb)
+    walletRepo := InitWalletRepo(t)
     wallet1 := createRandomWallet(t)
 
     wallet2, err := walletRepo.GetWalletByAddress(context.Background(), wallet1.Address)
@@ -94,7 +102,7 @@ func TestGetWalletByAddress(t *testing.T) {
 }
 
 func TestListWallet(t *testing.T) {
-    walletRepo := store.NewWalletRepo(testDb)
+    walletRepo := InitWalletRepo(t)
     var lastWallet domains.Wallet
     for i := 0; i < 5; i++ {
         lastWallet = createRandomWallet(t)
@@ -117,7 +125,7 @@ func TestListWallet(t *testing.T) {
 }
 
 func TestAddWalletBalance(t *testing.T) {
-    walletRepo := store.NewWalletRepo(testDb)
+    walletRepo := InitWalletRepo(t)
     wallet1 := createRandomWallet(t)
 
     args := store.AddWalletBalanceParams{
@@ -130,4 +138,24 @@ func TestAddWalletBalance(t *testing.T) {
     require.NotEmpty(t, wallet2)
 
     require.Equal(t, wallet1.Balance+args.Amount, wallet2.Balance)
+}
+
+func TestGetWalletByBankAccountID(t *testing.T) {
+    walletRepo := InitWalletRepo(t)
+    wallet1 := createRandomWallet(t)
+
+    wallet2, err := walletRepo.GetWalletByBankAccountID(context.Background(), wallet1.BankAccountID)
+    require.NoError(t, err)
+    require.NotEmpty(t, wallet2)
+
+    require.Equal(t, wallet1.ID, wallet2.ID)
+    require.Equal(t, wallet1.Name, wallet2.Name)
+    require.Equal(t, wallet1.Address, wallet2.Address)
+    require.Equal(t, wallet1.Currency, wallet2.Currency)
+    require.Equal(t, wallet1.UserID, wallet2.UserID)
+    require.Equal(t, wallet1.BankAccountID, wallet2.BankAccountID)
+    require.Equal(t, wallet1.Balance, wallet2.Balance)
+    require.Equal(t, wallet1.Status, wallet2.Status)
+    require.Equal(t, wallet1.CreatedAt, wallet2.CreatedAt)
+    require.Equal(t, wallet1.UpdatedAt, wallet2.UpdatedAt)
 }

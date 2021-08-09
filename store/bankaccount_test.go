@@ -9,8 +9,18 @@ import (
     "testing"
 )
 
+func InitBankAccountRepo(t *testing.T) store.BankAccountRepo {
+    transferRepo := store.NewTransferRepo(testDb)
+    entryRepo := store.NewEntryRepo(testDb)
+    walletRepo := store.NewWalletRepo(testDb, transferRepo, entryRepo)
+    userRepo := store.NewUserRepo(testDb)
+    bankAcctRepo := store.NewBankAccountRepo(testDb, walletRepo, userRepo)
+
+    return bankAcctRepo
+}
+
 func createRandomBankAccount(t *testing.T) domains.BankAccount {
-    bankAcctRepo := store.NewBankAccountRepo(testDb)
+    bankAcctRepo := InitBankAccountRepo(t)
 
     user := createRandomUser(t)
     currency := createRandomCurrency(t, util.RandomString(3))
@@ -46,7 +56,7 @@ func TestCreateBankAccount(t *testing.T) {
 }
 
 func TestGetBankAccount(t *testing.T) {
-    bankAcctRepo := store.NewBankAccountRepo(testDb)
+    bankAcctRepo := InitBankAccountRepo(t)
 
     bankAcct1 := createRandomBankAccount(t)
     bankAcct2, err := bankAcctRepo.GetBankAccount(context.Background(), bankAcct1.ID)
@@ -63,7 +73,8 @@ func TestGetBankAccount(t *testing.T) {
 }
 
 func TestUpdateBankAccountStatus(t *testing.T) {
-    bankAcctRepo := store.NewBankAccountRepo(testDb)
+    bankAcctRepo := InitBankAccountRepo(t)
+
     bankAcct1 := createRandomBankAccount(t)
 
     args := store.UpdateBankAccountStatusParams{
@@ -85,7 +96,7 @@ func TestUpdateBankAccountStatus(t *testing.T) {
 }
 
 func TestListBankAccounts(t *testing.T) {
-    bankAcctRepo := store.NewBankAccountRepo(testDb)
+    bankAcctRepo := InitBankAccountRepo(t)
 
     var lastBankAccount domains.BankAccount
     for i := 0; i < 5; i++ {
@@ -106,4 +117,111 @@ func TestListBankAccounts(t *testing.T) {
         require.NotEmpty(t, account)
         require.Equal(t, lastBankAccount.UserID, account.UserID)
     }
+}
+
+func TestCreateBankAccountWithWallet(t *testing.T) {
+    bankAcctRepo := InitBankAccountRepo(t)
+
+    user := createRandomUser(t)
+    currency := createRandomCurrency(t, util.RandomString(3))
+
+    res, err := bankAcctRepo.CreateBankAccountWithWallet(context.Background(), store.CreateBankAccountWithWalletParams{
+        AccountNo: util.RandomString(10),
+        Ifsc:      util.RandomString(7),
+        BankName:  util.RandomString(5),
+        UserID:    user.ID,
+        Currency:  currency.Code,
+    })
+
+    require.NoError(t, err)
+    require.NotEmpty(t, res)
+
+    bankAcct := res.BankAccount
+    wallet := res.Wallet
+
+    require.NotEmpty(t, bankAcct)
+    require.NotZero(t, bankAcct.ID)
+    require.Equal(t, domains.BankAccountStatusINVERIFICATION, bankAcct.Status)
+
+    require.NotEmpty(t, wallet)
+    require.NotZero(t, wallet.ID)
+    require.Equal(t, bankAcct.ID, wallet.BankAccountID)
+    require.Equal(t, wallet.Balance, int64(0))
+    require.Equal(t, domains.WalletStatusINACTIVE, wallet.Status)
+}
+
+func TestBankAccountVerificationSuccess(t *testing.T) {
+    bankAcctRepo := InitBankAccountRepo(t)
+
+    user := createRandomUser(t)
+    currency := createRandomCurrency(t, util.RandomString(3))
+
+    res, err := bankAcctRepo.CreateBankAccountWithWallet(context.Background(), store.CreateBankAccountWithWalletParams{
+        AccountNo: util.RandomString(10),
+        Ifsc:      util.RandomString(7),
+        BankName:  util.RandomString(5),
+        UserID:    user.ID,
+        Currency:  currency.Code,
+    })
+
+    require.NoError(t, err)
+    require.NotEmpty(t, res)
+    bankAcct := res.BankAccount
+    wallet := res.Wallet
+
+    require.NotEmpty(t, bankAcct)
+    require.NotEmpty(t, wallet)
+    require.Equal(t, domains.BankAccountStatusINVERIFICATION, bankAcct.Status)
+    require.Equal(t, domains.WalletStatusINACTIVE, wallet.Status)
+
+    verificationRes, err := bankAcctRepo.BankAccountVerificationSuccess(context.Background(), store.BankAccountVerificationParams{
+        BankAccountID: res.BankAccount.ID,
+    })
+
+    require.NoError(t, err)
+    require.NotEmpty(t, res)
+
+    verifiedBankAccount := verificationRes.BankAccount
+    verifiedWallet := verificationRes.Wallet
+    require.NotEmpty(t, verifiedBankAccount)
+    require.NotEmpty(t, verifiedWallet)
+    require.Equal(t, domains.BankAccountStatusVERIFIED, verifiedBankAccount.Status)
+    require.Equal(t, domains.WalletStatusACTIVE, verifiedWallet.Status)
+}
+
+func TestAccountVerificationFailed(t *testing.T) {
+    bankAcctRepo := InitBankAccountRepo(t)
+
+    user := createRandomUser(t)
+    currency := createRandomCurrency(t, util.RandomString(3))
+
+    res, err := bankAcctRepo.CreateBankAccountWithWallet(context.Background(), store.CreateBankAccountWithWalletParams{
+        AccountNo: util.RandomString(10),
+        Ifsc:      util.RandomString(7),
+        BankName:  util.RandomString(5),
+        UserID:    user.ID,
+        Currency:  currency.Code,
+    })
+
+    require.NoError(t, err)
+    require.NotEmpty(t, res)
+    bankAcct := res.BankAccount
+    wallet := res.Wallet
+
+    require.NotEmpty(t, bankAcct)
+    require.NotEmpty(t, wallet)
+    require.Equal(t, domains.BankAccountStatusINVERIFICATION, bankAcct.Status)
+    require.Equal(t, domains.WalletStatusINACTIVE, wallet.Status)
+
+    verificationRes, err := bankAcctRepo.BankAccountVerificationFailed(context.Background(), store.BankAccountVerificationParams{
+        BankAccountID: res.BankAccount.ID,
+    })
+
+    require.NoError(t, err)
+    require.NotEmpty(t, res)
+
+    verifiedBankAccount := verificationRes.BankAccount
+
+    require.NotEmpty(t, verifiedBankAccount)
+    require.Equal(t, domains.BankAccountStatusVERIFICATIONFAILED, verifiedBankAccount.Status)
 }
