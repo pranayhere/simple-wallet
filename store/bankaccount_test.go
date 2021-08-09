@@ -16,6 +16,12 @@ func InitBankAccountRepo(t *testing.T) store.BankAccountRepo {
     userRepo := store.NewUserRepo(testDb)
     bankAcctRepo := store.NewBankAccountRepo(testDb, walletRepo, userRepo)
 
+    require.NotEmpty(t, transferRepo)
+    require.NotEmpty(t, entryRepo)
+    require.NotEmpty(t, walletRepo)
+    require.NotEmpty(t, userRepo)
+    require.NotEmpty(t, bankAcctRepo)
+
     return bankAcctRepo
 }
 

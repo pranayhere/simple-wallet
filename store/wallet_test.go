@@ -16,6 +16,10 @@ func InitWalletRepo(t *testing.T) store.WalletRepo {
     entryRepo := store.NewEntryRepo(testDb)
     walletRepo := store.NewWalletRepo(testDb, transferRepo, entryRepo)
 
+    require.NotEmpty(t, transferRepo)
+    require.NotEmpty(t, entryRepo)
+    require.NotEmpty(t, walletRepo)
+
     return walletRepo
 }
 
