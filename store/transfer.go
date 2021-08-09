@@ -31,7 +31,7 @@ VALUES ($1, $2, $3, $4) RETURNING id, transfer_type, from_wallet_id, to_wallet_i
 `
 
 type CreateTransferParams struct {
-    TransferType         domains.TransferType `json:"transfer_type"`
+    TransferType domains.TransferType `json:"transfer_type"`
     FromWalletID sql.NullInt64        `json:"from_wallet_id"`
     ToWalletID   sql.NullInt64        `json:"to_wallet_id"`
     Amount       int64                `json:"amount"`

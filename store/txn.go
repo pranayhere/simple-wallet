@@ -2,20 +2,22 @@ package store
 
 import "database/sql"
 
-type Transaction interface {
+type Tx interface {
     Exec(query string, args ...interface{}) (sql.Result, error)
     Prepare(query string) (*sql.Stmt, error)
     Query(query string, args ...interface{}) (*sql.Rows, error)
     QueryRow(query string, args ...interface{}) *sql.Row
 }
 
-// TxFn is a function that will be called with an initialized `Transaction` object
-// that can be used for executing statements and queries against a database.
-type TxFn func(Transaction) error
+var TxKey = struct{}{}
 
-// WithTransaction creates a new transaction and handles rollback/commit based on the
+// TxFn is a function that will be called with an initialized `Tx` object
+// that can be used for executing statements and queries against a database.
+type TxFn func(Tx) error
+
+// ExecTx creates a new transaction and handles rollback/commit based on the
 // error object returned by the `TxFn`
-func WithTransaction(db *sql.DB, fn TxFn) (err error) {
+func ExecTx(db *sql.DB, fn TxFn) (err error) {
     tx, err := db.Begin()
     if err != nil {
         return

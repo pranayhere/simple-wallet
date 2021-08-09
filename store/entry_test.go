@@ -4,17 +4,19 @@ import (
     "context"
     "github.com/pranayhere/simple-wallet/domains"
     "github.com/pranayhere/simple-wallet/store"
-    "github.com/pranayhere/simple-wallet/util"
     "github.com/stretchr/testify/require"
     "testing"
     "time"
 )
 
-func createRandomEntry(t *testing.T, wallet domains.Wallet) domains.Entry {
+func createRandomEntry(t *testing.T, wallet1 domains.Wallet, wallet2 domains.Wallet) domains.Entry {
     entryRepo := store.NewEntryRepo(testDb)
+    transfer := createRandomTransfer(t, wallet1, wallet2)
+
     args := store.CreateEntryParams{
-        WalletID: wallet.ID,
-        Amount:   util.RandomMoney(),
+        WalletID: transfer.FromWalletID.Int64,
+        Amount:   transfer.Amount,
+        TransferID: transfer.ID,
     }
 
     entry, err := entryRepo.CreateEntry(context.Background(), args)
@@ -31,14 +33,17 @@ func createRandomEntry(t *testing.T, wallet domains.Wallet) domains.Entry {
 }
 
 func TestCreateEntry(t *testing.T) {
-    account := createRandomWallet(t)
-    createRandomEntry(t, account)
+    wallet1 := createRandomWallet(t)
+    wallet2 := createRandomWallet(t)
+    createRandomEntry(t, wallet1, wallet2)
 }
 
 func TestGetEntry(t *testing.T) {
     entryRepo := store.NewEntryRepo(testDb)
-    account := createRandomWallet(t)
-    entry1 := createRandomEntry(t, account)
+    wallet1 := createRandomWallet(t)
+    wallet2 := createRandomWallet(t)
+
+    entry1 := createRandomEntry(t, wallet1, wallet2)
     entry2, err := entryRepo.GetEntry(context.Background(), entry1.ID)
 
     require.NoError(t, err)
@@ -53,13 +58,14 @@ func TestGetEntry(t *testing.T) {
 
 func TestListEntries(t *testing.T) {
     entryRepo := store.NewEntryRepo(testDb)
-    account := createRandomWallet(t)
+    wallet1 := createRandomWallet(t)
+    wallet2 := createRandomWallet(t)
     for i := 0; i < 10; i++ {
-        createRandomEntry(t, account)
+        createRandomEntry(t, wallet1, wallet2)
     }
 
     arg := store.ListEntriesParams{
-        WalletID: account.ID,
+        WalletID: wallet1.ID,
         Limit:    5,
         Offset:   5,
     }

@@ -190,7 +190,7 @@ type BankAccountWithWalletResult struct {
 func (q *bankAccountRepository) CreateBankAccountWithWallet(ctx context.Context, arg CreateBankAccountWithWalletParams) (BankAccountWithWalletResult, error) {
     var result BankAccountWithWalletResult
 
-    err := WithTransaction(q.db, func(tx Transaction) error {
+    err := ExecTx(q.db, func(tx Tx) error {
         var err error
 
         user, err := q.userRepo.GetUser(ctx, arg.UserID)
@@ -246,7 +246,7 @@ type BankAccountVerificationResult struct {
 func (q *bankAccountRepository) BankAccountVerificationSuccess(ctx context.Context, arg BankAccountVerificationParams) (BankAccountVerificationResult, error) {
     var result BankAccountVerificationResult
 
-    err := WithTransaction(q.db, func(tx Transaction) error {
+    err := ExecTx(q.db, func(tx Tx) error {
         var err error
 
         result.BankAccount, err = q.UpdateBankAccountStatus(ctx, UpdateBankAccountStatusParams{

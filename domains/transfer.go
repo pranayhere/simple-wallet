@@ -9,16 +9,14 @@ import (
 type TransferType string
 
 const (
-    TransferTypeDEPOSITTOBANK    TransferType = "DEPOSIT_TO_BANK"
-    TransferTypeWITHDRAWFROMBANK TransferType = "WITHDRAW_FROM_BANK"
-    TransferTypeSENDMONEY        TransferType = "SEND_MONEY"
-    TransferTypePURCHASE         TransferType = "PURCHASE"
-    TransferTypeREFUND           TransferType = "REFUND"
+    TransferTypeDEPOSITTOWALLET    TransferType = "DEPOSIT_TO_WALLET"
+    TransferTypeWITHDRAWFROMWALLET TransferType = "WITHDRAW_FROM_WALLET"
+    TransferTypeSENDMONEY          TransferType = "SEND_MONEY"
 )
 
 type Transfer struct {
     ID           int64         `json:"id"`
-    TransferType         TransferType  `json:"type"`
+    TransferType TransferType  `json:"type"`
     FromWalletID sql.NullInt64 `json:"from_wallet_id"`
     ToWalletID   sql.NullInt64 `json:"to_wallet_id"`
     Amount       int64         `json:"amount"`

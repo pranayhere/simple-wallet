@@ -1,7 +1,7 @@
 package token
 
 import (
-    "github.com/pranayhere/simple-bank/util"
+    "github.com/pranayhere/simple-wallet/util"
     "github.com/stretchr/testify/require"
     "testing"
     "time"
@@ -11,7 +11,7 @@ func TestPasetoMaker(t *testing.T) {
     maker, err := NewPasetoMaker(util.RandomString(32))
     require.NoError(t, err)
 
-    username := util.RandomOwner()
+    username := util.RandomUser()
     duration := time.Minute
 
     issuedAt := time.Now()
@@ -35,7 +35,7 @@ func TestExpiredPasetoToken(t *testing.T) {
     maker, err := NewPasetoMaker(util.RandomString(32))
     require.NoError(t, err)
 
-    token, err := maker.CreateToken(util.RandomOwner(), -time.Minute)
+    token, err := maker.CreateToken(util.RandomUser(), -time.Minute)
     require.NoError(t, err)
     require.NotEmpty(t, token)
 

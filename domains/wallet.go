@@ -26,6 +26,10 @@ type Wallet struct {
     UpdatedAt     time.Time    `json:"updated_at"`
 }
 
+func (e *Wallet) IsBalanceSufficient(expectedAmount int64) bool {
+    return e.Balance >= expectedAmount
+}
+
 func (e *WalletStatus) Scan(src interface{}) error {
     switch s := src.(type) {
     case []byte:

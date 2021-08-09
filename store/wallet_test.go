@@ -159,3 +159,151 @@ func TestGetWalletByBankAccountID(t *testing.T) {
     require.Equal(t, wallet1.CreatedAt, wallet2.CreatedAt)
     require.Equal(t, wallet1.UpdatedAt, wallet2.UpdatedAt)
 }
+
+func TestDepositToWallet(t *testing.T) {
+    walletRepo := InitWalletRepo(t)
+    wallet := createRandomWallet(t)
+
+    verifyBankAccount(t, wallet.BankAccountID)
+
+    n := 5
+    amount := int64(100)
+
+    errs := make(chan error)
+    results := make(chan store.WalletTransferResult)
+
+    for i := 0; i < n; i++ {
+        txName := fmt.Sprintf("tx %d", i+1)
+        go func() {
+            ctx := context.WithValue(context.Background(), store.TxKey, txName)
+
+            result, err := walletRepo.DepositToWallet(ctx, store.DepositeToWalletParams{
+                WalletID: wallet.ID,
+                Amount:   amount,
+            })
+            errs <- err
+            results <- result
+        }()
+    }
+
+    for i := 0; i < n; i++ {
+        err := <-errs
+        require.NoError(t, err)
+
+        res := <-results
+        require.NotEmpty(t, res)
+    }
+
+    updatedWallet, err := walletRepo.GetWallet(context.Background(), wallet.ID)
+    require.NoError(t, err)
+    require.NotEmpty(t, updatedWallet)
+
+    require.Equal(t, wallet.Balance+int64(n)*amount, updatedWallet.Balance)
+}
+
+func TestWithdrawFromWallet(t *testing.T) {
+    walletRepo := InitWalletRepo(t)
+    wallet := createRandomWallet(t)
+
+    verifyBankAccount(t, wallet.BankAccountID)
+
+    initAmount := int64(2000)
+    result, err := walletRepo.DepositToWallet(context.Background(), store.DepositeToWalletParams{
+        WalletID: wallet.ID,
+        Amount:   initAmount,
+    })
+
+    wallet = result.Wallet
+
+    n := 5
+    amount := int64(100)
+
+    errs := make(chan error)
+    results := make(chan store.WalletTransferResult)
+
+    for i := 0; i < n; i++ {
+        txName := fmt.Sprintf("tx %d", i+1)
+        go func() {
+            ctx := context.WithValue(context.Background(), store.TxKey, txName)
+
+            result, err := walletRepo.WithdrawFromWallet(ctx, store.WithdrawFromWalletParams{
+                WalletID: wallet.ID,
+                Amount:   amount,
+            })
+            errs <- err
+            results <- result
+        }()
+    }
+
+    for i := 0; i < n; i++ {
+        err := <-errs
+        require.NoError(t, err)
+
+        res := <-results
+        require.NotEmpty(t, res)
+    }
+
+    updatedWallet, err := walletRepo.GetWallet(context.Background(), wallet.ID)
+    require.NoError(t, err)
+    require.NotEmpty(t, updatedWallet)
+
+    require.Equal(t, wallet.Balance-int64(n)*amount, updatedWallet.Balance)
+}
+
+func TestSendMoney(t *testing.T) {
+    walletRepo := InitWalletRepo(t)
+
+    fromWallet := createRandomWallet(t)
+    verifyBankAccount(t, fromWallet.BankAccountID)
+
+    toWallet := createRandomWallet(t)
+    verifyBankAccount(t, toWallet.BankAccountID)
+
+    initAmount := int64(50)
+    result, err := walletRepo.DepositToWallet(context.Background(), store.DepositeToWalletParams{
+        WalletID: fromWallet.ID,
+        Amount:   initAmount,
+    })
+
+    fromWallet = result.Wallet
+
+    n := 5
+    amount := int64(10)
+
+    errs := make(chan error)
+    results := make(chan store.WalletTransferResult)
+
+    for i := 0; i < n; i++ {
+        txName := fmt.Sprintf("tx %d", i+1)
+        go func() {
+            ctx := context.WithValue(context.Background(), store.TxKey, txName)
+
+            result, err := walletRepo.SendMoney(ctx, store.SendMoneyParams{
+                FromWalletAddress: fromWallet.Address,
+                ToWalletAddress: toWallet.Address,
+                Amount:        amount,
+            })
+
+            errs <- err
+            results <- result
+        }()
+    }
+
+    for i := 0; i < n; i++ {
+        err := <-errs
+        require.NoError(t, err)
+
+        res := <-results
+        require.NotEmpty(t, res)
+    }
+
+    updatedFromWallet, err := walletRepo.GetWallet(context.Background(), fromWallet.ID)
+    require.NoError(t, err)
+    require.NotEmpty(t, updatedFromWallet)
+    require.Equal(t, fromWallet.Balance-int64(n)*amount, updatedFromWallet.Balance)
+
+    updatedToWallet, err := walletRepo.GetWallet(context.Background(), toWallet.ID)
+    require.NoError(t, err)
+    require.NotEmpty(t, updatedToWallet)
+    require.Equal(t, toWallet.Balance+int64(n)*amount, updatedToWallet.Balance)
+}

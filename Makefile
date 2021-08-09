@@ -25,8 +25,8 @@ test:
 sleep:
 	sleep 5s
 
-reinit: postgresdrop postgres sleep createdb migrateup sqlc
+reinit: postgresdrop postgres sleep createdb migrateup
 
-init: postgres sleep createdb migrateup sqlc
+init: postgres sleep createdb migrateup
 
 .PHONY: postgres createdb dropdb migrateup migratedown sqlc test

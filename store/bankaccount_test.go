@@ -51,6 +51,17 @@ func createRandomBankAccount(t *testing.T) domains.BankAccount {
     return bankAcct
 }
 
+func verifyBankAccount(t *testing.T, bankAccountID int64) store.BankAccountVerificationResult {
+    bankAcctRepo := InitBankAccountRepo(t)
+    res, err := bankAcctRepo.BankAccountVerificationSuccess(context.Background(), store.BankAccountVerificationParams{
+        BankAccountID: bankAccountID,
+    })
+    require.NoError(t, err)
+    require.NotEmpty(t, res)
+
+    return res
+}
+
 func TestCreateBankAccount(t *testing.T) {
     createRandomBankAccount(t)
 }

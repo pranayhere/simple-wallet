@@ -25,17 +25,13 @@ func NewEntryRepo(client *sql.DB) EntryRepo {
 const createEntry = `-- name: CreateEntry :one
 INSERT INTO entries (wallet_id,
                      amount,
-                     entry_type,
-                     balance,
                      transfer_id)
-VALUES ($1, $2, $3, $4, $5) RETURNING id, entry_type, wallet_id, amount, balance, transfer_id, created_at
+VALUES ($1, $2, $3) RETURNING id, wallet_id, amount, transfer_id, created_at
 `
 
 type CreateEntryParams struct {
     WalletID   int64             `json:"wallet_id"`
     Amount     int64             `json:"amount"`
-    EntryType  domains.EntryType `json:"entry_type"`
-    Balance    int64             `json:"balance"`
     TransferID int64             `json:"transfer_id"`
 }
 
@@ -43,17 +39,13 @@ func (q *entryRepository) CreateEntry(ctx context.Context, arg CreateEntryParams
     row := q.db.QueryRowContext(ctx, createEntry,
         arg.WalletID,
         arg.Amount,
-        arg.EntryType,
-        arg.Balance,
         arg.TransferID,
     )
     var i domains.Entry
     err := row.Scan(
         &i.ID,
-        &i.EntryType,
         &i.WalletID,
         &i.Amount,
-        &i.Balance,
         &i.TransferID,
         &i.CreatedAt,
     )
@@ -62,7 +54,7 @@ func (q *entryRepository) CreateEntry(ctx context.Context, arg CreateEntryParams
 }
 
 const getEntriesByTransferID = `-- name: GetEntriesByTransferID :many
-SELECT id, entry_type, wallet_id, amount, balance, transfer_id, created_at
+SELECT id, wallet_id, amount, transfer_id, created_at
 FROM entries
 WHERE transfer_id = $1
 `
@@ -78,10 +70,8 @@ func (q *entryRepository) GetEntriesByTransferID(ctx context.Context, transferID
         var i domains.Entry
         if err := rows.Scan(
             &i.ID,
-            &i.EntryType,
             &i.WalletID,
             &i.Amount,
-            &i.Balance,
             &i.TransferID,
             &i.CreatedAt,
         ); err != nil {
@@ -99,7 +89,7 @@ func (q *entryRepository) GetEntriesByTransferID(ctx context.Context, transferID
 }
 
 const getEntry = `-- name: GetEntry :one
-SELECT id, entry_type, wallet_id, amount, balance, transfer_id, created_at
+SELECT id, wallet_id, amount, transfer_id, created_at
 FROM entries
 WHERE id = $1 LIMIT 1
 `
@@ -109,10 +99,8 @@ func (q *entryRepository) GetEntry(ctx context.Context, id int64) (domains.Entry
     var i domains.Entry
     err := row.Scan(
         &i.ID,
-        &i.EntryType,
         &i.WalletID,
         &i.Amount,
-        &i.Balance,
         &i.TransferID,
         &i.CreatedAt,
     )
@@ -120,7 +108,7 @@ func (q *entryRepository) GetEntry(ctx context.Context, id int64) (domains.Entry
 }
 
 const listEntries = `-- name: ListEntries :many
-SELECT id, entry_type, wallet_id, amount, balance, transfer_id, created_at
+SELECT id, wallet_id, amount, transfer_id, created_at
 FROM entries
 WHERE wallet_id = $1
 ORDER BY id LIMIT $2
@@ -144,10 +132,8 @@ func (q *entryRepository) ListEntries(ctx context.Context, arg ListEntriesParams
         var i domains.Entry
         if err := rows.Scan(
             &i.ID,
-            &i.EntryType,
             &i.WalletID,
             &i.Amount,
-            &i.Balance,
             &i.TransferID,
             &i.CreatedAt,
         ); err != nil {

@@ -2,7 +2,8 @@ package token
 
 import (
     "github.com/dgrijalva/jwt-go"
-    "github.com/pranayhere/simple-bank/util"
+    "github.com/pranayhere/simple-wallet/util"
+
     "github.com/stretchr/testify/require"
     "testing"
     "time"
@@ -12,7 +13,7 @@ func TestJWTMaker(t *testing.T) {
     maker, err := NewJWTMaker(util.RandomString(32))
     require.NoError(t, err)
 
-    username := util.RandomOwner()
+    username := util.RandomUser()
     duration := time.Minute
 
     issuedAt := time.Now()
@@ -36,7 +37,7 @@ func TestExpiredJWTTest(t *testing.T) {
     maker, err := NewJWTMaker(util.RandomString(32))
     require.NoError(t, err)
 
-    token, err := maker.CreateToken(util.RandomOwner(), -time.Minute)
+    token, err := maker.CreateToken(util.RandomUser(), -time.Minute)
     require.NoError(t, err)
     require.NotEmpty(t, token)
 
@@ -47,7 +48,7 @@ func TestExpiredJWTTest(t *testing.T) {
 }
 
 func TestInvalidJWTTokenALgoNone(t *testing.T) {
-    payload, err := NewPayload(util.RandomOwner(), time.Minute)
+    payload, err := NewPayload(util.RandomUser(), time.Minute)
     require.NoError(t, err)
 
     jwtToken := jwt.NewWithClaims(jwt.SigningMethodNone, payload)
