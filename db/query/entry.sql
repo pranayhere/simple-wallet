@@ -1,7 +1,7 @@
 -- name: CreateEntry :one
 INSERT INTO entries (wallet_id,
                      amount,
-                     type,
+                     entry_type,
                      balance,
                      transfer_id)
 VALUES ($1, $2, $3, $4, $5) RETURNING *;

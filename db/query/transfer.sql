@@ -1,5 +1,5 @@
 -- name: CreateTransfer :one
-INSERT INTO transfers (type,
+INSERT INTO transfers (transfer_type,
                        from_wallet_id,
                        to_wallet_id,
                        amount)
