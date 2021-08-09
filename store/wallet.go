@@ -345,7 +345,7 @@ type DepositeToWalletParams struct {
 
 // DepositToWallet transfer money from linked bank account to the wallet
 func (q *walletRepository) DepositToWallet(ctx context.Context, arg DepositeToWalletParams) {
-
+    
 }
 
 type WithdrawFromWalletParams struct {

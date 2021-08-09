@@ -23,15 +23,15 @@ func NewTransferRepo(client *sql.DB) TransferRepo {
 }
 
 const createTransfer = `-- name: CreateTransfer :one
-INSERT INTO transfers (type,
+INSERT INTO transfers (transfer_type,
                        from_wallet_id,
                        to_wallet_id,
                        amount)
-VALUES ($1, $2, $3, $4) RETURNING id, type, from_wallet_id, to_wallet_id, amount, created_at
+VALUES ($1, $2, $3, $4) RETURNING id, transfer_type, from_wallet_id, to_wallet_id, amount, created_at
 `
 
 type CreateTransferParams struct {
-    Type         domains.TransferType `json:"type"`
+    TransferType         domains.TransferType `json:"transfer_type"`
     FromWalletID sql.NullInt64        `json:"from_wallet_id"`
     ToWalletID   sql.NullInt64        `json:"to_wallet_id"`
     Amount       int64                `json:"amount"`
@@ -39,7 +39,7 @@ type CreateTransferParams struct {
 
 func (q *transferRepository) CreateTransfer(ctx context.Context, arg CreateTransferParams) (domains.Transfer, error) {
     row := q.db.QueryRowContext(ctx, createTransfer,
-        arg.Type,
+        arg.TransferType,
         arg.FromWalletID,
         arg.ToWalletID,
         arg.Amount,
@@ -47,7 +47,7 @@ func (q *transferRepository) CreateTransfer(ctx context.Context, arg CreateTrans
     var i domains.Transfer
     err := row.Scan(
         &i.ID,
-        &i.Type,
+        &i.TransferType,
         &i.FromWalletID,
         &i.ToWalletID,
         &i.Amount,
@@ -57,7 +57,7 @@ func (q *transferRepository) CreateTransfer(ctx context.Context, arg CreateTrans
 }
 
 const getTransfer = `-- name: GetTransfer :one
-SELECT id, type, from_wallet_id, to_wallet_id, amount, created_at
+SELECT id, transfer_type, from_wallet_id, to_wallet_id, amount, created_at
 FROM transfers
 WHERE id = $1 LIMIT 1
 `
@@ -67,7 +67,7 @@ func (q *transferRepository) GetTransfer(ctx context.Context, id int64) (domains
     var i domains.Transfer
     err := row.Scan(
         &i.ID,
-        &i.Type,
+        &i.TransferType,
         &i.FromWalletID,
         &i.ToWalletID,
         &i.Amount,
@@ -77,7 +77,7 @@ func (q *transferRepository) GetTransfer(ctx context.Context, id int64) (domains
 }
 
 const listTransfers = `-- name: ListTransfers :many
-SELECT id, type, from_wallet_id, to_wallet_id, amount, created_at
+SELECT id, transfer_type, from_wallet_id, to_wallet_id, amount, created_at
 FROM transfers
 WHERE from_wallet_id = $1
 OR to_wallet_id = $2
@@ -108,7 +108,7 @@ func (q *transferRepository) ListTransfers(ctx context.Context, arg ListTransfer
         var i domains.Transfer
         if err := rows.Scan(
             &i.ID,
-            &i.Type,
+            &i.TransferType,
             &i.FromWalletID,
             &i.ToWalletID,
             &i.Amount,

@@ -18,7 +18,7 @@ const (
 
 type Transfer struct {
     ID           int64         `json:"id"`
-    Type         TransferType  `json:"type"`
+    TransferType         TransferType  `json:"type"`
     FromWalletID sql.NullInt64 `json:"from_wallet_id"`
     ToWalletID   sql.NullInt64 `json:"to_wallet_id"`
     Amount       int64         `json:"amount"`
