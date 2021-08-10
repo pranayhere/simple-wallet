@@ -2,14 +2,14 @@ package store_test
 
 import (
     "context"
-    "github.com/pranayhere/simple-wallet/domains"
+    "github.com/pranayhere/simple-wallet/domain"
     "github.com/pranayhere/simple-wallet/store"
     "github.com/pranayhere/simple-wallet/util"
     "github.com/stretchr/testify/require"
     "testing"
 )
 
-func createRandomCurrency(t *testing.T, code string) domains.Currency {
+func createRandomCurrency(t *testing.T, code string) domain.Currency {
     currencyRepo := store.NewCurrencyRepo(testDb)
     args := store.CreateCurrencyParams{
         Code:     code,

@@ -3,13 +3,13 @@ package store
 import (
     "context"
     "database/sql"
-    "github.com/pranayhere/simple-wallet/domains"
+    "github.com/pranayhere/simple-wallet/domain"
 )
 
 type TransferRepo interface {
-    CreateTransfer(ctx context.Context, arg CreateTransferParams) (domains.Transfer, error)
-    GetTransfer(ctx context.Context, id int64) (domains.Transfer, error)
-    ListTransfers(ctx context.Context, arg ListTransfersParams) ([]domains.Transfer, error)
+    CreateTransfer(ctx context.Context, arg CreateTransferParams) (domain.Transfer, error)
+    GetTransfer(ctx context.Context, id int64) (domain.Transfer, error)
+    ListTransfers(ctx context.Context, arg ListTransfersParams) ([]domain.Transfer, error)
 }
 
 type transferRepository struct {
@@ -31,20 +31,20 @@ VALUES ($1, $2, $3, $4) RETURNING id, transfer_type, from_wallet_id, to_wallet_i
 `
 
 type CreateTransferParams struct {
-    TransferType domains.TransferType `json:"transfer_type"`
-    FromWalletID int64        `json:"from_wallet_id"`
-    ToWalletID   int64        `json:"to_wallet_id"`
+    TransferType domain.TransferType `json:"transfer_type"`
+    FromWalletID int64               `json:"from_wallet_id"`
+    ToWalletID   int64                `json:"to_wallet_id"`
     Amount       int64                `json:"amount"`
 }
 
-func (q *transferRepository) CreateTransfer(ctx context.Context, arg CreateTransferParams) (domains.Transfer, error) {
+func (q *transferRepository) CreateTransfer(ctx context.Context, arg CreateTransferParams) (domain.Transfer, error) {
     row := q.db.QueryRowContext(ctx, createTransfer,
         arg.TransferType,
         arg.FromWalletID,
         arg.ToWalletID,
         arg.Amount,
     )
-    var i domains.Transfer
+    var i domain.Transfer
     err := row.Scan(
         &i.ID,
         &i.TransferType,
@@ -62,9 +62,9 @@ FROM transfers
 WHERE id = $1 LIMIT 1
 `
 
-func (q *transferRepository) GetTransfer(ctx context.Context, id int64) (domains.Transfer, error) {
+func (q *transferRepository) GetTransfer(ctx context.Context, id int64) (domain.Transfer, error) {
     row := q.db.QueryRowContext(ctx, getTransfer, id)
-    var i domains.Transfer
+    var i domain.Transfer
     err := row.Scan(
         &i.ID,
         &i.TransferType,
@@ -88,11 +88,11 @@ OFFSET $4
 type ListTransfersParams struct {
     FromWalletID int64 `json:"from_wallet_id"`
     ToWalletID   int64 `json:"to_wallet_id"`
-    Limit        int32         `json:"limit"`
-    Offset       int32         `json:"offset"`
+    Limit        int32 `json:"limit"`
+    Offset       int32 `json:"offset"`
 }
 
-func (q *transferRepository) ListTransfers(ctx context.Context, arg ListTransfersParams) ([]domains.Transfer, error) {
+func (q *transferRepository) ListTransfers(ctx context.Context, arg ListTransfersParams) ([]domain.Transfer, error) {
     rows, err := q.db.QueryContext(ctx, listTransfers,
         arg.FromWalletID,
         arg.ToWalletID,
@@ -103,9 +103,9 @@ func (q *transferRepository) ListTransfers(ctx context.Context, arg ListTransfer
         return nil, err
     }
     defer rows.Close()
-    items := []domains.Transfer{}
+    items := []domain.Transfer{}
     for rows.Next() {
-        var i domains.Transfer
+        var i domain.Transfer
         if err := rows.Scan(
             &i.ID,
             &i.TransferType,

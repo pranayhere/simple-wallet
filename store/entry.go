@@ -3,13 +3,13 @@ package store
 import (
     "context"
     "database/sql"
-    "github.com/pranayhere/simple-wallet/domains"
+    "github.com/pranayhere/simple-wallet/domain"
 )
 
 type EntryRepo interface {
-    CreateEntry(ctx context.Context, arg CreateEntryParams) (domains.Entry, error)
-    GetEntry(ctx context.Context, id int64) (domains.Entry, error)
-    ListEntries(ctx context.Context, arg ListEntriesParams) ([]domains.Entry, error)
+    CreateEntry(ctx context.Context, arg CreateEntryParams) (domain.Entry, error)
+    GetEntry(ctx context.Context, id int64) (domain.Entry, error)
+    ListEntries(ctx context.Context, arg ListEntriesParams) ([]domain.Entry, error)
 }
 
 type entryRepository struct {
@@ -35,13 +35,13 @@ type CreateEntryParams struct {
     TransferID int64 `json:"transfer_id"`
 }
 
-func (q *entryRepository) CreateEntry(ctx context.Context, arg CreateEntryParams) (domains.Entry, error) {
+func (q *entryRepository) CreateEntry(ctx context.Context, arg CreateEntryParams) (domain.Entry, error) {
     row := q.db.QueryRowContext(ctx, createEntry,
         arg.WalletID,
         arg.Amount,
         arg.TransferID,
     )
-    var i domains.Entry
+    var i domain.Entry
     err := row.Scan(
         &i.ID,
         &i.WalletID,
@@ -59,15 +59,15 @@ FROM entries
 WHERE transfer_id = $1
 `
 
-func (q *entryRepository) GetEntriesByTransferID(ctx context.Context, transferID int64) ([]domains.Entry, error) {
+func (q *entryRepository) GetEntriesByTransferID(ctx context.Context, transferID int64) ([]domain.Entry, error) {
     rows, err := q.db.QueryContext(ctx, getEntriesByTransferID, transferID)
     if err != nil {
         return nil, err
     }
     defer rows.Close()
-    items := []domains.Entry{}
+    items := []domain.Entry{}
     for rows.Next() {
-        var i domains.Entry
+        var i domain.Entry
         if err := rows.Scan(
             &i.ID,
             &i.WalletID,
@@ -94,9 +94,9 @@ FROM entries
 WHERE id = $1 LIMIT 1
 `
 
-func (q *entryRepository) GetEntry(ctx context.Context, id int64) (domains.Entry, error) {
+func (q *entryRepository) GetEntry(ctx context.Context, id int64) (domain.Entry, error) {
     row := q.db.QueryRowContext(ctx, getEntry, id)
-    var i domains.Entry
+    var i domain.Entry
     err := row.Scan(
         &i.ID,
         &i.WalletID,
@@ -121,15 +121,15 @@ type ListEntriesParams struct {
     Offset   int32 `json:"offset"`
 }
 
-func (q *entryRepository) ListEntries(ctx context.Context, arg ListEntriesParams) ([]domains.Entry, error) {
+func (q *entryRepository) ListEntries(ctx context.Context, arg ListEntriesParams) ([]domain.Entry, error) {
     rows, err := q.db.QueryContext(ctx, listEntries, arg.WalletID, arg.Limit, arg.Offset)
     if err != nil {
         return nil, err
     }
     defer rows.Close()
-    items := []domains.Entry{}
+    items := []domain.Entry{}
     for rows.Next() {
-        var i domains.Entry
+        var i domain.Entry
         if err := rows.Scan(
             &i.ID,
             &i.WalletID,

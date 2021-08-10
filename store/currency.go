@@ -3,12 +3,12 @@ package store
 import (
     "context"
     "database/sql"
-    "github.com/pranayhere/simple-wallet/domains"
+    "github.com/pranayhere/simple-wallet/domain"
 )
 
 type CurrencyRepo interface {
-    CreateCurrency(ctx context.Context, arg CreateCurrencyParams) (domains.Currency, error)
-    GetCurrency(ctx context.Context, code string) (domains.Currency, error)
+    CreateCurrency(ctx context.Context, arg CreateCurrencyParams) (domain.Currency, error)
+    GetCurrency(ctx context.Context, code string) (domain.Currency, error)
 }
 
 type currencyRepository struct {
@@ -34,9 +34,9 @@ type CreateCurrencyParams struct {
     Fraction int64  `json:"fraction"`
 }
 
-func (q *currencyRepository) CreateCurrency(ctx context.Context, arg CreateCurrencyParams) (domains.Currency, error) {
+func (q *currencyRepository) CreateCurrency(ctx context.Context, arg CreateCurrencyParams) (domain.Currency, error) {
     row := q.db.QueryRowContext(ctx, createCurrency, arg.Code, arg.Fraction)
-    var i domains.Currency
+    var i domain.Currency
     err := row.Scan(&i.Code, &i.Fraction, &i.CreatedAt)
     return i, err
 }
@@ -46,9 +46,9 @@ SELECT code, fraction, created_at FROM currencies
 where code = $1 LIMIT 1
 `
 
-func (q *currencyRepository) GetCurrency(ctx context.Context, code string) (domains.Currency, error) {
+func (q *currencyRepository) GetCurrency(ctx context.Context, code string) (domain.Currency, error) {
     row := q.db.QueryRowContext(ctx, getCurrency, code)
-    var i domains.Currency
+    var i domain.Currency
     err := row.Scan(&i.Code, &i.Fraction, &i.CreatedAt)
     return i, err
 }

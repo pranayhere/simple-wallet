@@ -4,20 +4,20 @@ import (
     "context"
     "database/sql"
     "fmt"
-    "github.com/pranayhere/simple-wallet/domains"
+    "github.com/pranayhere/simple-wallet/domain"
 )
 
 type WalletRepo interface {
-    AddWalletBalance(ctx context.Context, arg AddWalletBalanceParams) (domains.Wallet, error)
-    CreateWallet(ctx context.Context, arg CreateWalletParams) (domains.Wallet, error)
-    GetWallet(ctx context.Context, id int64) (domains.Wallet, error)
-    GetWalletForUpdate(ctx context.Context, id int64) (domains.Wallet, error)
-    GetWalletByAddress(ctx context.Context, address string) (domains.Wallet, error)
-    GetWalletByAddressForUpdate(ctx context.Context, address string) (domains.Wallet, error)
-    ListWallets(ctx context.Context, arg ListWalletsParams) ([]domains.Wallet, error)
-    UpdateWalletStatus(ctx context.Context, arg UpdateWalletStatusParams) (domains.Wallet, error)
-    GetWalletByBankAccountID(ctx context.Context, bankAccountID int64) (domains.Wallet, error)
-    GetWalletByBankAccountIDForUpdate(ctx context.Context, bankAccountID int64) (domains.Wallet, error)
+    AddWalletBalance(ctx context.Context, arg AddWalletBalanceParams) (domain.Wallet, error)
+    CreateWallet(ctx context.Context, arg CreateWalletParams) (domain.Wallet, error)
+    GetWallet(ctx context.Context, id int64) (domain.Wallet, error)
+    GetWalletForUpdate(ctx context.Context, id int64) (domain.Wallet, error)
+    GetWalletByAddress(ctx context.Context, address string) (domain.Wallet, error)
+    GetWalletByAddressForUpdate(ctx context.Context, address string) (domain.Wallet, error)
+    ListWallets(ctx context.Context, arg ListWalletsParams) ([]domain.Wallet, error)
+    UpdateWalletStatus(ctx context.Context, arg UpdateWalletStatusParams) (domain.Wallet, error)
+    GetWalletByBankAccountID(ctx context.Context, bankAccountID int64) (domain.Wallet, error)
+    GetWalletByBankAccountIDForUpdate(ctx context.Context, bankAccountID int64) (domain.Wallet, error)
     DepositToWallet(ctx context.Context, arg DepositeToWalletParams) (WalletTransferResult, error)
     WithdrawFromWallet(ctx context.Context, arg WithdrawFromWalletParams) (WalletTransferResult, error)
     SendMoney(ctx context.Context, arg SendMoneyParams) (WalletTransferResult, error)
@@ -48,9 +48,9 @@ type AddWalletBalanceParams struct {
     ID     int64 `json:"id"`
 }
 
-func (q *walletRepository) AddWalletBalance(ctx context.Context, arg AddWalletBalanceParams) (domains.Wallet, error) {
+func (q *walletRepository) AddWalletBalance(ctx context.Context, arg AddWalletBalanceParams) (domain.Wallet, error) {
     row := q.db.QueryRowContext(ctx, addWalletBalance, arg.Amount, arg.ID)
-    var i domains.Wallet
+    var i domain.Wallet
     err := row.Scan(
         &i.ID,
         &i.Name,
@@ -79,15 +79,15 @@ VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING id, name, address, status, user_id
 
 type CreateWalletParams struct {
     Name          string               `json:"name"`
-    Address       string               `json:"address"`
-    Status        domains.WalletStatus `json:"status"`
-    UserID        int64                `json:"user_id"`
+    Address string              `json:"address"`
+    Status  domain.WalletStatus `json:"status"`
+    UserID  int64               `json:"user_id"`
     BankAccountID int64                `json:"bank_account_id"`
     Balance       int64                `json:"balance"`
     Currency      string               `json:"currency"`
 }
 
-func (q *walletRepository) CreateWallet(ctx context.Context, arg CreateWalletParams) (domains.Wallet, error) {
+func (q *walletRepository) CreateWallet(ctx context.Context, arg CreateWalletParams) (domain.Wallet, error) {
     row := q.db.QueryRowContext(ctx, createWallet,
         arg.Name,
         arg.Address,
@@ -97,7 +97,7 @@ func (q *walletRepository) CreateWallet(ctx context.Context, arg CreateWalletPar
         arg.Balance,
         arg.Currency,
     )
-    var i domains.Wallet
+    var i domain.Wallet
     err := row.Scan(
         &i.ID,
         &i.Name,
@@ -119,9 +119,9 @@ FROM wallets
 WHERE id = $1 LIMIT 1
 `
 
-func (q *walletRepository) GetWallet(ctx context.Context, id int64) (domains.Wallet, error) {
+func (q *walletRepository) GetWallet(ctx context.Context, id int64) (domain.Wallet, error) {
     row := q.db.QueryRowContext(ctx, getWallet, id)
-    var i domains.Wallet
+    var i domain.Wallet
     err := row.Scan(
         &i.ID,
         &i.Name,
@@ -143,9 +143,9 @@ FROM wallets
 WHERE address = $1 LIMIT 1
 `
 
-func (q *walletRepository) GetWalletByAddress(ctx context.Context, address string) (domains.Wallet, error) {
+func (q *walletRepository) GetWalletByAddress(ctx context.Context, address string) (domain.Wallet, error) {
     row := q.db.QueryRowContext(ctx, getWalletByAddress, address)
-    var i domains.Wallet
+    var i domain.Wallet
     err := row.Scan(
         &i.ID,
         &i.Name,
@@ -169,9 +169,9 @@ FOR NO KEY
 UPDATE
 `
 
-func (q *walletRepository) GetWalletByAddressForUpdate(ctx context.Context, address string) (domains.Wallet, error) {
+func (q *walletRepository) GetWalletByAddressForUpdate(ctx context.Context, address string) (domain.Wallet, error) {
     row := q.db.QueryRowContext(ctx, getWalletByAddressForUpdate, address)
-    var i domains.Wallet
+    var i domain.Wallet
     err := row.Scan(
         &i.ID,
         &i.Name,
@@ -195,9 +195,9 @@ FOR NO KEY
 UPDATE
 `
 
-func (q *walletRepository) GetWalletForUpdate(ctx context.Context, id int64) (domains.Wallet, error) {
+func (q *walletRepository) GetWalletForUpdate(ctx context.Context, id int64) (domain.Wallet, error) {
     row := q.db.QueryRowContext(ctx, getWalletForUpdate, id)
-    var i domains.Wallet
+    var i domain.Wallet
     err := row.Scan(
         &i.ID,
         &i.Name,
@@ -227,15 +227,15 @@ type ListWalletsParams struct {
     Offset int32 `json:"offset"`
 }
 
-func (q *walletRepository) ListWallets(ctx context.Context, arg ListWalletsParams) ([]domains.Wallet, error) {
+func (q *walletRepository) ListWallets(ctx context.Context, arg ListWalletsParams) ([]domain.Wallet, error) {
     rows, err := q.db.QueryContext(ctx, listWallets, arg.UserID, arg.Limit, arg.Offset)
     if err != nil {
         return nil, err
     }
     defer rows.Close()
-    items := []domains.Wallet{}
+    items := []domain.Wallet{}
     for rows.Next() {
-        var i domains.Wallet
+        var i domain.Wallet
         if err := rows.Scan(
             &i.ID,
             &i.Name,
@@ -269,13 +269,13 @@ RETURNING id, name, address, status, user_id, bank_account_id, balance, currency
 `
 
 type UpdateWalletStatusParams struct {
-    Status domains.WalletStatus `json:"status"`
-    ID     int64                `json:"id"`
+    Status domain.WalletStatus `json:"status"`
+    ID     int64               `json:"id"`
 }
 
-func (q *walletRepository) UpdateWalletStatus(ctx context.Context, arg UpdateWalletStatusParams) (domains.Wallet, error) {
+func (q *walletRepository) UpdateWalletStatus(ctx context.Context, arg UpdateWalletStatusParams) (domain.Wallet, error) {
     row := q.db.QueryRowContext(ctx, updateWalletStatus, arg.Status, arg.ID)
-    var i domains.Wallet
+    var i domain.Wallet
     err := row.Scan(
         &i.ID,
         &i.Name,
@@ -297,9 +297,9 @@ FROM wallets
 WHERE bank_account_id = $1 LIMIT 1
 `
 
-func (q *walletRepository) GetWalletByBankAccountID(ctx context.Context, bankAccountID int64) (domains.Wallet, error) {
+func (q *walletRepository) GetWalletByBankAccountID(ctx context.Context, bankAccountID int64) (domain.Wallet, error) {
     row := q.db.QueryRowContext(ctx, getWalletByBankAccountID, bankAccountID)
-    var i domains.Wallet
+    var i domain.Wallet
     err := row.Scan(
         &i.ID,
         &i.Name,
@@ -323,9 +323,9 @@ FOR NO KEY
 UPDATE
 `
 
-func (q *walletRepository) GetWalletByBankAccountIDForUpdate(ctx context.Context, bankAccountID int64) (domains.Wallet, error) {
+func (q *walletRepository) GetWalletByBankAccountIDForUpdate(ctx context.Context, bankAccountID int64) (domain.Wallet, error) {
     row := q.db.QueryRowContext(ctx, getWalletByBankAccountIDForUpdate, bankAccountID)
-    var i domains.Wallet
+    var i domain.Wallet
     err := row.Scan(
         &i.ID,
         &i.Name,
@@ -347,10 +347,10 @@ type DepositeToWalletParams struct {
 }
 
 type WalletTransferResult struct {
-    Wallet    domains.Wallet   `json:"wallet"`
-    FromEntry domains.Entry    `json:"from_entry"`
-    ToEntry   domains.Entry    `json:"to_entry"`
-    Transfer  domains.Transfer `json:"transfer"`
+    Wallet    domain.Wallet   `json:"wallet"`
+    FromEntry domain.Entry    `json:"from_entry"`
+    ToEntry   domain.Entry    `json:"to_entry"`
+    Transfer  domain.Transfer `json:"transfer"`
 }
 
 // DepositToWallet transfer money from linked bank account to the wallet
@@ -364,7 +364,7 @@ func (q *walletRepository) DepositToWallet(ctx context.Context, arg DepositeToWa
             return err
         }
 
-        if wallet.Status != domains.WalletStatusACTIVE {
+        if wallet.Status != domain.WalletStatusACTIVE {
             return fmt.Errorf("inactive wallet")
         }
 
@@ -374,7 +374,7 @@ func (q *walletRepository) DepositToWallet(ctx context.Context, arg DepositeToWa
         })
 
         res.Transfer, err = q.transferRepo.CreateTransfer(ctx, CreateTransferParams{
-            TransferType: domains.TransferTypeDEPOSITTOWALLET,
+            TransferType: domain.TransferTypeDEPOSITTOWALLET,
             Amount:       arg.Amount,
             FromWalletID: wallet.ID,
             ToWalletID:   wallet.ID,
@@ -417,7 +417,7 @@ func (q *walletRepository) WithdrawFromWallet(ctx context.Context, arg WithdrawF
             return err
         }
 
-        if wallet.Status != domains.WalletStatusACTIVE {
+        if wallet.Status != domain.WalletStatusACTIVE {
             return fmt.Errorf("inactive wallet")
         }
 
@@ -431,7 +431,7 @@ func (q *walletRepository) WithdrawFromWallet(ctx context.Context, arg WithdrawF
         })
 
         res.Transfer, err = q.transferRepo.CreateTransfer(ctx, CreateTransferParams{
-            TransferType: domains.TransferTypeWITHDRAWFROMWALLET,
+            TransferType: domain.TransferTypeWITHDRAWFROMWALLET,
             Amount:       arg.Amount,
             FromWalletID: wallet.ID,
             ToWalletID:   wallet.ID,
@@ -474,7 +474,7 @@ func (q *walletRepository) SendMoney(ctx context.Context, arg SendMoneyParams) (
             return err
         }
 
-        if fromWallet.Status != domains.WalletStatusACTIVE {
+        if fromWallet.Status != domain.WalletStatusACTIVE {
             return fmt.Errorf("inactive wallet")
         }
 
@@ -487,12 +487,12 @@ func (q *walletRepository) SendMoney(ctx context.Context, arg SendMoneyParams) (
             return err
         }
 
-        if toWallet.Status != domains.WalletStatusACTIVE {
+        if toWallet.Status != domain.WalletStatusACTIVE {
             return fmt.Errorf("inactive wallet")
         }
 
         res.Transfer, err = q.transferRepo.CreateTransfer(ctx, CreateTransferParams{
-            TransferType: domains.TransferTypeSENDMONEY,
+            TransferType: domain.TransferTypeSENDMONEY,
             FromWalletID: fromWallet.ID,
             ToWalletID:   toWallet.ID,
             Amount:       arg.Amount,
@@ -535,7 +535,7 @@ func (q *walletRepository) SendMoney(ctx context.Context, arg SendMoneyParams) (
     return res, err
 }
 
-func addMoney(ctx context.Context, q *walletRepository, walletID1 int64, amount1 int64, walletID2 int64, amount2 int64, ) (wallet1 domains.Wallet, wallet2 domains.Wallet, err error) {
+func addMoney(ctx context.Context, q *walletRepository, walletID1 int64, amount1 int64, walletID2 int64, amount2 int64, ) (wallet1 domain.Wallet, wallet2 domain.Wallet, err error) {
     wallet1, err = q.AddWalletBalance(ctx, AddWalletBalanceParams{
         ID:     walletID1,
         Amount: amount1,

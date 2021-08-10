@@ -3,14 +3,14 @@ package store
 import (
     "context"
     "database/sql"
-    "github.com/pranayhere/simple-wallet/domains"
+    "github.com/pranayhere/simple-wallet/domain"
 )
 
 type UserRepo interface {
-    CreateUser(ctx context.Context, arg CreateUserParams) (domains.User, error)
-    GetUser(ctx context.Context, id int64) (domains.User, error)
-    GetUserByUsername(ctx context.Context, username string) (domains.User, error)
-    UpdateUserStatus(ctx context.Context, arg UpdateUserStatusParams) (domains.User, error)
+    CreateUser(ctx context.Context, arg CreateUserParams) (domain.User, error)
+    GetUser(ctx context.Context, id int64) (domain.User, error)
+    GetUserByUsername(ctx context.Context, username string) (domain.User, error)
+    UpdateUserStatus(ctx context.Context, arg UpdateUserStatusParams) (domain.User, error)
 }
 
 type userRepository struct {
@@ -31,19 +31,19 @@ INSERT INTO users (
     full_name,
     email
 ) values (
-$1, $2, $3, $4, $5
+$1, $2, userStat, $4, $5
 ) RETURNING id, username, hashed_password, status, full_name, email, password_changed_at, created_at, updated_at
 `
 
 type CreateUserParams struct {
     Username       string             `json:"username"`
-    HashedPassword string             `json:"hashed_password"`
-    Status         domains.UserStatus `json:"status"`
-    FullName       string             `json:"full_name"`
+    HashedPassword string            `json:"hashed_password"`
+    Status         domain.UserStatus `json:"status"`
+    FullName       string            `json:"full_name"`
     Email          string             `json:"email"`
 }
 
-func (q *userRepository) CreateUser(ctx context.Context, arg CreateUserParams) (domains.User, error) {
+func (q *userRepository) CreateUser(ctx context.Context, arg CreateUserParams) (domain.User, error) {
     row := q.db.QueryRowContext(ctx, createUser,
         arg.Username,
         arg.HashedPassword,
@@ -51,7 +51,7 @@ func (q *userRepository) CreateUser(ctx context.Context, arg CreateUserParams) (
         arg.FullName,
         arg.Email,
     )
-    var i domains.User
+    var i domain.User
     err := row.Scan(
         &i.ID,
         &i.Username,
@@ -71,9 +71,9 @@ SELECT id, username, hashed_password, status, full_name, email, password_changed
 where username = $1 LIMIT 1
 `
 
-func (q *userRepository) GetUserByUsername(ctx context.Context, username string) (domains.User, error) {
+func (q *userRepository) GetUserByUsername(ctx context.Context, username string) (domain.User, error) {
     row := q.db.QueryRowContext(ctx, getUserByUsername, username)
-    var i domains.User
+    var i domain.User
     err := row.Scan(
         &i.ID,
         &i.Username,
@@ -93,9 +93,9 @@ SELECT id, username, hashed_password, status, full_name, email, password_changed
 where id = $1 LIMIT 1
 `
 
-func (q *userRepository) GetUser(ctx context.Context, id int64) (domains.User, error) {
+func (q *userRepository) GetUser(ctx context.Context, id int64) (domain.User, error) {
     row := q.db.QueryRowContext(ctx, getUser, id)
-    var i domains.User
+    var i domain.User
     err := row.Scan(
         &i.ID,
         &i.Username,
@@ -118,13 +118,13 @@ RETURNING id, username, hashed_password, status, full_name, email, password_chan
 `
 
 type UpdateUserStatusParams struct {
-    Status domains.UserStatus `json:"status"`
-    ID     int64              `json:"id"`
+    Status domain.UserStatus `json:"status"`
+    ID     int64             `json:"id"`
 }
 
-func (q *userRepository) UpdateUserStatus(ctx context.Context, arg UpdateUserStatusParams) (domains.User, error) {
+func (q *userRepository) UpdateUserStatus(ctx context.Context, arg UpdateUserStatusParams) (domain.User, error) {
     row := q.db.QueryRowContext(ctx, updateUserStatus, arg.Status, arg.ID)
-    var i domains.User
+    var i domain.User
     err := row.Scan(
         &i.ID,
         &i.Username,

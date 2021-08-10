@@ -3,7 +3,7 @@ package store_test
 import (
     "context"
     "fmt"
-    "github.com/pranayhere/simple-wallet/domains"
+    "github.com/pranayhere/simple-wallet/domain"
     "github.com/pranayhere/simple-wallet/store"
     "github.com/pranayhere/simple-wallet/util"
     "github.com/stretchr/testify/require"
@@ -23,7 +23,7 @@ func InitWalletRepo(t *testing.T) store.WalletRepo {
     return walletRepo
 }
 
-func createRandomWallet(t *testing.T) domains.Wallet {
+func createRandomWallet(t *testing.T) domain.Wallet {
     walletRepo := InitWalletRepo(t)
 
     user := createRandomUser(t)
@@ -34,7 +34,7 @@ func createRandomWallet(t *testing.T) domains.Wallet {
 
     args := store.CreateWalletParams{
         Name:          util.RandomString(6),
-        Status:        domains.WalletStatusINACTIVE,
+        Status:        domain.WalletStatusINACTIVE,
         UserID:        user.ID,
         BankAccountID: bankAccount.ID,
         Balance:       0,
@@ -107,7 +107,7 @@ func TestGetWalletByAddress(t *testing.T) {
 
 func TestListWallet(t *testing.T) {
     walletRepo := InitWalletRepo(t)
-    var lastWallet domains.Wallet
+    var lastWallet domain.Wallet
     for i := 0; i < 5; i++ {
         lastWallet = createRandomWallet(t)
     }

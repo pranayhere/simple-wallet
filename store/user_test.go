@@ -2,7 +2,7 @@ package store_test
 
 import (
     "context"
-    "github.com/pranayhere/simple-wallet/domains"
+    "github.com/pranayhere/simple-wallet/domain"
     "github.com/pranayhere/simple-wallet/store"
     "github.com/pranayhere/simple-wallet/util"
     "github.com/stretchr/testify/require"
@@ -10,7 +10,7 @@ import (
     "time"
 )
 
-func createRandomUser(t *testing.T) domains.User {
+func createRandomUser(t *testing.T) domain.User {
     userRepo := store.NewUserRepo(testDb)
 
     hashedPassword, err := util.HashPassword(util.RandomString(6))
@@ -18,7 +18,7 @@ func createRandomUser(t *testing.T) domains.User {
 
     args := store.CreateUserParams{
         Username:       util.RandomUser(),
-        Status:         domains.UserStatusACTIVE,
+        Status:         domain.UserStatusACTIVE,
         FullName:       util.RandomUser(),
         Email:          util.RandomEmail(),
         HashedPassword: hashedPassword,
@@ -66,7 +66,7 @@ func TestUpdateUserStatus(t *testing.T) {
 
     args := store.UpdateUserStatusParams{
         ID:     user1.ID,
-        Status: domains.UserStatusBLOCKED,
+        Status: domain.UserStatusBLOCKED,
     }
     user2, err := userRepo.UpdateUserStatus(context.Background(), args)
     require.NoError(t, err)
@@ -74,7 +74,7 @@ func TestUpdateUserStatus(t *testing.T) {
 
     require.Equal(t, user1.Username, user2.Username)
     require.Equal(t, user1.Email, user2.Email)
-    require.Equal(t, domains.UserStatusBLOCKED, user2.Status)
+    require.Equal(t, domain.UserStatusBLOCKED, user2.Status)
     require.Equal(t, user1.HashedPassword, user2.HashedPassword)
     require.Equal(t, user1.FullName, user2.FullName)
 

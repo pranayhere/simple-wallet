@@ -4,15 +4,15 @@ import (
     "context"
     "database/sql"
     "fmt"
-    "github.com/pranayhere/simple-wallet/domains"
+    "github.com/pranayhere/simple-wallet/domain"
     "strings"
 )
 
 type BankAccountRepo interface {
-    CreateBankAccount(ctx context.Context, arg CreateBankAccountParams) (domains.BankAccount, error)
-    GetBankAccount(ctx context.Context, id int64) (domains.BankAccount, error)
-    ListBankAccounts(ctx context.Context, arg ListBankAccountsParams) ([]domains.BankAccount, error)
-    UpdateBankAccountStatus(ctx context.Context, arg UpdateBankAccountStatusParams) (domains.BankAccount, error)
+    CreateBankAccount(ctx context.Context, arg CreateBankAccountParams) (domain.BankAccount, error)
+    GetBankAccount(ctx context.Context, id int64) (domain.BankAccount, error)
+    ListBankAccounts(ctx context.Context, arg ListBankAccountsParams) ([]domain.BankAccount, error)
+    UpdateBankAccountStatus(ctx context.Context, arg UpdateBankAccountStatusParams) (domain.BankAccount, error)
     CreateBankAccountWithWallet(ctx context.Context, arg CreateBankAccountWithWalletParams) (BankAccountWithWalletResult, error)
     BankAccountVerificationSuccess(ctx context.Context, arg BankAccountVerificationParams) (BankAccountVerificationResult, error)
     BankAccountVerificationFailed(ctx context.Context, arg BankAccountVerificationParams) (BankAccountVerificationResult, error)
@@ -47,11 +47,11 @@ type CreateBankAccountParams struct {
     Ifsc      string                    `json:"ifsc"`
     BankName  string                    `json:"bank_name"`
     Currency  string                    `json:"currency"`
-    UserID    int64                     `json:"user_id"`
-    Status    domains.BankAccountStatus `json:"status"`
+    UserID int64                    `json:"user_id"`
+    Status domain.BankAccountStatus `json:"status"`
 }
 
-func (q *bankAccountRepository) CreateBankAccount(ctx context.Context, arg CreateBankAccountParams) (domains.BankAccount, error) {
+func (q *bankAccountRepository) CreateBankAccount(ctx context.Context, arg CreateBankAccountParams) (domain.BankAccount, error) {
     row := q.db.QueryRowContext(ctx, createBankAccount,
         arg.AccountNo,
         arg.Ifsc,
@@ -60,7 +60,7 @@ func (q *bankAccountRepository) CreateBankAccount(ctx context.Context, arg Creat
         arg.UserID,
         arg.Status,
     )
-    var i domains.BankAccount
+    var i domain.BankAccount
     err := row.Scan(
         &i.ID,
         &i.AccountNo,
@@ -81,9 +81,9 @@ from bank_accounts
 where id = $1 LIMIT 1
 `
 
-func (q *bankAccountRepository) GetBankAccount(ctx context.Context, id int64) (domains.BankAccount, error) {
+func (q *bankAccountRepository) GetBankAccount(ctx context.Context, id int64) (domain.BankAccount, error) {
     row := q.db.QueryRowContext(ctx, getBankAccount, id)
-    var i domains.BankAccount
+    var i domain.BankAccount
     err := row.Scan(
         &i.ID,
         &i.AccountNo,
@@ -112,15 +112,15 @@ type ListBankAccountsParams struct {
     Offset int32 `json:"offset"`
 }
 
-func (q *bankAccountRepository) ListBankAccounts(ctx context.Context, arg ListBankAccountsParams) ([]domains.BankAccount, error) {
+func (q *bankAccountRepository) ListBankAccounts(ctx context.Context, arg ListBankAccountsParams) ([]domain.BankAccount, error) {
     rows, err := q.db.QueryContext(ctx, listBankAccounts, arg.UserID, arg.Limit, arg.Offset)
     if err != nil {
         return nil, err
     }
     defer rows.Close()
-    items := []domains.BankAccount{}
+    items := []domain.BankAccount{}
     for rows.Next() {
-        var i domains.BankAccount
+        var i domain.BankAccount
         if err := rows.Scan(
             &i.ID,
             &i.AccountNo,
@@ -153,13 +153,13 @@ RETURNING id, account_no, ifsc, bank_name, status, user_id, currency, created_at
 `
 
 type UpdateBankAccountStatusParams struct {
-    Status domains.BankAccountStatus `json:"status"`
-    ID     int64                     `json:"id"`
+    Status domain.BankAccountStatus `json:"status"`
+    ID     int64                    `json:"id"`
 }
 
-func (q *bankAccountRepository) UpdateBankAccountStatus(ctx context.Context, arg UpdateBankAccountStatusParams) (domains.BankAccount, error) {
+func (q *bankAccountRepository) UpdateBankAccountStatus(ctx context.Context, arg UpdateBankAccountStatusParams) (domain.BankAccount, error) {
     row := q.db.QueryRowContext(ctx, updateBankAccountStatus, arg.Status, arg.ID)
-    var i domains.BankAccount
+    var i domain.BankAccount
     err := row.Scan(
         &i.ID,
         &i.AccountNo,
@@ -183,8 +183,8 @@ type CreateBankAccountWithWalletParams struct {
 }
 
 type BankAccountWithWalletResult struct {
-    BankAccount domains.BankAccount `json:"bank_account"`
-    Wallet      domains.Wallet      `json:"wallet"`
+    BankAccount domain.BankAccount `json:"bank_account"`
+    Wallet      domain.Wallet      `json:"wallet"`
 }
 
 func (q *bankAccountRepository) CreateBankAccountWithWallet(ctx context.Context, arg CreateBankAccountWithWalletParams) (BankAccountWithWalletResult, error) {
@@ -205,7 +205,7 @@ func (q *bankAccountRepository) CreateBankAccountWithWallet(ctx context.Context,
             Ifsc:      arg.Ifsc,
             BankName:  arg.BankName,
             Currency:  arg.Currency,
-            Status:    domains.BankAccountStatusINVERIFICATION,
+            Status:    domain.BankAccountStatusINVERIFICATION,
         })
 
         if err != nil {
@@ -221,7 +221,7 @@ func (q *bankAccountRepository) CreateBankAccountWithWallet(ctx context.Context,
             Balance:       0,
             Address:       walletAddress,
             BankAccountID: result.BankAccount.ID,
-            Status:        domains.WalletStatusINACTIVE,
+            Status:        domain.WalletStatusINACTIVE,
         })
 
         if err != nil {
@@ -239,8 +239,8 @@ type BankAccountVerificationParams struct {
 }
 
 type BankAccountVerificationResult struct {
-    BankAccount domains.BankAccount `json:"bank_account"`
-    Wallet      domains.Wallet      `json:"wallet"`
+    BankAccount domain.BankAccount `json:"bank_account"`
+    Wallet      domain.Wallet      `json:"wallet"`
 }
 
 func (q *bankAccountRepository) BankAccountVerificationSuccess(ctx context.Context, arg BankAccountVerificationParams) (BankAccountVerificationResult, error) {
@@ -251,7 +251,7 @@ func (q *bankAccountRepository) BankAccountVerificationSuccess(ctx context.Conte
 
         result.BankAccount, err = q.UpdateBankAccountStatus(ctx, UpdateBankAccountStatusParams{
             ID:     arg.BankAccountID,
-            Status: domains.BankAccountStatusVERIFIED,
+            Status: domain.BankAccountStatusVERIFIED,
         })
         if err != nil {
             return err
@@ -264,7 +264,7 @@ func (q *bankAccountRepository) BankAccountVerificationSuccess(ctx context.Conte
 
         result.Wallet, err = q.walletRepo.UpdateWalletStatus(ctx, UpdateWalletStatusParams{
             ID:     wallet.ID,
-            Status: domains.WalletStatusACTIVE,
+            Status: domain.WalletStatusACTIVE,
         })
         if err != nil {
             return err
@@ -283,7 +283,7 @@ func (q *bankAccountRepository) BankAccountVerificationFailed(ctx context.Contex
 
     result.BankAccount, err = q.UpdateBankAccountStatus(ctx, UpdateBankAccountStatusParams{
         ID:     arg.BankAccountID,
-        Status: domains.BankAccountStatusVERIFICATIONFAILED,
+        Status: domain.BankAccountStatusVERIFICATIONFAILED,
     })
     if err != nil {
         return result, err

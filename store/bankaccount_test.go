@@ -2,7 +2,7 @@ package store_test
 
 import (
     "context"
-    "github.com/pranayhere/simple-wallet/domains"
+    "github.com/pranayhere/simple-wallet/domain"
     "github.com/pranayhere/simple-wallet/store"
     "github.com/pranayhere/simple-wallet/util"
     "github.com/stretchr/testify/require"
@@ -25,7 +25,7 @@ func InitBankAccountRepo(t *testing.T) store.BankAccountRepo {
     return bankAcctRepo
 }
 
-func createRandomBankAccount(t *testing.T) domains.BankAccount {
+func createRandomBankAccount(t *testing.T) domain.BankAccount {
     bankAcctRepo := InitBankAccountRepo(t)
 
     user := createRandomUser(t)
@@ -36,7 +36,7 @@ func createRandomBankAccount(t *testing.T) domains.BankAccount {
         Ifsc:      util.RandomString(7),
         BankName:  util.RandomString(5),
         UserID:    user.ID,
-        Status:    domains.BankAccountStatusINVERIFICATION,
+        Status:    domain.BankAccountStatusINVERIFICATION,
         Currency:  currency.Code,
     }
 
@@ -96,7 +96,7 @@ func TestUpdateBankAccountStatus(t *testing.T) {
 
     args := store.UpdateBankAccountStatusParams{
         ID:     bankAcct1.ID,
-        Status: domains.BankAccountStatusVERIFIED,
+        Status: domain.BankAccountStatusVERIFIED,
     }
 
     bankAcct2, err := bankAcctRepo.UpdateBankAccountStatus(context.Background(), args)
@@ -107,7 +107,7 @@ func TestUpdateBankAccountStatus(t *testing.T) {
     require.Equal(t, bankAcct1.Ifsc, bankAcct2.Ifsc)
     require.Equal(t, bankAcct1.UserID, bankAcct2.UserID)
     require.Equal(t, bankAcct1.BankName, bankAcct2.BankName)
-    require.Equal(t, domains.BankAccountStatusVERIFIED, bankAcct2.Status)
+    require.Equal(t, domain.BankAccountStatusVERIFIED, bankAcct2.Status)
     require.Equal(t, bankAcct1.Currency, bankAcct2.Currency)
     require.Equal(t, bankAcct1.ID, bankAcct2.ID)
 }
@@ -115,7 +115,7 @@ func TestUpdateBankAccountStatus(t *testing.T) {
 func TestListBankAccounts(t *testing.T) {
     bankAcctRepo := InitBankAccountRepo(t)
 
-    var lastBankAccount domains.BankAccount
+    var lastBankAccount domain.BankAccount
     for i := 0; i < 5; i++ {
         lastBankAccount = createRandomBankAccount(t)
     }
@@ -158,13 +158,13 @@ func TestCreateBankAccountWithWallet(t *testing.T) {
 
     require.NotEmpty(t, bankAcct)
     require.NotZero(t, bankAcct.ID)
-    require.Equal(t, domains.BankAccountStatusINVERIFICATION, bankAcct.Status)
+    require.Equal(t, domain.BankAccountStatusINVERIFICATION, bankAcct.Status)
 
     require.NotEmpty(t, wallet)
     require.NotZero(t, wallet.ID)
     require.Equal(t, bankAcct.ID, wallet.BankAccountID)
     require.Equal(t, wallet.Balance, int64(0))
-    require.Equal(t, domains.WalletStatusINACTIVE, wallet.Status)
+    require.Equal(t, domain.WalletStatusINACTIVE, wallet.Status)
 }
 
 func TestBankAccountVerificationSuccess(t *testing.T) {
@@ -188,8 +188,8 @@ func TestBankAccountVerificationSuccess(t *testing.T) {
 
     require.NotEmpty(t, bankAcct)
     require.NotEmpty(t, wallet)
-    require.Equal(t, domains.BankAccountStatusINVERIFICATION, bankAcct.Status)
-    require.Equal(t, domains.WalletStatusINACTIVE, wallet.Status)
+    require.Equal(t, domain.BankAccountStatusINVERIFICATION, bankAcct.Status)
+    require.Equal(t, domain.WalletStatusINACTIVE, wallet.Status)
 
     verificationRes, err := bankAcctRepo.BankAccountVerificationSuccess(context.Background(), store.BankAccountVerificationParams{
         BankAccountID: res.BankAccount.ID,
@@ -202,8 +202,8 @@ func TestBankAccountVerificationSuccess(t *testing.T) {
     verifiedWallet := verificationRes.Wallet
     require.NotEmpty(t, verifiedBankAccount)
     require.NotEmpty(t, verifiedWallet)
-    require.Equal(t, domains.BankAccountStatusVERIFIED, verifiedBankAccount.Status)
-    require.Equal(t, domains.WalletStatusACTIVE, verifiedWallet.Status)
+    require.Equal(t, domain.BankAccountStatusVERIFIED, verifiedBankAccount.Status)
+    require.Equal(t, domain.WalletStatusACTIVE, verifiedWallet.Status)
 }
 
 func TestAccountVerificationFailed(t *testing.T) {
@@ -227,8 +227,8 @@ func TestAccountVerificationFailed(t *testing.T) {
 
     require.NotEmpty(t, bankAcct)
     require.NotEmpty(t, wallet)
-    require.Equal(t, domains.BankAccountStatusINVERIFICATION, bankAcct.Status)
-    require.Equal(t, domains.WalletStatusINACTIVE, wallet.Status)
+    require.Equal(t, domain.BankAccountStatusINVERIFICATION, bankAcct.Status)
+    require.Equal(t, domain.WalletStatusINACTIVE, wallet.Status)
 
     verificationRes, err := bankAcctRepo.BankAccountVerificationFailed(context.Background(), store.BankAccountVerificationParams{
         BankAccountID: res.BankAccount.ID,
@@ -240,5 +240,5 @@ func TestAccountVerificationFailed(t *testing.T) {
     verifiedBankAccount := verificationRes.BankAccount
 
     require.NotEmpty(t, verifiedBankAccount)
-    require.Equal(t, domains.BankAccountStatusVERIFICATIONFAILED, verifiedBankAccount.Status)
+    require.Equal(t, domain.BankAccountStatusVERIFICATIONFAILED, verifiedBankAccount.Status)
 }

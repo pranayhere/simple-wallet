@@ -2,14 +2,14 @@ package store_test
 
 import (
     "context"
-    "github.com/pranayhere/simple-wallet/domains"
+    "github.com/pranayhere/simple-wallet/domain"
     "github.com/pranayhere/simple-wallet/store"
     "github.com/stretchr/testify/require"
     "testing"
     "time"
 )
 
-func createRandomEntry(t *testing.T, wallet1 domains.Wallet, wallet2 domains.Wallet) domains.Entry {
+func createRandomEntry(t *testing.T, wallet1 domain.Wallet, wallet2 domain.Wallet) domain.Entry {
     entryRepo := store.NewEntryRepo(testDb)
     transfer := createRandomTransfer(t, wallet1, wallet2)
 

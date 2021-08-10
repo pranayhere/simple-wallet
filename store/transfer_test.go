@@ -2,20 +2,20 @@ package store_test
 
 import (
     "context"
-    "github.com/pranayhere/simple-wallet/domains"
+    "github.com/pranayhere/simple-wallet/domain"
     "github.com/pranayhere/simple-wallet/store"
     "github.com/pranayhere/simple-wallet/util"
     "github.com/stretchr/testify/require"
     "testing"
 )
 
-func createRandomTransfer(t *testing.T, wallet1, wallet2 domains.Wallet) domains.Transfer {
+func createRandomTransfer(t *testing.T, wallet1, wallet2 domain.Wallet) domain.Transfer {
     transferRepo := store.NewTransferRepo(testDb)
     arg := store.CreateTransferParams{
         FromWalletID: wallet1.ID,
         ToWalletID:   wallet2.ID,
         Amount:       util.RandomMoney(),
-        TransferType: domains.TransferTypeSENDMONEY,
+        TransferType: domain.TransferTypeSENDMONEY,
     }
 
     transfer, err := transferRepo.CreateTransfer(context.Background(), arg)
