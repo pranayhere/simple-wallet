@@ -71,18 +71,18 @@ CREATE TABLE "currencies"
 CREATE TABLE "entries"
 (
     "id"          bigserial PRIMARY KEY,
-    "wallet_id"   bigint     NOT NULL,
-    "amount"      bigint     NOT NULL,
-    "transfer_id" bigint     NOT NULL,
-    "created_at"  timestamp  NOT NULL DEFAULT 'now()'
+    "wallet_id"   bigint    NOT NULL,
+    "amount"      bigint    NOT NULL,
+    "transfer_id" bigint    NOT NULL,
+    "created_at"  timestamp NOT NULL DEFAULT 'now()'
 );
 
 CREATE TABLE "transfers"
 (
     "id"             bigserial PRIMARY KEY,
     "transfer_type"  transfer_type NOT NULL,
-    "from_wallet_id" bigint,
-    "to_wallet_id"   bigint,
+    "from_wallet_id" bigint        NOT NULL,
+    "to_wallet_id"   bigint        NOT NULL,
     "amount"         bigint        NOT NULL,
     "created_at"     timestamp     NOT NULL DEFAULT 'now()'
 );

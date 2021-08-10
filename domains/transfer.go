@@ -1,7 +1,6 @@
 package domains
 
 import (
-    "database/sql"
     "fmt"
     "time"
 )
@@ -17,8 +16,8 @@ const (
 type Transfer struct {
     ID           int64         `json:"id"`
     TransferType TransferType  `json:"type"`
-    FromWalletID sql.NullInt64 `json:"from_wallet_id"`
-    ToWalletID   sql.NullInt64 `json:"to_wallet_id"`
+    FromWalletID int64 `json:"from_wallet_id"`
+    ToWalletID   int64 `json:"to_wallet_id"`
     Amount       int64         `json:"amount"`
     CreatedAt    time.Time     `json:"created_at"`
 }

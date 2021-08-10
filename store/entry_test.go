@@ -14,8 +14,8 @@ func createRandomEntry(t *testing.T, wallet1 domains.Wallet, wallet2 domains.Wal
     transfer := createRandomTransfer(t, wallet1, wallet2)
 
     args := store.CreateEntryParams{
-        WalletID: transfer.FromWalletID.Int64,
-        Amount:   transfer.Amount,
+        WalletID:   transfer.FromWalletID,
+        Amount:     transfer.Amount,
         TransferID: transfer.ID,
     }
 

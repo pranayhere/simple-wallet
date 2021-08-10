@@ -24,7 +24,9 @@ func NewCurrencyRepo(client *sql.DB) CurrencyRepo {
 const createCurrency = `-- name: CreateCurrency :one
 INSERT INTO currencies (code,
                         fraction)
-VALUES ($1, $2) returning code, fraction, created_at
+VALUES ($1, $2)
+ON CONFLICT (code) DO UPDATE SET fraction = $2
+returning code, fraction, created_at
 `
 
 type CreateCurrencyParams struct {

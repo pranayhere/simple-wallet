@@ -376,7 +376,8 @@ func (q *walletRepository) DepositToWallet(ctx context.Context, arg DepositeToWa
         res.Transfer, err = q.transferRepo.CreateTransfer(ctx, CreateTransferParams{
             TransferType: domains.TransferTypeDEPOSITTOWALLET,
             Amount:       arg.Amount,
-            ToWalletID:   sql.NullInt64{wallet.ID, true},
+            FromWalletID: wallet.ID,
+            ToWalletID:   wallet.ID,
         })
 
         if err != nil {
@@ -432,7 +433,8 @@ func (q *walletRepository) WithdrawFromWallet(ctx context.Context, arg WithdrawF
         res.Transfer, err = q.transferRepo.CreateTransfer(ctx, CreateTransferParams{
             TransferType: domains.TransferTypeWITHDRAWFROMWALLET,
             Amount:       arg.Amount,
-            ToWalletID:   sql.NullInt64{wallet.ID, true},
+            FromWalletID: wallet.ID,
+            ToWalletID:   wallet.ID,
         })
 
         if err != nil {
@@ -458,7 +460,7 @@ func (q *walletRepository) WithdrawFromWallet(ctx context.Context, arg WithdrawF
 type SendMoneyParams struct {
     FromWalletAddress string `json:"from_account_address"`
     ToWalletAddress   string `json:"to_account_address""`
-    Amount             int64  `json:"amount"`
+    Amount            int64  `json:"amount"`
 }
 
 func (q *walletRepository) SendMoney(ctx context.Context, arg SendMoneyParams) (WalletTransferResult, error) {
@@ -491,8 +493,8 @@ func (q *walletRepository) SendMoney(ctx context.Context, arg SendMoneyParams) (
 
         res.Transfer, err = q.transferRepo.CreateTransfer(ctx, CreateTransferParams{
             TransferType: domains.TransferTypeSENDMONEY,
-            FromWalletID: sql.NullInt64{fromWallet.ID, true},
-            ToWalletID:   sql.NullInt64{toWallet.ID, true},
+            FromWalletID: fromWallet.ID,
+            ToWalletID:   toWallet.ID,
             Amount:       arg.Amount,
         })
 
@@ -501,8 +503,8 @@ func (q *walletRepository) SendMoney(ctx context.Context, arg SendMoneyParams) (
         }
 
         res.FromEntry, err = q.entryRepo.CreateEntry(ctx, CreateEntryParams{
-            WalletID: fromWallet.ID,
-            Amount:    arg.Amount * -1,
+            WalletID:   fromWallet.ID,
+            Amount:     arg.Amount * -1,
             TransferID: res.Transfer.ID,
         })
 
@@ -511,8 +513,8 @@ func (q *walletRepository) SendMoney(ctx context.Context, arg SendMoneyParams) (
         }
 
         res.ToEntry, err = q.entryRepo.CreateEntry(ctx, CreateEntryParams{
-            WalletID: fromWallet.ID,
-            Amount:    arg.Amount,
+            WalletID:   fromWallet.ID,
+            Amount:     arg.Amount,
             TransferID: res.Transfer.ID,
         })
 
@@ -533,7 +535,7 @@ func (q *walletRepository) SendMoney(ctx context.Context, arg SendMoneyParams) (
     return res, err
 }
 
-func addMoney(ctx context.Context, q *walletRepository, walletID1 int64, amount1 int64, walletID2 int64, amount2 int64, )(wallet1 domains.Wallet, wallet2 domains.Wallet, err error) {
+func addMoney(ctx context.Context, q *walletRepository, walletID1 int64, amount1 int64, walletID2 int64, amount2 int64, ) (wallet1 domains.Wallet, wallet2 domains.Wallet, err error) {
     wallet1, err = q.AddWalletBalance(ctx, AddWalletBalanceParams{
         ID:     walletID1,
         Amount: amount1,

@@ -30,9 +30,9 @@ VALUES ($1, $2, $3) RETURNING id, wallet_id, amount, transfer_id, created_at
 `
 
 type CreateEntryParams struct {
-    WalletID   int64             `json:"wallet_id"`
-    Amount     int64             `json:"amount"`
-    TransferID int64             `json:"transfer_id"`
+    WalletID   int64 `json:"wallet_id"`
+    Amount     int64 `json:"amount"`
+    TransferID int64 `json:"transfer_id"`
 }
 
 func (q *entryRepository) CreateEntry(ctx context.Context, arg CreateEntryParams) (domains.Entry, error) {

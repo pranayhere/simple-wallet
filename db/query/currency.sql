@@ -1,15 +1,9 @@
-CREATE TABLE "currencies"
-(
-    "code"       varchar PRIMARY KEY,
-    "fraction"   bigint    NOT NULL,
-    "created_at" timestamp NOT NULL DEFAULT 'now()'
-);
-
 -- name: CreateCurrency :one
 INSERT INTO currencies (code,
                         fraction)
 VALUES ($1, $2)
-returning *;
+ON CONFLICT (code) DO UPDATE SET fraction = $2
+returning code, fraction, created_at;
 
 -- name: GetCurrency :one
 SELECT *

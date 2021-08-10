@@ -284,8 +284,8 @@ func TestSendMoney(t *testing.T) {
 
             result, err := walletRepo.SendMoney(ctx, store.SendMoneyParams{
                 FromWalletAddress: fromWallet.Address,
-                ToWalletAddress: toWallet.Address,
-                Amount:        amount,
+                ToWalletAddress:   toWallet.Address,
+                Amount:            amount,
             })
 
             errs <- err

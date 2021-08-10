@@ -32,8 +32,8 @@ VALUES ($1, $2, $3, $4) RETURNING id, transfer_type, from_wallet_id, to_wallet_i
 
 type CreateTransferParams struct {
     TransferType domains.TransferType `json:"transfer_type"`
-    FromWalletID sql.NullInt64        `json:"from_wallet_id"`
-    ToWalletID   sql.NullInt64        `json:"to_wallet_id"`
+    FromWalletID int64        `json:"from_wallet_id"`
+    ToWalletID   int64        `json:"to_wallet_id"`
     Amount       int64                `json:"amount"`
 }
 
@@ -86,8 +86,8 @@ OFFSET $4
 `
 
 type ListTransfersParams struct {
-    FromWalletID sql.NullInt64 `json:"from_wallet_id"`
-    ToWalletID   sql.NullInt64 `json:"to_wallet_id"`
+    FromWalletID int64 `json:"from_wallet_id"`
+    ToWalletID   int64 `json:"to_wallet_id"`
     Limit        int32         `json:"limit"`
     Offset       int32         `json:"offset"`
 }
