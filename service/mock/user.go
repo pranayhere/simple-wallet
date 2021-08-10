@@ -51,10 +51,10 @@ func (mr *MockUserSvcMockRecorder) CreateUser(ctx, createUserDto interface{}) *g
 }
 
 // LoginUser mocks base method.
-func (m *MockUserSvc) LoginUser(ctx context.Context, loginCredsDto dto.LoginCredentialsDto) (dto.LoginUserDto, error) {
+func (m *MockUserSvc) LoginUser(ctx context.Context, loginCredsDto dto.LoginCredentialsDto) (dto.LoggedInUserDto, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "LoginUser", ctx, loginCredsDto)
-	ret0, _ := ret[0].(dto.LoginUserDto)
+	ret0, _ := ret[0].(dto.LoggedInUserDto)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }

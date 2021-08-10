@@ -43,12 +43,12 @@ VALUES ($1, $2, $3, $4, $5, $6) RETURNING id, account_no, ifsc, bank_name, statu
 `
 
 type CreateBankAccountParams struct {
-    AccountNo string                    `json:"account_no"`
-    Ifsc      string                    `json:"ifsc"`
-    BankName  string                    `json:"bank_name"`
-    Currency  string                    `json:"currency"`
-    UserID int64                    `json:"user_id"`
-    Status domain.BankAccountStatus `json:"status"`
+    AccountNo string                   `json:"account_no"`
+    Ifsc      string                   `json:"ifsc"`
+    BankName  string                   `json:"bank_name"`
+    Currency  string                   `json:"currency"`
+    UserID    int64                    `json:"user_id"`
+    Status    domain.BankAccountStatus `json:"status"`
 }
 
 func (q *bankAccountRepository) CreateBankAccount(ctx context.Context, arg CreateBankAccountParams) (domain.BankAccount, error) {

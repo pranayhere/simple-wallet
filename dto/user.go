@@ -13,7 +13,7 @@ type CreateUserDto struct {
 }
 
 type UserDto struct {
-    ID                int64    `json:"id"`
+    ID                int64     `json:"id"`
     Username          string    `json:"username" binding:"required,alphanum"`
     Status            string    `json:"status"`
     FullName          string    `json:"full_name" binding:"required"`
@@ -27,7 +27,7 @@ type LoginCredentialsDto struct {
     Password string `json:"password" binding:"required,min=6"`
 }
 
-type LoginUserDto struct {
+type LoggedInUserDto struct {
     AccessToken string  `json:"access_token"`
     User        UserDto `json:"user"`
 }

@@ -31,16 +31,16 @@ INSERT INTO users (
     full_name,
     email
 ) values (
-$1, $2, userStat, $4, $5
+$1, $2, $3, $4, $5
 ) RETURNING id, username, hashed_password, status, full_name, email, password_changed_at, created_at, updated_at
 `
 
 type CreateUserParams struct {
-    Username       string             `json:"username"`
+    Username       string            `json:"username"`
     HashedPassword string            `json:"hashed_password"`
     Status         domain.UserStatus `json:"status"`
     FullName       string            `json:"full_name"`
-    Email          string             `json:"email"`
+    Email          string            `json:"email"`
 }
 
 func (q *userRepository) CreateUser(ctx context.Context, arg CreateUserParams) (domain.User, error) {

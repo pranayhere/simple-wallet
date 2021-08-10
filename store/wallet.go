@@ -78,13 +78,13 @@ VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING id, name, address, status, user_id
 `
 
 type CreateWalletParams struct {
-    Name          string               `json:"name"`
-    Address string              `json:"address"`
-    Status  domain.WalletStatus `json:"status"`
-    UserID  int64               `json:"user_id"`
-    BankAccountID int64                `json:"bank_account_id"`
-    Balance       int64                `json:"balance"`
-    Currency      string               `json:"currency"`
+    Name          string              `json:"name"`
+    Address       string              `json:"address"`
+    Status        domain.WalletStatus `json:"status"`
+    UserID        int64               `json:"user_id"`
+    BankAccountID int64               `json:"bank_account_id"`
+    Balance       int64               `json:"balance"`
+    Currency      string              `json:"currency"`
 }
 
 func (q *walletRepository) CreateWallet(ctx context.Context, arg CreateWalletParams) (domain.Wallet, error) {

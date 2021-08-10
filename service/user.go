@@ -4,7 +4,6 @@ import (
     "context"
     "database/sql"
     "github.com/lib/pq"
-    "github.com/pkg/errors"
     "github.com/pranayhere/simple-wallet/common"
     "github.com/pranayhere/simple-wallet/domain"
     "github.com/pranayhere/simple-wallet/dto"
@@ -15,17 +14,17 @@ import (
 
 type UserSvc interface {
     CreateUser(ctx context.Context, createUserDto dto.CreateUserDto) (dto.UserDto, error)
-    LoginUser(ctx context.Context, loginCredsDto dto.LoginCredentialsDto) (dto.LoginUserDto, error)
+    LoginUser(ctx context.Context, loginCredsDto dto.LoginCredentialsDto) (dto.LoggedInUserDto, error)
 }
 
 type userService struct {
-    userRepo store.UserRepo
+    userRepo   store.UserRepo
     tokenMaker token.Maker
 }
 
 func NewUserService(userRepo store.UserRepo, tokenMaker token.Maker) UserSvc {
     return &userService{
-        userRepo: userRepo,
+        userRepo:   userRepo,
         tokenMaker: tokenMaker,
     }
 }
@@ -51,7 +50,7 @@ func (u *userService) CreateUser(ctx context.Context, createUserDto dto.CreateUs
         if pqErr, ok := err.(*pq.Error); ok {
             switch pqErr.Code.Name() {
             case "unique_violation":
-                return userDto, errors.Wrap(common.ErrUserAlreadyExist, err.Error())
+                return userDto, common.ErrUserAlreadyExist
             }
         }
         return userDto, err
@@ -61,31 +60,31 @@ func (u *userService) CreateUser(ctx context.Context, createUserDto dto.CreateUs
     return userDto, nil
 }
 
-func (u userService) LoginUser(ctx context.Context, loginCredentialsDto dto.LoginCredentialsDto) (dto.LoginUserDto, error) {
-    var loginDto dto.LoginUserDto
+func (u userService) LoginUser(ctx context.Context, loginCredentialsDto dto.LoginCredentialsDto) (dto.LoggedInUserDto, error) {
+    var loggedInDto dto.LoggedInUserDto
 
     user, err := u.userRepo.GetUserByUsername(ctx, loginCredentialsDto.Username)
     if err != nil {
-        return loginDto, errors.Wrap(common.ErrUserNotFound, err.Error())
+        if err == sql.ErrNoRows {
+            return loggedInDto, common.ErrUserNotFound
+        }
+        return loggedInDto, err
     }
 
     err = util.CheckPassword(loginCredentialsDto.Password, user.HashedPassword)
     if err != nil {
-        if err == sql.ErrNoRows {
-            return loginDto, errors.Wrap(common.ErrUnauthorisedUser, err.Error())
-        }
-        return loginDto, err
+        return loggedInDto, common.ErrIncorrectPassword
     }
 
     accessToken, err := u.tokenMaker.CreateToken(user.Username, common.AccessTokenDuration)
     if err != nil {
-        return loginDto, err
+        return loggedInDto, err
     }
 
-    loginDto = dto.LoginUserDto{
+    loggedInDto = dto.LoggedInUserDto{
         AccessToken: accessToken,
         User:        dto.NewUserDto(user),
     }
 
-    return loginDto, nil
+    return loggedInDto, nil
 }
