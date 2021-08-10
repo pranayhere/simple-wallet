@@ -1,4 +1,4 @@
-Overview:
+```Overview:
 Let’s build a wallet service (a.k.a. MyWallet) that can be used for business accounts as well as for personal usage, and
 allows a user to make and receive payments and store cash balance.
 
@@ -42,3 +42,4 @@ svc:
 mockgen -source service/user.go -destination service/mock/user.go -package=mocksvc
 
 // https://www.postgresql.org/docs/13/errcodes-appendix.html
+```
