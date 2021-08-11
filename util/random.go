@@ -9,6 +9,12 @@ import (
 
 const alphabets = "abcdefghijklmnopqrstuvwxyz"
 
+const (
+    USD = "USD"
+    INR = "INR"
+    EUR = "EUR"
+)
+
 func init() {
     rand.Seed(time.Now().UnixNano())
 }
@@ -45,4 +51,11 @@ func RandomMoney() int64 {
 func RandomEmail() string {
     email := fmt.Sprintf("%s@email.com", RandomUser())
     return email
+}
+
+// RandomWalletAddress generate random wallet address
+func RandomWalletAddress(email string) string {
+    walletAddress := strings.Split(email, "@")[0]
+    walletAddress = fmt.Sprintf("%s-%d@my.wallet", walletAddress, RandomInt(1,100))
+    return walletAddress
 }

@@ -60,7 +60,7 @@ func (u *userService) CreateUser(ctx context.Context, createUserDto dto.CreateUs
     return userDto, nil
 }
 
-func (u userService) LoginUser(ctx context.Context, loginCredentialsDto dto.LoginCredentialsDto) (dto.LoggedInUserDto, error) {
+func (u *userService) LoginUser(ctx context.Context, loginCredentialsDto dto.LoginCredentialsDto) (dto.LoggedInUserDto, error) {
     var loggedInDto dto.LoggedInUserDto
 
     user, err := u.userRepo.GetUserByUsername(ctx, loginCredentialsDto.Username)

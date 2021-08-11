@@ -238,6 +238,7 @@ func randomUser(t *testing.T, createUserDto dto.CreateUserDto) (user domain.User
     require.NoError(t, err)
 
     user = domain.User{
+        ID:             util.RandomInt(1, 1000),
         Username:       createUserDto.Username,
         HashedPassword: hashedPassword,
         FullName:       createUserDto.FullName,

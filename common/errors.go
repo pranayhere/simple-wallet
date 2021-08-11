@@ -10,4 +10,6 @@ var (
     ErrBankAccountAlreadyExist = errors.New("bank account already exist")
     ErrBankAccountNotFound     = errors.New("bank account not found")
     ErrSomethingWrong          = errors.New("something went wrong")
+    ErrCurrencyMismatch        = errors.New("currency mismatch")
+    ErrWalletNotFound          = errors.New("wallet not found")
 )
