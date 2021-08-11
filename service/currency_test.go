@@ -17,8 +17,8 @@ import (
 )
 
 func TestCreateCurrency(t *testing.T) {
-    testcases := []struct{
-        name string
+    testcases := []struct {
+        name      string
         buildStub func(mockCurrencyRepo *mockdb.MockCurrencyRepo, currencyDto dto.CurrencyDto, currency domain.Currency)
         checkResp func(t *testing.T, currencyDto dto.CurrencyDto, res dto.CurrencyDto, err error)
     }{
@@ -26,7 +26,7 @@ func TestCreateCurrency(t *testing.T) {
             name: "Ok",
             buildStub: func(mockCurrencyRepo *mockdb.MockCurrencyRepo, currencyDto dto.CurrencyDto, currency domain.Currency) {
                 arg := store.CreateCurrencyParams{
-                    Code: strings.ToUpper(currencyDto.Code),
+                    Code:     strings.ToUpper(currencyDto.Code),
                     Fraction: currencyDto.Fraction,
                 }
 
@@ -73,9 +73,9 @@ func TestCreateCurrency(t *testing.T) {
 }
 
 func TestGetCurrency(t *testing.T) {
-    testcases := []struct{
-        name string
-        reqDto func(t *testing.T) dto.CurrencyDto
+    testcases := []struct {
+        name      string
+        reqDto    func(t *testing.T) dto.CurrencyDto
         buildStub func(mockCurrencyRepo *mockdb.MockCurrencyRepo, currencyDto dto.CurrencyDto, currency domain.Currency)
         checkResp func(t *testing.T, currencyDto dto.CurrencyDto, res dto.CurrencyDto, err error)
     }{
@@ -97,9 +97,9 @@ func TestGetCurrency(t *testing.T) {
         },
         {
             name: "CurrencyNotFound",
-            reqDto: func(t *testing.T) dto.CurrencyDto{
+            reqDto: func(t *testing.T) dto.CurrencyDto {
                 return dto.CurrencyDto{
-                    Code: "Random Currency",
+                    Code:     "Random Currency",
                     Fraction: 2,
                 }
             },
@@ -145,14 +145,14 @@ func TestGetCurrency(t *testing.T) {
 
 func randomCurrencyDto(t *testing.T) dto.CurrencyDto {
     return dto.CurrencyDto{
-        Code: util.RandomString(3),
+        Code:     util.RandomString(3),
         Fraction: util.RandomInt(1, 3),
     }
 }
 
 func randomCurrency(t *testing.T, currencyDto dto.CurrencyDto) domain.Currency {
     return domain.Currency{
-        Code: currencyDto.Code,
+        Code:     currencyDto.Code,
         Fraction: currencyDto.Fraction,
     }
 }

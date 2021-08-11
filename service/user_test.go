@@ -135,9 +135,9 @@ func TestLoginUser(t *testing.T) {
     createUserDto := randomCreateUserDto()
     user, password := randomUser(t, createUserDto)
 
-    testcases := []struct{
-        name string
-        reqDto func() dto.LoginCredentialsDto
+    testcases := []struct {
+        name      string
+        reqDto    func() dto.LoginCredentialsDto
         buildStub func(mockUserRepo *mockdb.MockUserRepo, username string)
         checkResp func(t *testing.T, createUserDto dto.CreateUserDto, userDto dto.LoggedInUserDto, err error)
     }{

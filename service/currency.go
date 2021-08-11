@@ -28,7 +28,7 @@ func (c *CurrencyService) CreateCurrency(ctx context.Context, currencyDto dto.Cu
     var res dto.CurrencyDto
 
     arg := store.CreateCurrencyParams{
-        Code: strings.ToUpper(currencyDto.Code),
+        Code:     strings.ToUpper(currencyDto.Code),
         Fraction: currencyDto.Fraction,
     }
 
@@ -38,8 +38,8 @@ func (c *CurrencyService) CreateCurrency(ctx context.Context, currencyDto dto.Cu
     }
 
     res = dto.CurrencyDto{
-        Code: currency.Code,
-        Fraction: currency.Fraction,
+        Code:      currency.Code,
+        Fraction:  currency.Fraction,
         CreatedAt: currency.CreatedAt,
     }
 
@@ -58,8 +58,8 @@ func (c *CurrencyService) GetCurrency(ctx context.Context, currencyCode string) 
     }
 
     res = dto.CurrencyDto{
-        Code: currency.Code,
-        Fraction: currency.Fraction,
+        Code:      currency.Code,
+        Fraction:  currency.Fraction,
         CreatedAt: currency.CreatedAt,
     }
 
