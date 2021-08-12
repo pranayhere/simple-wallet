@@ -41,6 +41,9 @@ mockgen -source store/wallet.go -destination store/mock/wallet.go -package=mockd
 
 svc:
 mockgen -source service/user.go -destination service/mock/user.go -package=mocksvc
+mockgen -source service/wallet.go -destination service/mock/wallet.go -package=mocksvc
+mockgen -source service/currency.go -destination service/mock/currency.go -package=mocksvc
+mockgen -source service/bankaccount.go -destination service/mock/bankaccount.go -package=mocksvc
 
 // https://www.postgresql.org/docs/13/errcodes-appendix.html
 ```
