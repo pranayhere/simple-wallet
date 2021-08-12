@@ -6,25 +6,25 @@ import (
 )
 
 type CreateUserDto struct {
-    Username string `json:"username" binding:"required,alphanum"`
-    Password string `json:"password" binding:"required,min=6"`
-    FullName string `json:"full_name" binding:"required"`
-    Email    string `json:"email" binding:"required,email"`
+    Username string `json:"username" validate:"required,alphanum"`
+    Password string `json:"password" validate:"required,min=6"`
+    FullName string `json:"full_name" validate:"required"`
+    Email    string `json:"email" validate:"required,email"`
 }
 
 type UserDto struct {
     ID                int64     `json:"id"`
-    Username          string    `json:"username" binding:"required,alphanum"`
+    Username          string    `json:"username" validate:"required,alphanum"`
     Status            string    `json:"status"`
-    FullName          string    `json:"full_name" binding:"required"`
-    Email             string    `json:"email" binding:"required,email"`
+    FullName          string    `json:"full_name" validate:"required"`
+    Email             string    `json:"email" validate:"required,email"`
     PasswordChangedAt time.Time `json:"password_changed_at"`
     CreatedAt         time.Time `json:"created_at"`
 }
 
 type LoginCredentialsDto struct {
-    Username string `json:"username" binding:"required,alphanum"`
-    Password string `json:"password" binding:"required,min=6"`
+    Username string `json:"username" validate:"required,alphanum"`
+    Password string `json:"password" validate:"required,min=6"`
 }
 
 type LoggedInUserDto struct {

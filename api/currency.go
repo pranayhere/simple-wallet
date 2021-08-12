@@ -21,9 +21,9 @@ type currencyResource struct {
     currencySvc service.CurrencySvc
 }
 
-func (server *currencyResource) RegisterRoutes(r *chi.Mux) http.Handler {
-    r.Get("/currencies/{currencyCode}", server.Get)
-    r.Post("/currencies", server.Create)
+func (s *currencyResource) RegisterRoutes(r *chi.Mux) http.Handler {
+    r.Get("/currencies/{currencyCode}", s.Get)
+    r.Post("/currencies", s.Create)
 
     return r
 }
@@ -48,21 +48,21 @@ func (s *currencyResource) Get(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *currencyResource) Create(w http.ResponseWriter, r *http.Request) {
-    var currencyDto dto.CurrencyDto
+    var req dto.CurrencyDto
     ctx := r.Context()
 
-    if err := json.NewDecoder(r.Body).Decode(&currencyDto); err != nil {
+    if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
         _ = render.Render(w, r, types.ErrResponse(err))
         return
     }
     defer r.Body.Close()
 
-    if err := validator.New().Struct(currencyDto); err != nil {
+    if err := validator.New().Struct(req); err != nil {
         _ = render.Render(w, r, types.ErrValidation(err))
         return
     }
 
-    res, err := s.currencySvc.CreateCurrency(ctx, currencyDto)
+    res, err := s.currencySvc.CreateCurrency(ctx, req)
     if err != nil {
         _ = render.Render(w, r, types.ErrResponse(err))
         return

@@ -26,11 +26,11 @@ func Status(err error) int {
     case common.ErrIncorrectPassword:
         return http.StatusUnauthorized
     case common.ErrUserAlreadyExist:
-        return http.StatusConflict
+        return http.StatusForbidden
     case common.ErrCurrencyNotFound:
         return http.StatusNotFound
     case common.ErrBankAccountAlreadyExist:
-        return http.StatusConflict
+        return http.StatusForbidden
     case common.ErrBankAccountNotFound:
         return http.StatusNotFound
     case common.ErrCurrencyMismatch:

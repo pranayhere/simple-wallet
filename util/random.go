@@ -75,3 +75,39 @@ func RandomCurrency(currencyDto dto.CurrencyDto) domain.Currency {
         Fraction: currencyDto.Fraction,
     }
 }
+
+func RandomCreateUserDto() dto.CreateUserDto {
+    createUserDto := dto.CreateUserDto{
+        Username: RandomUser(),
+        Password: RandomString(8),
+        FullName: RandomUser(),
+        Email:    RandomEmail(),
+    }
+
+    return createUserDto
+}
+
+func RandomNewUser(createUserDto dto.CreateUserDto) (user domain.User, password string) {
+    password = createUserDto.Password
+    hashedPassword, _ := HashPassword(password)
+
+    user = domain.User{
+        ID:             RandomInt(1, 1000),
+        Username:       createUserDto.Username,
+        HashedPassword: hashedPassword,
+        FullName:       createUserDto.FullName,
+        Status:         domain.UserStatusACTIVE,
+        Email:          createUserDto.Email,
+    }
+
+    return
+}
+
+func RandomUserDto(createUserDto dto.CreateUserDto) dto.UserDto {
+    return dto.UserDto{
+        Username: createUserDto.Username,
+        FullName: createUserDto.FullName,
+        Status: string(domain.UserStatusACTIVE),
+        Email:    createUserDto.Email,
+    }
+}

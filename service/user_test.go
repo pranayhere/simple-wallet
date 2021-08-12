@@ -57,10 +57,11 @@ func TestCreateUser(t *testing.T) {
         {
             name: "OK",
             reqDto: func() dto.CreateUserDto {
-                return randomCreateUserDto()
+                return util.RandomCreateUserDto()
+
             },
             buildStub: func(mockUserRepo *mockdb.MockUserRepo, createUserDto dto.CreateUserDto) {
-                user, password := randomUser(t, createUserDto)
+                user, password := util.RandomNewUser(createUserDto)
 
                 arg := store.CreateUserParams{
                     Username: createUserDto.Username,
@@ -83,7 +84,7 @@ func TestCreateUser(t *testing.T) {
         {
             name: "DatabaseConnectionClosed",
             reqDto: func() dto.CreateUserDto {
-                return randomCreateUserDto()
+                return util.RandomCreateUserDto()
             },
             buildStub: func(mockUserRepo *mockdb.MockUserRepo, createUserDto dto.CreateUserDto) {
                 mockUserRepo.EXPECT().CreateUser(gomock.Any(), gomock.Any()).Times(1).Return(domain.User{}, sql.ErrConnDone)
@@ -96,7 +97,7 @@ func TestCreateUser(t *testing.T) {
         {
             name: "DuplicateUser",
             reqDto: func() dto.CreateUserDto {
-                return randomCreateUserDto()
+                return util.RandomCreateUserDto()
             },
             buildStub: func(mockUserRepo *mockdb.MockUserRepo, createUserDto dto.CreateUserDto) {
                 // https://www.postgresql.org/docs/13/errcodes-appendix.html
@@ -132,8 +133,8 @@ func TestCreateUser(t *testing.T) {
 }
 
 func TestLoginUser(t *testing.T) {
-    createUserDto := randomCreateUserDto()
-    user, password := randomUser(t, createUserDto)
+    createUserDto := util.RandomCreateUserDto()
+    user, password := util.RandomNewUser(createUserDto)
 
     testcases := []struct {
         name      string
@@ -230,32 +231,4 @@ func TestLoginUser(t *testing.T) {
             tc.checkResp(t, createUserDto, loggedInUserDto, err)
         })
     }
-}
-
-func randomUser(t *testing.T, createUserDto dto.CreateUserDto) (user domain.User, password string) {
-    password = createUserDto.Password
-    hashedPassword, err := util.HashPassword(password)
-    require.NoError(t, err)
-
-    user = domain.User{
-        ID:             util.RandomInt(1, 1000),
-        Username:       createUserDto.Username,
-        HashedPassword: hashedPassword,
-        FullName:       createUserDto.FullName,
-        Status:         domain.UserStatusACTIVE,
-        Email:          createUserDto.Email,
-    }
-
-    return
-}
-
-func randomCreateUserDto() dto.CreateUserDto {
-    createUserDto := dto.CreateUserDto{
-        Username: util.RandomUser(),
-        Password: util.RandomString(8),
-        FullName: util.RandomUser(),
-        Email:    util.RandomEmail(),
-    }
-
-    return createUserDto
 }
