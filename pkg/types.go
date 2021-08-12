@@ -50,7 +50,7 @@ func ErrResponse(err error) render.Renderer {
     }
 }
 
-func ErrValidation(err error) render.Renderer {
+func ErrBadRequest(err error) render.Renderer {
     return &Error{
         Err: err,
         HTTPStatusCode: http.StatusBadRequest,

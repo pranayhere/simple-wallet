@@ -4,6 +4,7 @@ import (
     "bytes"
     "database/sql"
     "encoding/json"
+    "fmt"
     "github.com/go-chi/chi"
     "github.com/golang/mock/gomock"
     "github.com/pranayhere/simple-wallet/api"
@@ -40,6 +41,22 @@ func TestCreateUser(t *testing.T) {
             },
             checkRes: func(recorder *httptest.ResponseRecorder) {
                 require.Equal(t, http.StatusOK, recorder.Code)
+            },
+        },
+        {
+            name: "JsonInvalid",
+            body: map[string]interface{}{
+                "username": 1,
+                "password": createUserDto.Password,
+                "full_name": createUserDto.FullName,
+                "email": createUserDto.Email,
+            },
+            buildStub: func(mockUserSvc *mocksvc.MockUserSvc) {
+                mockUserSvc.EXPECT().CreateUser(gomock.Any(), createUserDto).Times(0)
+            },
+            checkRes: func(recorder *httptest.ResponseRecorder) {
+                require.Equal(t, http.StatusBadRequest, recorder.Code)
+                fmt.Println(recorder.Body)
             },
         },
         {
@@ -178,6 +195,19 @@ func TestLoginUser(t *testing.T) {
             },
             checkRes: func(recorder *httptest.ResponseRecorder) {
                 require.Equal(t, http.StatusOK, recorder.Code)
+            },
+        },
+        {
+            name: "JsonInvalid",
+            body: map[string]interface{}{
+                "username": 1,
+                "password": createUserDto.Password,
+            },
+            buildStub: func(mockUserSvc *mocksvc.MockUserSvc) {
+                mockUserSvc.EXPECT().LoginUser(gomock.Any(), gomock.Any()).Times(0)
+            },
+            checkRes: func(recorder *httptest.ResponseRecorder) {
+                require.Equal(t, http.StatusBadRequest, recorder.Code)
             },
         },
         {

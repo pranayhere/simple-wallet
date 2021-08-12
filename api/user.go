@@ -39,13 +39,13 @@ func (u *userResource) Create(w http.ResponseWriter, r *http.Request) {
     ctx := r.Context()
 
     if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-        _ = render.Render(w, r, types.ErrResponse(err))
+        _ = render.Render(w, r, types.ErrBadRequest(err))
         return
     }
     defer r.Body.Close()
 
     if err := validator.New().Struct(req); err != nil {
-        _ = render.Render(w, r, types.ErrValidation(err))
+        _ = render.Render(w, r, types.ErrBadRequest(err))
         return
     }
 
@@ -63,13 +63,13 @@ func (u *userResource) Login(w http.ResponseWriter, r *http.Request) {
     ctx := r.Context()
 
     if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-        _ = render.Render(w, r, types.ErrResponse(err))
+        _ = render.Render(w, r, types.ErrBadRequest(err))
         return
     }
     defer r.Body.Close()
 
     if err := validator.New().Struct(req); err != nil {
-        _ = render.Render(w, r, types.ErrValidation(err))
+        _ = render.Render(w, r, types.ErrBadRequest(err))
         return
     }
 
