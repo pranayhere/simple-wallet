@@ -27,8 +27,8 @@ func TestCreateBankAccount(t *testing.T) {
         {
             name: "Ok",
             currency: func(t *testing.T) (dto.CurrencyDto, domain.Currency) {
-                currencyDto := randomCurrencyDto(t)
-                currency := randomCurrency(t, currencyDto)
+                currencyDto := util.RandomCurrencyDto()
+                currency := util.RandomCurrency(currencyDto)
                 return currencyDto, currency
             },
             bankAccount: func(t *testing.T, currency string) (dto.CreateBankAccountDto, domain.BankAccount) {
@@ -67,8 +67,8 @@ func TestCreateBankAccount(t *testing.T) {
         {
             name: "BankAccountAlreadyExist",
             currency: func(t *testing.T) (dto.CurrencyDto, domain.Currency) {
-                currencyDto := randomCurrencyDto(t)
-                currency := randomCurrency(t, currencyDto)
+                currencyDto := util.RandomCurrencyDto()
+                currency := util.RandomCurrency(currencyDto)
                 return currencyDto, currency
             },
             bankAccount: func(t *testing.T, currency string) (dto.CreateBankAccountDto, domain.BankAccount) {
@@ -101,8 +101,8 @@ func TestCreateBankAccount(t *testing.T) {
         {
             name: "CurrencyNotFound",
             currency: func(t *testing.T) (dto.CurrencyDto, domain.Currency) {
-                currencyDto := randomCurrencyDto(t)
-                currency := randomCurrency(t, currencyDto)
+                currencyDto := util.RandomCurrencyDto()
+                currency := util.RandomCurrency(currencyDto)
                 return currencyDto, currency
             },
             bankAccount: func(t *testing.T, currency string) (dto.CreateBankAccountDto, domain.BankAccount) {
@@ -121,8 +121,8 @@ func TestCreateBankAccount(t *testing.T) {
         {
             name: "DbConnectionDown",
             currency: func(t *testing.T) (dto.CurrencyDto, domain.Currency) {
-                currencyDto := randomCurrencyDto(t)
-                currency := randomCurrency(t, currencyDto)
+                currencyDto := util.RandomCurrencyDto()
+                currency := util.RandomCurrency(currencyDto)
                 return currencyDto, currency
             },
             bankAccount: func(t *testing.T, currency string) (dto.CreateBankAccountDto, domain.BankAccount) {

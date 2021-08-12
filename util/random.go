@@ -2,6 +2,8 @@ package util
 
 import (
     "fmt"
+    "github.com/pranayhere/simple-wallet/domain"
+    "github.com/pranayhere/simple-wallet/dto"
     "math/rand"
     "strings"
     "time"
@@ -58,4 +60,18 @@ func RandomWalletAddress(email string) string {
     walletAddress := strings.Split(email, "@")[0]
     walletAddress = fmt.Sprintf("%s-%d@my.wallet", walletAddress, RandomInt(1,100))
     return walletAddress
+}
+
+func RandomCurrencyDto() dto.CurrencyDto {
+    return dto.CurrencyDto{
+        Code:     RandomString(3),
+        Fraction: RandomInt(1, 3),
+    }
+}
+
+func RandomCurrency(currencyDto dto.CurrencyDto) domain.Currency {
+    return domain.Currency{
+        Code:     currencyDto.Code,
+        Fraction: currencyDto.Fraction,
+    }
 }

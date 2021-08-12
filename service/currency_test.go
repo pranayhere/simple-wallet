@@ -57,8 +57,8 @@ func TestCreateCurrency(t *testing.T) {
             ctrl := gomock.NewController(t)
             defer ctrl.Finish()
 
-            currencyDto := randomCurrencyDto(t)
-            currency := randomCurrency(t, currencyDto)
+            currencyDto := util.RandomCurrencyDto()
+            currency := util.RandomCurrency(currencyDto)
 
             mockCurrencyRepo := mockdb.NewMockCurrencyRepo(ctrl)
             tc.buildStub(mockCurrencyRepo, currencyDto, currency)
@@ -82,7 +82,7 @@ func TestGetCurrency(t *testing.T) {
         {
             name: "Ok",
             reqDto: func(t *testing.T) dto.CurrencyDto {
-                return randomCurrencyDto(t)
+                return util.RandomCurrencyDto()
             },
             buildStub: func(mockCurrencyRepo *mockdb.MockCurrencyRepo, currencyDto dto.CurrencyDto, currency domain.Currency) {
                 mockCurrencyRepo.EXPECT().GetCurrency(gomock.Any(), strings.ToUpper(currencyDto.Code)).Times(1).Return(currency, nil)
@@ -128,8 +128,8 @@ func TestGetCurrency(t *testing.T) {
             ctrl := gomock.NewController(t)
             defer ctrl.Finish()
 
-            currencyDto := randomCurrencyDto(t)
-            currency := randomCurrency(t, currencyDto)
+            currencyDto := util.RandomCurrencyDto()
+            currency := util.RandomCurrency(currencyDto)
 
             mockCurrencyRepo := mockdb.NewMockCurrencyRepo(ctrl)
             tc.buildStub(mockCurrencyRepo, currencyDto, currency)
@@ -140,19 +140,5 @@ func TestGetCurrency(t *testing.T) {
             res, err := currencySvc.GetCurrency(ctx, currencyDto.Code)
             tc.checkResp(t, currencyDto, res, err)
         })
-    }
-}
-
-func randomCurrencyDto(t *testing.T) dto.CurrencyDto {
-    return dto.CurrencyDto{
-        Code:     util.RandomString(3),
-        Fraction: util.RandomInt(1, 3),
-    }
-}
-
-func randomCurrency(t *testing.T, currencyDto dto.CurrencyDto) domain.Currency {
-    return domain.Currency{
-        Code:     currencyDto.Code,
-        Fraction: currencyDto.Fraction,
     }
 }
