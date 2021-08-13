@@ -8,8 +8,8 @@ import (
     "github.com/go-chi/chi"
     "github.com/golang/mock/gomock"
     "github.com/pranayhere/simple-wallet/api"
-    "github.com/pranayhere/simple-wallet/common"
     "github.com/pranayhere/simple-wallet/dto"
+    "github.com/pranayhere/simple-wallet/pkg/errors"
     mocksvc "github.com/pranayhere/simple-wallet/service/mock"
     "github.com/pranayhere/simple-wallet/util"
     "github.com/stretchr/testify/require"
@@ -102,7 +102,7 @@ func TestCreateBankAccount(t *testing.T) {
                 "user_id": createBankAccountDto.UserID,
             },
             buildStub: func(mockBankAcctSvc *mocksvc.MockBankAccountSvc) {
-                mockBankAcctSvc.EXPECT().CreateBankAccount(gomock.Any(), gomock.Any()).Times(1).Return(dto.BankAccountDto{}, common.ErrBankAccountAlreadyExist)
+                mockBankAcctSvc.EXPECT().CreateBankAccount(gomock.Any(), gomock.Any()).Times(1).Return(dto.BankAccountDto{}, errors.ErrBankAccountAlreadyExist)
             },
             checkResp: func(recorder *httptest.ResponseRecorder) {
                 require.Equal(t, http.StatusForbidden, recorder.Code)
@@ -173,7 +173,7 @@ func TestGetBankAccount(t *testing.T) {
             name : "BankAccountNotFound",
             url: fmt.Sprintf("/bank-accounts/%d", 1),
             buildStub: func(mockBankAcctSvc *mocksvc.MockBankAccountSvc) {
-                mockBankAcctSvc.EXPECT().GetBankAccount(gomock.Any(), gomock.Any()).Times(1).Return(dto.BankAccountDto{}, common.ErrBankAccountNotFound)
+                mockBankAcctSvc.EXPECT().GetBankAccount(gomock.Any(), gomock.Any()).Times(1).Return(dto.BankAccountDto{}, errors.ErrBankAccountNotFound)
             },
             checkResp: func(recorder *httptest.ResponseRecorder) {
                 require.Equal(t, http.StatusNotFound, recorder.Code)
@@ -260,7 +260,7 @@ func TestBankAccountVerificationSuccess(t *testing.T) {
             name: "BankAccountNotFound",
             url: fmt.Sprintf("/bank-accounts/%d/verification-success", 1),
             buildStub: func(mockBankAcctSvc *mocksvc.MockBankAccountSvc) {
-                mockBankAcctSvc.EXPECT().VerificationSuccess(gomock.Any(), gomock.Any()).Times(1).Return(dto.BankAccountDto{}, common.ErrBankAccountNotFound)
+                mockBankAcctSvc.EXPECT().VerificationSuccess(gomock.Any(), gomock.Any()).Times(1).Return(dto.BankAccountDto{}, errors.ErrBankAccountNotFound)
             },
             checkResp: func(recorder *httptest.ResponseRecorder) {
                 require.Equal(t, http.StatusNotFound, recorder.Code)
@@ -336,7 +336,7 @@ func TestBankAccountVerificationFailed(t *testing.T) {
             name: "BankAccountNotFound",
             url: fmt.Sprintf("/bank-accounts/%d/verification-failed", 1),
             buildStub: func(mockBankAcctSvc *mocksvc.MockBankAccountSvc) {
-                mockBankAcctSvc.EXPECT().VerificationFailed(gomock.Any(), gomock.Any()).Times(1).Return(dto.BankAccountDto{}, common.ErrBankAccountNotFound)
+                mockBankAcctSvc.EXPECT().VerificationFailed(gomock.Any(), gomock.Any()).Times(1).Return(dto.BankAccountDto{}, errors.ErrBankAccountNotFound)
             },
             checkResp: func(recorder *httptest.ResponseRecorder) {
                 require.Equal(t, http.StatusNotFound, recorder.Code)

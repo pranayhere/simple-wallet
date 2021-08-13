@@ -3,8 +3,8 @@ package service
 import (
     "context"
     "database/sql"
-    "github.com/pranayhere/simple-wallet/common"
     "github.com/pranayhere/simple-wallet/dto"
+    "github.com/pranayhere/simple-wallet/pkg/errors"
     "github.com/pranayhere/simple-wallet/store"
 )
 
@@ -83,7 +83,7 @@ func (w *walletService) GetWalletById(ctx context.Context, id int64) (dto.Wallet
     wallet, err := w.walletRepo.GetWallet(ctx, id)
     if err != nil {
         if err == sql.ErrNoRows {
-            return walletDto, common.ErrWalletNotFound
+            return walletDto, errors.ErrWalletNotFound
         }
 
         return walletDto, err

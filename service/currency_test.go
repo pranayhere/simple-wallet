@@ -4,9 +4,9 @@ import (
     "context"
     "database/sql"
     "github.com/golang/mock/gomock"
-    "github.com/pranayhere/simple-wallet/common"
     "github.com/pranayhere/simple-wallet/domain"
     "github.com/pranayhere/simple-wallet/dto"
+    "github.com/pranayhere/simple-wallet/pkg/errors"
     "github.com/pranayhere/simple-wallet/service"
     "github.com/pranayhere/simple-wallet/store"
     mockdb "github.com/pranayhere/simple-wallet/store/mock"
@@ -108,7 +108,7 @@ func TestGetCurrency(t *testing.T) {
             },
             checkResp: func(t *testing.T, currencyDto dto.CurrencyDto, res dto.CurrencyDto, err error) {
                 require.Error(t, err)
-                require.EqualError(t, err, common.ErrCurrencyNotFound.Error())
+                require.EqualError(t, err, errors.ErrCurrencyNotFound.Error())
             },
         },
         {

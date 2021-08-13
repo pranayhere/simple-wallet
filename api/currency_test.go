@@ -8,8 +8,8 @@ import (
     "github.com/go-chi/chi"
     "github.com/golang/mock/gomock"
     "github.com/pranayhere/simple-wallet/api"
-    "github.com/pranayhere/simple-wallet/common"
     "github.com/pranayhere/simple-wallet/dto"
+    "github.com/pranayhere/simple-wallet/pkg/errors"
     mocksvc "github.com/pranayhere/simple-wallet/service/mock"
     "github.com/pranayhere/simple-wallet/util"
     "github.com/stretchr/testify/require"
@@ -141,7 +141,7 @@ func TestGetCurrency(t *testing.T) {
         {
             name: "NotFound",
             buildStub: func(mockCurrencySvc *mocksvc.MockCurrencySvc) {
-                mockCurrencySvc.EXPECT().GetCurrency(gomock.Any(), currencyDto.Code).Times(1).Return(currencyDto, common.ErrCurrencyNotFound)
+                mockCurrencySvc.EXPECT().GetCurrency(gomock.Any(), currencyDto.Code).Times(1).Return(currencyDto, errors.ErrCurrencyNotFound)
             },
             checkResp: func(recorder *httptest.ResponseRecorder) {
                 require.Equal(t, http.StatusNotFound, recorder.Code)

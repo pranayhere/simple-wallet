@@ -8,8 +8,8 @@ import (
     "github.com/go-chi/chi"
     "github.com/golang/mock/gomock"
     "github.com/pranayhere/simple-wallet/api"
-    "github.com/pranayhere/simple-wallet/common"
     "github.com/pranayhere/simple-wallet/dto"
+    "github.com/pranayhere/simple-wallet/pkg/errors"
     mocksvc "github.com/pranayhere/simple-wallet/service/mock"
     "github.com/pranayhere/simple-wallet/util"
     "github.com/stretchr/testify/require"
@@ -39,7 +39,7 @@ func TestGetWallet(t *testing.T) {
             name: "WalletNotFound",
             url: fmt.Sprintf("/wallets/%d", 1),
             buildStub: func(mockWalletSvc *mocksvc.MockWalletSvc) {
-                mockWalletSvc.EXPECT().GetWalletById(gomock.Any(), gomock.Any()).Times(1).Return(dto.WalletDto{}, common.ErrWalletNotFound)
+                mockWalletSvc.EXPECT().GetWalletById(gomock.Any(), gomock.Any()).Times(1).Return(dto.WalletDto{}, errors.ErrWalletNotFound)
             },
             checkResp: func(recorder *httptest.ResponseRecorder) {
                 require.Equal(t, http.StatusNotFound, recorder.Code)
@@ -158,7 +158,7 @@ func TestDepositToWallet(t *testing.T) {
                 "amount": util.RandomInt(1, 1000),
             },
             buildStub: func(mockWalletSvc *mocksvc.MockWalletSvc) {
-                mockWalletSvc.EXPECT().Deposit(gomock.Any(), gomock.Any()).Times(1).Return(dto.WalletTransferResultDto{}, common.ErrWalletNotFound)
+                mockWalletSvc.EXPECT().Deposit(gomock.Any(), gomock.Any()).Times(1).Return(dto.WalletTransferResultDto{}, errors.ErrWalletNotFound)
             },
             checkResp: func(recorder *httptest.ResponseRecorder) {
                 require.Equal(t, http.StatusNotFound, recorder.Code)
@@ -266,7 +266,7 @@ func TestWithdrawFromWallet(t *testing.T) {
                 "user_id": util.RandomInt(1, 1000),
             },
             buildStub: func(mockWalletSvc *mocksvc.MockWalletSvc) {
-                mockWalletSvc.EXPECT().Withdraw(gomock.Any(), gomock.Any()).Times(1).Return(dto.WalletTransferResultDto{}, common.ErrWalletNotFound)
+                mockWalletSvc.EXPECT().Withdraw(gomock.Any(), gomock.Any()).Times(1).Return(dto.WalletTransferResultDto{}, errors.ErrWalletNotFound)
             },
             checkResp: func(recorder *httptest.ResponseRecorder) {
                 require.Equal(t, http.StatusNotFound, recorder.Code)

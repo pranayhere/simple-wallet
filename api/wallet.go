@@ -6,7 +6,7 @@ import (
     "github.com/go-chi/render"
     "github.com/go-playground/validator/v10"
     "github.com/pranayhere/simple-wallet/dto"
-    types "github.com/pranayhere/simple-wallet/pkg"
+    types "github.com/pranayhere/simple-wallet/pkg/errors"
     "github.com/pranayhere/simple-wallet/service"
     "net/http"
     "strconv"

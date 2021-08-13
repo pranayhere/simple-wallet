@@ -3,8 +3,8 @@ package service
 import (
     "context"
     "database/sql"
-    "github.com/pranayhere/simple-wallet/common"
     "github.com/pranayhere/simple-wallet/dto"
+    "github.com/pranayhere/simple-wallet/pkg/errors"
     "github.com/pranayhere/simple-wallet/store"
 )
 
@@ -58,7 +58,7 @@ func (b *bankAccountService) GetBankAccount(ctx context.Context, bankAccountId i
     bankAcct, err := b.bankAcctRepo.GetBankAccount(ctx, bankAccountId)
     if err != nil {
         if err == sql.ErrNoRows {
-            return bankAcctDto, common.ErrBankAccountNotFound
+            return bankAcctDto, errors.ErrBankAccountNotFound
         }
         return bankAcctDto, err
     }

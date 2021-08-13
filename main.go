@@ -7,7 +7,7 @@ import (
     "github.com/go-chi/chi"
     "github.com/go-chi/chi/middleware"
     "github.com/pranayhere/simple-wallet/api"
-    "github.com/pranayhere/simple-wallet/common"
+    "github.com/pranayhere/simple-wallet/pkg/constant"
     "github.com/pranayhere/simple-wallet/service"
     "github.com/pranayhere/simple-wallet/store"
     "github.com/pranayhere/simple-wallet/token"
@@ -39,7 +39,7 @@ func main() {
     currencyApi := api.NewCurrencyResource(currencySvc)
     currencyApi.RegisterRoutes(r)
 
-    tokenMaker, err := token.NewJWTMaker(common.SymmetricKey)
+    tokenMaker, err := token.NewJWTMaker(constant.SymmetricKey)
     if err != nil {
         panic(err)
     }

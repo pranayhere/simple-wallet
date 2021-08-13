@@ -8,8 +8,8 @@ import (
     "github.com/go-chi/chi"
     "github.com/golang/mock/gomock"
     "github.com/pranayhere/simple-wallet/api"
-    "github.com/pranayhere/simple-wallet/common"
     "github.com/pranayhere/simple-wallet/dto"
+    "github.com/pranayhere/simple-wallet/pkg/errors"
     mocksvc "github.com/pranayhere/simple-wallet/service/mock"
     "github.com/pranayhere/simple-wallet/util"
     "github.com/stretchr/testify/require"
@@ -83,7 +83,7 @@ func TestCreateUser(t *testing.T) {
                 "email": createUserDto.Email,
             },
             buildStub: func(mockUserSvc *mocksvc.MockUserSvc) {
-                mockUserSvc.EXPECT().CreateUser(gomock.Any(), createUserDto).Times(1).Return(dto.UserDto{}, common.ErrUserAlreadyExist)
+                mockUserSvc.EXPECT().CreateUser(gomock.Any(), createUserDto).Times(1).Return(dto.UserDto{}, errors.ErrUserAlreadyExist)
             },
             checkRes: func(recorder *httptest.ResponseRecorder) {
                 require.Equal(t, http.StatusForbidden, recorder.Code)
@@ -217,7 +217,7 @@ func TestLoginUser(t *testing.T) {
                 "password": createUserDto.Password,
             },
             buildStub: func(mockUserSvc *mocksvc.MockUserSvc) {
-                mockUserSvc.EXPECT().LoginUser(gomock.Any(), gomock.Any()).Times(1).Return(dto.LoggedInUserDto{}, common.ErrUserNotFound)
+                mockUserSvc.EXPECT().LoginUser(gomock.Any(), gomock.Any()).Times(1).Return(dto.LoggedInUserDto{}, errors.ErrUserNotFound)
             },
             checkRes: func(recorder *httptest.ResponseRecorder) {
                 require.Equal(t, http.StatusNotFound, recorder.Code)
@@ -230,7 +230,7 @@ func TestLoginUser(t *testing.T) {
                 "password": createUserDto.Password,
             },
             buildStub: func(mockUserSvc *mocksvc.MockUserSvc) {
-                mockUserSvc.EXPECT().LoginUser(gomock.Any(), gomock.Any()).Times(1).Return(dto.LoggedInUserDto{}, common.ErrUserNotFound)
+                mockUserSvc.EXPECT().LoginUser(gomock.Any(), gomock.Any()).Times(1).Return(dto.LoggedInUserDto{}, errors.ErrUserNotFound)
             },
             checkRes: func(recorder *httptest.ResponseRecorder) {
                 require.Equal(t, http.StatusNotFound, recorder.Code)

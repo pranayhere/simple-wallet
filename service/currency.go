@@ -3,8 +3,8 @@ package service
 import (
     "context"
     "database/sql"
-    "github.com/pranayhere/simple-wallet/common"
     "github.com/pranayhere/simple-wallet/dto"
+    "github.com/pranayhere/simple-wallet/pkg/errors"
     "github.com/pranayhere/simple-wallet/store"
     "strings"
 )
@@ -52,7 +52,7 @@ func (c *currencyService) GetCurrency(ctx context.Context, currencyCode string) 
     currency, err := c.currencyRepo.GetCurrency(ctx, strings.ToUpper(currencyCode))
     if err != nil {
         if err == sql.ErrNoRows {
-            return res, common.ErrCurrencyNotFound
+            return res, errors.ErrCurrencyNotFound
         }
         return res, err
     }

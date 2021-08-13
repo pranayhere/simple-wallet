@@ -4,9 +4,9 @@ import (
     "context"
     "database/sql"
     "github.com/golang/mock/gomock"
-    "github.com/pranayhere/simple-wallet/common"
     "github.com/pranayhere/simple-wallet/domain"
     "github.com/pranayhere/simple-wallet/dto"
+    "github.com/pranayhere/simple-wallet/pkg/errors"
     "github.com/pranayhere/simple-wallet/service"
     "github.com/pranayhere/simple-wallet/store"
     mockdb "github.com/pranayhere/simple-wallet/store/mock"
@@ -91,11 +91,11 @@ func TestCreateBankAccount(t *testing.T) {
                     BankAccount: bankAccount,
                 }
 
-                mockBankAcctRepo.EXPECT().CreateBankAccountWithWallet(gomock.Any(), arg).Times(1).Return(bankAcctWithWalletRes, common.ErrBankAccountAlreadyExist)
+                mockBankAcctRepo.EXPECT().CreateBankAccountWithWallet(gomock.Any(), arg).Times(1).Return(bankAcctWithWalletRes, errors.ErrBankAccountAlreadyExist)
             },
             checkResp: func(t *testing.T, dto dto.CreateBankAccountDto, res dto.BankAccountDto, err error) {
                 require.Error(t, err)
-                require.EqualError(t, err, common.ErrBankAccountAlreadyExist.Error())
+                require.EqualError(t, err, errors.ErrBankAccountAlreadyExist.Error())
             },
         },
         {
@@ -115,7 +115,7 @@ func TestCreateBankAccount(t *testing.T) {
             },
             checkResp: func(t *testing.T, dto dto.CreateBankAccountDto, res dto.BankAccountDto, err error) {
                 require.Error(t, err)
-                require.EqualError(t, err, common.ErrCurrencyNotFound.Error())
+                require.EqualError(t, err, errors.ErrCurrencyNotFound.Error())
             },
         },
         {
@@ -186,7 +186,7 @@ func TestGetBankAccount(t *testing.T) {
             },
             checkResp: func(t *testing.T, err error) {
                 require.Error(t, err)
-                require.EqualError(t, err, common.ErrBankAccountNotFound.Error())
+                require.EqualError(t, err, errors.ErrBankAccountNotFound.Error())
             },
         },
         {

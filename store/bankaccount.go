@@ -5,8 +5,8 @@ import (
     "database/sql"
     "fmt"
     "github.com/lib/pq"
-    "github.com/pranayhere/simple-wallet/common"
     "github.com/pranayhere/simple-wallet/domain"
+    "github.com/pranayhere/simple-wallet/pkg/errors"
     "strings"
 )
 
@@ -199,7 +199,7 @@ func (q *bankAccountRepository) CreateBankAccountWithWallet(ctx context.Context,
 
         if err != nil {
             if err == sql.ErrNoRows {
-                return common.ErrUserNotFound
+                return errors.ErrUserNotFound
             }
             return err
         }
@@ -217,7 +217,7 @@ func (q *bankAccountRepository) CreateBankAccountWithWallet(ctx context.Context,
             if pqErr, ok := err.(*pq.Error); ok {
                 switch pqErr.Code.Name() {
                 case "unique_violation":
-                    return common.ErrBankAccountAlreadyExist
+                    return errors.ErrBankAccountAlreadyExist
                 }
             }
             return err

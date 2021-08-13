@@ -4,9 +4,10 @@ import (
     "context"
     "database/sql"
     "github.com/lib/pq"
-    "github.com/pranayhere/simple-wallet/common"
     "github.com/pranayhere/simple-wallet/domain"
     "github.com/pranayhere/simple-wallet/dto"
+    "github.com/pranayhere/simple-wallet/pkg/constant"
+    "github.com/pranayhere/simple-wallet/pkg/errors"
     "github.com/pranayhere/simple-wallet/store"
     "github.com/pranayhere/simple-wallet/token"
     "github.com/pranayhere/simple-wallet/util"
@@ -50,7 +51,7 @@ func (u *userService) CreateUser(ctx context.Context, createUserDto dto.CreateUs
         if pqErr, ok := err.(*pq.Error); ok {
             switch pqErr.Code.Name() {
             case "unique_violation":
-                return userDto, common.ErrUserAlreadyExist
+                return userDto, errors.ErrUserAlreadyExist
             }
         }
         return userDto, err
@@ -66,17 +67,17 @@ func (u *userService) LoginUser(ctx context.Context, loginCredentialsDto dto.Log
     user, err := u.userRepo.GetUserByUsername(ctx, loginCredentialsDto.Username)
     if err != nil {
         if err == sql.ErrNoRows {
-            return loggedInDto, common.ErrUserNotFound
+            return loggedInDto, errors.ErrUserNotFound
         }
         return loggedInDto, err
     }
 
     err = util.CheckPassword(loginCredentialsDto.Password, user.HashedPassword)
     if err != nil {
-        return loggedInDto, common.ErrIncorrectPassword
+        return loggedInDto, errors.ErrIncorrectPassword
     }
 
-    accessToken, err := u.tokenMaker.CreateToken(user.Username, common.AccessTokenDuration)
+    accessToken, err := u.tokenMaker.CreateToken(user.Username, constant.AccessTokenDuration)
     if err != nil {
         return loggedInDto, err
     }

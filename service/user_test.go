@@ -6,9 +6,10 @@ import (
     "fmt"
     "github.com/golang/mock/gomock"
     "github.com/lib/pq"
-    "github.com/pranayhere/simple-wallet/common"
     "github.com/pranayhere/simple-wallet/domain"
     "github.com/pranayhere/simple-wallet/dto"
+    "github.com/pranayhere/simple-wallet/pkg/constant"
+    "github.com/pranayhere/simple-wallet/pkg/errors"
     "github.com/pranayhere/simple-wallet/service"
     "github.com/pranayhere/simple-wallet/store"
     mockdb "github.com/pranayhere/simple-wallet/store/mock"
@@ -105,7 +106,7 @@ func TestCreateUser(t *testing.T) {
             },
             checkResp: func(t *testing.T, createUserDto dto.CreateUserDto, userDto dto.UserDto, err error) {
                 require.Error(t, err)
-                require.EqualError(t, err, common.ErrUserAlreadyExist.Error())
+                require.EqualError(t, err, errors.ErrUserAlreadyExist.Error())
             },
         },
     }
@@ -120,7 +121,7 @@ func TestCreateUser(t *testing.T) {
             mockUserRepo := mockdb.NewMockUserRepo(ctrl)
             tc.buildStub(mockUserRepo, createUserDto)
 
-            tokenMaker, err := token.NewJWTMaker(common.SymmetricKey)
+            tokenMaker, err := token.NewJWTMaker(constant.SymmetricKey)
             require.NoError(t, err)
 
             ctx := context.TODO()
@@ -174,7 +175,7 @@ func TestLoginUser(t *testing.T) {
             },
             checkResp: func(t *testing.T, createUserDto dto.CreateUserDto, loggedInUserDto dto.LoggedInUserDto, err error) {
                 require.Error(t, err)
-                require.EqualError(t, err, common.ErrUserNotFound.Error())
+                require.EqualError(t, err, errors.ErrUserNotFound.Error())
             },
         },
         {
@@ -190,7 +191,7 @@ func TestLoginUser(t *testing.T) {
             },
             checkResp: func(t *testing.T, createUserDto dto.CreateUserDto, loggedInUserDto dto.LoggedInUserDto, err error) {
                 require.Error(t, err)
-                require.EqualError(t, err, common.ErrIncorrectPassword.Error())
+                require.EqualError(t, err, errors.ErrIncorrectPassword.Error())
             },
         },
         {
@@ -219,7 +220,7 @@ func TestLoginUser(t *testing.T) {
             mockUserRepo := mockdb.NewMockUserRepo(ctrl)
             tc.buildStub(mockUserRepo, user.Username)
 
-            tokenMaker, err := token.NewJWTMaker(common.SymmetricKey)
+            tokenMaker, err := token.NewJWTMaker(constant.SymmetricKey)
             require.NoError(t, err)
 
             ctx := context.TODO()
