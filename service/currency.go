@@ -14,17 +14,17 @@ type CurrencySvc interface {
     GetCurrency(ctx context.Context, currencyCode string) (dto.CurrencyDto, error)
 }
 
-type CurrencyService struct {
+type currencyService struct {
     currencyRepo store.CurrencyRepo
 }
 
 func NewCurrencyService(currencyRepo store.CurrencyRepo) CurrencySvc {
-    return &CurrencyService{
+    return &currencyService{
         currencyRepo: currencyRepo,
     }
 }
 
-func (c *CurrencyService) CreateCurrency(ctx context.Context, currencyDto dto.CurrencyDto) (dto.CurrencyDto, error) {
+func (c *currencyService) CreateCurrency(ctx context.Context, currencyDto dto.CurrencyDto) (dto.CurrencyDto, error) {
     var res dto.CurrencyDto
 
     arg := store.CreateCurrencyParams{
@@ -46,7 +46,7 @@ func (c *CurrencyService) CreateCurrency(ctx context.Context, currencyDto dto.Cu
     return res, nil
 }
 
-func (c *CurrencyService) GetCurrency(ctx context.Context, currencyCode string) (dto.CurrencyDto, error) {
+func (c *currencyService) GetCurrency(ctx context.Context, currencyCode string) (dto.CurrencyDto, error) {
     var res dto.CurrencyDto
 
     currency, err := c.currencyRepo.GetCurrency(ctx, strings.ToUpper(currencyCode))

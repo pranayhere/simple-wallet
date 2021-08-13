@@ -15,19 +15,19 @@ type BankAccountSvc interface {
     GetBankAccount(ctx context.Context, bankAccountId int64) (dto.BankAccountDto, error)
 }
 
-type BankAccountService struct {
+type bankAccountService struct {
     bankAcctRepo store.BankAccountRepo
     currencySvc  CurrencySvc
 }
 
 func NewBankAccountService(bankAcctRepo store.BankAccountRepo, currencySvc CurrencySvc) BankAccountSvc {
-    return &BankAccountService{
+    return &bankAccountService{
         bankAcctRepo: bankAcctRepo,
         currencySvc:  currencySvc,
     }
 }
 
-func (b *BankAccountService) CreateBankAccount(ctx context.Context, newBankAcctDto dto.CreateBankAccountDto) (dto.BankAccountDto, error) {
+func (b *bankAccountService) CreateBankAccount(ctx context.Context, newBankAcctDto dto.CreateBankAccountDto) (dto.BankAccountDto, error) {
     var bankAcctDto dto.BankAccountDto
 
     currency, err := b.currencySvc.GetCurrency(ctx, newBankAcctDto.Currency)
@@ -52,7 +52,7 @@ func (b *BankAccountService) CreateBankAccount(ctx context.Context, newBankAcctD
     return bankAcctDto, nil
 }
 
-func (b *BankAccountService) GetBankAccount(ctx context.Context, bankAccountId int64) (dto.BankAccountDto, error) {
+func (b *bankAccountService) GetBankAccount(ctx context.Context, bankAccountId int64) (dto.BankAccountDto, error) {
     var bankAcctDto dto.BankAccountDto
 
     bankAcct, err := b.bankAcctRepo.GetBankAccount(ctx, bankAccountId)
@@ -67,7 +67,7 @@ func (b *BankAccountService) GetBankAccount(ctx context.Context, bankAccountId i
     return bankAcctDto, nil
 }
 
-func (b *BankAccountService) VerificationSuccess(ctx context.Context, verificationDto dto.BankAccountVerificationDto) (dto.BankAccountDto, error) {
+func (b *bankAccountService) VerificationSuccess(ctx context.Context, verificationDto dto.BankAccountVerificationDto) (dto.BankAccountDto, error) {
     var bankAcctDto dto.BankAccountDto
 
     bankAcctDto, err := b.GetBankAccount(ctx, verificationDto.BankAccountID)
@@ -88,7 +88,7 @@ func (b *BankAccountService) VerificationSuccess(ctx context.Context, verificati
     return bankAcctDto, nil
 }
 
-func (b *BankAccountService) VerificationFailed(ctx context.Context, verificationDto dto.BankAccountVerificationDto) (dto.BankAccountDto, error) {
+func (b *bankAccountService) VerificationFailed(ctx context.Context, verificationDto dto.BankAccountVerificationDto) (dto.BankAccountDto, error) {
     var bankAcctDto dto.BankAccountDto
 
     bankAcctDto, err := b.GetBankAccount(ctx, verificationDto.BankAccountID)

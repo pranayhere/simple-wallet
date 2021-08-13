@@ -13,20 +13,19 @@ type WalletSvc interface {
     Deposit(ctx context.Context, depositDto dto.DepositDto) (dto.WalletTransferResultDto, error)
     Withdraw(ctx context.Context, withdrawDto dto.WithdrawDto) (dto.WalletTransferResultDto, error)
     GetWalletById(ctx context.Context, id int64) (dto.WalletDto, error)
-    GetWalletByAddress(ctx context.Context, walletAddress string) (dto.WalletDto, error)
 }
 
-type WalletService struct {
+type walletService struct {
     walletRepo store.WalletRepo
 }
 
 func NewWalletService(walletRepo store.WalletRepo) WalletSvc {
-    return &WalletService{
+    return &walletService{
         walletRepo: walletRepo,
     }
 }
 
-func (w *WalletService) SendMoney(ctx context.Context, sendMoneyDto dto.SendMoneyDto) (dto.WalletTransferResultDto, error) {
+func (w *walletService) SendMoney(ctx context.Context, sendMoneyDto dto.SendMoneyDto) (dto.WalletTransferResultDto, error) {
     var txnResDto dto.WalletTransferResultDto
 
     arg := store.SendMoneyParams{
@@ -44,7 +43,7 @@ func (w *WalletService) SendMoney(ctx context.Context, sendMoneyDto dto.SendMone
     return txnResDto, nil
 }
 
-func (w *WalletService) Deposit(ctx context.Context, depositDto dto.DepositDto) (dto.WalletTransferResultDto, error) {
+func (w *walletService) Deposit(ctx context.Context, depositDto dto.DepositDto) (dto.WalletTransferResultDto, error) {
     var txnResDto dto.WalletTransferResultDto
 
     arg := store.DepositeToWalletParams{
@@ -61,7 +60,7 @@ func (w *WalletService) Deposit(ctx context.Context, depositDto dto.DepositDto) 
     return txnResDto, nil
 }
 
-func (w *WalletService) Withdraw(ctx context.Context, withdrawDto dto.WithdrawDto) (dto.WalletTransferResultDto, error) {
+func (w *walletService) Withdraw(ctx context.Context, withdrawDto dto.WithdrawDto) (dto.WalletTransferResultDto, error) {
     var txnResDto dto.WalletTransferResultDto
 
     arg := store.WithdrawFromWalletParams{
@@ -78,26 +77,10 @@ func (w *WalletService) Withdraw(ctx context.Context, withdrawDto dto.WithdrawDt
     return txnResDto, nil
 }
 
-func (w *WalletService) GetWalletById(ctx context.Context, id int64) (dto.WalletDto, error) {
+func (w *walletService) GetWalletById(ctx context.Context, id int64) (dto.WalletDto, error) {
     var walletDto dto.WalletDto
 
     wallet, err := w.walletRepo.GetWallet(ctx, id)
-    if err != nil {
-        if err == sql.ErrNoRows {
-            return walletDto, common.ErrWalletNotFound
-        }
-
-        return walletDto, err
-    }
-
-    walletDto = dto.NewWalletDto(wallet)
-    return walletDto, nil
-}
-
-func (w *WalletService) GetWalletByAddress(ctx context.Context, walletAddress string) (dto.WalletDto, error) {
-    var walletDto dto.WalletDto
-
-    wallet, err := w.walletRepo.GetWalletByAddress(ctx, walletAddress)
     if err != nil {
         if err == sql.ErrNoRows {
             return walletDto, common.ErrWalletNotFound

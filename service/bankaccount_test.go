@@ -32,8 +32,8 @@ func TestCreateBankAccount(t *testing.T) {
                 return currencyDto, currency
             },
             bankAccount: func(t *testing.T, currency string) (dto.CreateBankAccountDto, domain.BankAccount) {
-                bankAccountDto := randomCreateBankAccountDto(t, currency)
-                bankAccount := randomBankAccount(t, bankAccountDto)
+                bankAccountDto := util.RandomCreateBankAccountDto(currency)
+                bankAccount := util.RandomBankAccount(bankAccountDto)
                 return bankAccountDto, bankAccount
             },
             buildStub: func(mockCurrencyRepo *mockdb.MockCurrencyRepo, mockBankAcctRepo *mockdb.MockBankAccountRepo, currency domain.Currency, bankAccountDto dto.CreateBankAccountDto, bankAccount domain.BankAccount) {
@@ -72,8 +72,8 @@ func TestCreateBankAccount(t *testing.T) {
                 return currencyDto, currency
             },
             bankAccount: func(t *testing.T, currency string) (dto.CreateBankAccountDto, domain.BankAccount) {
-                bankAccountDto := randomCreateBankAccountDto(t, currency)
-                bankAccount := randomBankAccount(t, bankAccountDto)
+                bankAccountDto := util.RandomCreateBankAccountDto(currency)
+                bankAccount := util.RandomBankAccount(bankAccountDto)
                 return bankAccountDto, bankAccount
             },
             buildStub: func(mockCurrencyRepo *mockdb.MockCurrencyRepo, mockBankAcctRepo *mockdb.MockBankAccountRepo, currency domain.Currency, bankAccountDto dto.CreateBankAccountDto, bankAccount domain.BankAccount) {
@@ -106,8 +106,8 @@ func TestCreateBankAccount(t *testing.T) {
                 return currencyDto, currency
             },
             bankAccount: func(t *testing.T, currency string) (dto.CreateBankAccountDto, domain.BankAccount) {
-                bankAccountDto := randomCreateBankAccountDto(t, currency)
-                bankAccount := randomBankAccount(t, bankAccountDto)
+                bankAccountDto := util.RandomCreateBankAccountDto(currency)
+                bankAccount := util.RandomBankAccount(bankAccountDto)
                 return bankAccountDto, bankAccount
             },
             buildStub: func(mockCurrencyRepo *mockdb.MockCurrencyRepo, mockBankAcctRepo *mockdb.MockBankAccountRepo, currency domain.Currency, bankAccountDto dto.CreateBankAccountDto, bankAccount domain.BankAccount) {
@@ -126,8 +126,8 @@ func TestCreateBankAccount(t *testing.T) {
                 return currencyDto, currency
             },
             bankAccount: func(t *testing.T, currency string) (dto.CreateBankAccountDto, domain.BankAccount) {
-                bankAccountDto := randomCreateBankAccountDto(t, currency)
-                bankAccount := randomBankAccount(t, bankAccountDto)
+                bankAccountDto := util.RandomCreateBankAccountDto(currency)
+                bankAccount := util.RandomBankAccount(bankAccountDto)
                 return bankAccountDto, bankAccount
             },
             buildStub: func(mockCurrencyRepo *mockdb.MockCurrencyRepo, mockBankAcctRepo *mockdb.MockBankAccountRepo, currency domain.Currency, bankAccountDto dto.CreateBankAccountDto, bankAccount domain.BankAccount) {
@@ -268,7 +268,7 @@ func TestBankAccountVerificationSuccess(t *testing.T) {
             mockCurrencyRepo := mockdb.NewMockCurrencyRepo(ctrl)
             mockBankAcctRepo := mockdb.NewMockBankAccountRepo(ctrl)
 
-            bankAcct := randomBankAccount(t, randomCreateBankAccountDto(t, "INR"))
+            bankAcct := util.RandomBankAccount(util.RandomCreateBankAccountDto("INR"))
             tc.buildStub(mockBankAcctRepo, bankAcct)
 
             ctx := context.TODO()
@@ -334,7 +334,7 @@ func TestBankAccountVerificationFailed(t *testing.T) {
             mockCurrencyRepo := mockdb.NewMockCurrencyRepo(ctrl)
             mockBankAcctRepo := mockdb.NewMockBankAccountRepo(ctrl)
 
-            bankAcct := randomBankAccount(t, randomCreateBankAccountDto(t, "INR"))
+            bankAcct := util.RandomBankAccount(util.RandomCreateBankAccountDto( "INR"))
             tc.buildStub(mockBankAcctRepo, bankAcct)
 
             ctx := context.TODO()
@@ -348,25 +348,5 @@ func TestBankAccountVerificationFailed(t *testing.T) {
             res, err := bankAcctSvc.VerificationFailed(ctx, verificationDto)
             tc.checkResp(t, res, err)
         })
-    }
-}
-
-func randomCreateBankAccountDto(t *testing.T, currencyCode string) dto.CreateBankAccountDto {
-    return dto.CreateBankAccountDto{
-        AccountNo: util.RandomString(10),
-        Ifsc:      util.RandomString(7),
-        BankName:  util.RandomString(5),
-        UserID:    util.RandomInt(1, 1000),
-        Currency:  currencyCode,
-    }
-}
-
-func randomBankAccount(t *testing.T, createBankAcctDto dto.CreateBankAccountDto) domain.BankAccount {
-    return domain.BankAccount{
-        UserID:    createBankAcctDto.UserID,
-        BankName:  createBankAcctDto.BankName,
-        Ifsc:      createBankAcctDto.Ifsc,
-        AccountNo: createBankAcctDto.AccountNo,
-        Currency:  createBankAcctDto.Currency,
     }
 }

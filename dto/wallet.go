@@ -7,40 +7,40 @@ import (
 )
 
 type SendMoneyDto struct {
-    FromWalletAddress string `json:"from_account_address"`
-    ToWalletAddress   string `json:"to_account_address""`
-    Amount            int64  `json:"amount"`
+    FromWalletAddress string `json:"from_account_address" validate:"required"`
+    ToWalletAddress   string `json:"to_account_address" validate:"required"`
+    Amount            int64  `json:"amount" validate:"required,gt=0"`
 }
 
 type WalletTransferResultDto struct {
-    Wallet    domain.Wallet   `json:"wallet"`
-    FromEntry domain.Entry    `json:"from_entry"`
-    ToEntry   domain.Entry    `json:"to_entry"`
-    Transfer  domain.Transfer `json:"transfer"`
+    Wallet    domain.Wallet   `json:"wallet" validate:"required"`
+    FromEntry domain.Entry    `json:"from_entry" validate:"required"`
+    ToEntry   domain.Entry    `json:"to_entry" validate:"required"`
+    Transfer  domain.Transfer `json:"transfer" validate:"required"`
 }
 
 type DepositDto struct {
-    WalletID int64 `json:"wallet_id"`
-    Amount   int64 `json:"amount"`
+    WalletID int64 `json:"wallet_id" validate:"required"`
+    Amount   int64 `json:"amount" validate:"required,gt=0"`
 }
 
 type WithdrawDto struct {
-    WalletID int64 `json:"wallet_id"`
-    Amount   int64 `json:"amount"`
-    UserId   int64 `json:"user_id"`
+    WalletID int64 `json:"wallet_id" validate:"required"`
+    Amount   int64 `json:"amount" validate:"required,gt=0"`
+    UserId   int64 `json:"user_id" validate:"required"`
 }
 
 type WalletDto struct {
-    ID            int64               `json:"id"`
-    Name          string              `json:"name"`
-    Address       string              `json:"address"`
-    Status        domain.WalletStatus `json:"status"`
-    UserID        int64               `json:"user_id"`
-    BankAccountID int64               `json:"bank_account_id"`
-    Balance       int64               `json:"balance"`
-    Currency      string              `json:"currency"`
-    CreatedAt     time.Time           `json:"created_at"`
-    UpdatedAt     time.Time           `json:"updated_at"`
+    ID            int64               `json:"id" validate:"required"`
+    Name          string              `json:"name" validate:"required"`
+    Address       string              `json:"address" validate:"required"`
+    Status        domain.WalletStatus `json:"status" validate:"required"`
+    UserID        int64               `json:"user_id" validate:"required"`
+    BankAccountID int64               `json:"bank_account_id" validate:"required"`
+    Balance       int64               `json:"balance" validate:"required"`
+    Currency      string              `json:"currency" validate:"required"`
+    CreatedAt     time.Time           `json:"created_at" validate:"required"`
+    UpdatedAt     time.Time           `json:"updated_at" validate:"required"`
 }
 
 func NewWalletTransferDto(wtr store.WalletTransferResult) WalletTransferResultDto {

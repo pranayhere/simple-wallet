@@ -7,8 +7,10 @@ import (
     "github.com/go-chi/chi"
     "github.com/go-chi/chi/middleware"
     "github.com/pranayhere/simple-wallet/api"
+    "github.com/pranayhere/simple-wallet/common"
     "github.com/pranayhere/simple-wallet/service"
     "github.com/pranayhere/simple-wallet/store"
+    "github.com/pranayhere/simple-wallet/token"
     "log"
     "net/http"
     "os"
@@ -36,6 +38,28 @@ func main() {
     currencySvc := service.NewCurrencyService(currencyRepo)
     currencyApi := api.NewCurrencyResource(currencySvc)
     currencyApi.RegisterRoutes(r)
+
+    tokenMaker, err := token.NewJWTMaker(common.SymmetricKey)
+    if err != nil {
+        panic(err)
+    }
+
+    userRepo := store.NewUserRepo(db)
+    userSvc := service.NewUserService(userRepo, tokenMaker)
+    userApi := api.NewUserResource(userSvc)
+    userApi.RegisterRoutes(r)
+
+    transferRepo := store.NewTransferRepo(db)
+    entryRepo := store.NewEntryRepo(db)
+    walletRepo := store.NewWalletRepo(db, transferRepo, entryRepo)
+    bankAccountRepo := store.NewBankAccountRepo(db, walletRepo, userRepo)
+    bankAcctSvc := service.NewBankAccountService(bankAccountRepo, currencySvc)
+    bankAcctApi := api.NewBankAccountResource(bankAcctSvc)
+    bankAcctApi.RegisterRoutes(r)
+
+    walletSvc := service.NewWalletService(walletRepo)
+    walletApi := api.NewWalletResource(walletSvc)
+    walletApi.RegisterRoutes(r)
 
     r.Get("/health", func(w http.ResponseWriter, r *http.Request) {
         w.Write([]byte(fmt.Sprintf("Sup!!!")))
@@ -69,7 +93,7 @@ func main() {
     }()
 
     // Run the server
-    err := server.ListenAndServe()
+    err = server.ListenAndServe()
     if err != nil && err != http.ErrServerClosed {
         log.Fatal(err)
     }

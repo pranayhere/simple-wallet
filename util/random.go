@@ -111,3 +111,24 @@ func RandomUserDto(createUserDto dto.CreateUserDto) dto.UserDto {
         Email:    createUserDto.Email,
     }
 }
+
+func RandomCreateBankAccountDto(currencyCode string) dto.CreateBankAccountDto {
+    return dto.CreateBankAccountDto{
+        AccountNo: RandomString(10),
+        Ifsc:      RandomString(7),
+        BankName:  RandomString(5),
+        UserID:    RandomInt(1, 1000),
+        Currency:  currencyCode,
+    }
+}
+
+func RandomBankAccount(createBankAcctDto dto.CreateBankAccountDto) domain.BankAccount {
+    return domain.BankAccount{
+        UserID:    createBankAcctDto.UserID,
+        BankName:  createBankAcctDto.BankName,
+        Ifsc:      createBankAcctDto.Ifsc,
+        AccountNo: createBankAcctDto.AccountNo,
+        Status: domain.BankAccountStatusINVERIFICATION,
+        Currency:  createBankAcctDto.Currency,
+    }
+}

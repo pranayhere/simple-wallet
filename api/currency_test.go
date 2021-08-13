@@ -41,6 +41,19 @@ func TestCreateCurrency(t *testing.T) {
             },
         },
         {
+            name: "JsonInvalid",
+            body: map[string]interface{}{
+                "code": currencyDto.Code,
+                "fraction" : "abc",
+            },
+            buildStub: func(mockCurrencySvc *mocksvc.MockCurrencySvc) {
+                mockCurrencySvc.EXPECT().CreateCurrency(gomock.Any(), currencyDto).Times(0)
+            },
+            checkResp: func(recorder *httptest.ResponseRecorder) {
+                require.Equal(t, http.StatusBadRequest, recorder.Code)
+            },
+        },
+        {
             name: "EmptyCurrencyCode",
             body: map[string]interface{}{
                 "fraction" : currencyDto.Fraction,
