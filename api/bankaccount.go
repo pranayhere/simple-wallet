@@ -17,7 +17,7 @@ type BankAccountResource interface {
     VerificationSuccess(w http.ResponseWriter, r *http.Request)
     VerificationFailed(w http.ResponseWriter, r *http.Request)
     Get(w http.ResponseWriter, r *http.Request)
-    RegisterRoutes(r *chi.Mux) http.Handler
+    RegisterRoutes(r chi.Router) http.Handler
 }
 
 type bankAccountResource struct {
@@ -30,11 +30,11 @@ func NewBankAccountResource(bankAcctSvc service.BankAccountSvc) BankAccountResou
     }
 }
 
-func (b *bankAccountResource) RegisterRoutes(r *chi.Mux) http.Handler {
-    r.Get("/bank-accounts/{bankAcctID}", b.Get)
-    r.Post("/bank-accounts", b.Create)
-    r.Patch("/bank-accounts/{bankAcctID}/verification-success", b.VerificationSuccess)
-    r.Patch("/bank-accounts/{bankAcctID}/verification-failed", b.VerificationFailed)
+func (b *bankAccountResource) RegisterRoutes(r chi.Router) http.Handler {
+    r.Get("/{bankAcctID}", b.Get)
+    r.Post("/", b.Create)
+    r.Patch("/{bankAcctID}/verification-success", b.VerificationSuccess)
+    r.Patch("/{bankAcctID}/verification-failed", b.VerificationFailed)
 
     return r
 }

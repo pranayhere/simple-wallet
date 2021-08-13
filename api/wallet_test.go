@@ -79,7 +79,7 @@ func TestGetWallet(t *testing.T) {
             router := chi.NewRouter()
 
             walletApi := api.NewWalletResource(mockWalletSvc)
-            walletApi.RegisterRoutes(router)
+            router.Mount("/wallets", walletApi.RegisterRoutes(router))
 
             url := tc.url
             request, err := http.NewRequest(http.MethodGet, url, nil)
@@ -179,7 +179,7 @@ func TestDepositToWallet(t *testing.T) {
             router := chi.NewRouter()
 
             walletApi := api.NewWalletResource(mockWalletSvc)
-            walletApi.RegisterRoutes(router)
+            router.Mount("/wallets", walletApi.RegisterRoutes(router))
 
             data, err := json.Marshal(body)
             require.NoError(t, err)
@@ -287,7 +287,7 @@ func TestWithdrawFromWallet(t *testing.T) {
             router := chi.NewRouter()
 
             walletApi := api.NewWalletResource(mockWalletSvc)
-            walletApi.RegisterRoutes(router)
+            router.Mount("/wallets", walletApi.RegisterRoutes(router))
 
             data, err := json.Marshal(body)
             require.NoError(t, err)

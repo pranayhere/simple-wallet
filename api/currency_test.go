@@ -105,7 +105,7 @@ func TestCreateCurrency(t *testing.T) {
             router := chi.NewRouter()
 
             currencyApi := api.NewCurrencyResource(mockCurrencySvc)
-            currencyApi.RegisterRoutes(router)
+            router.Mount("/currencies", currencyApi.RegisterRoutes(router))
 
             data, err := json.Marshal(tc.body)
             require.NoError(t, err)
@@ -161,7 +161,7 @@ func TestGetCurrency(t *testing.T) {
             router := chi.NewRouter()
 
             currencyApi := api.NewCurrencyResource(mockCurrencySvc)
-            currencyApi.RegisterRoutes(router)
+            router.Mount("/currencies", currencyApi.RegisterRoutes(router))
 
             url := fmt.Sprintf("/currencies/%s", currencyDto.Code)
             request, err := http.NewRequest(http.MethodGet, url, nil)

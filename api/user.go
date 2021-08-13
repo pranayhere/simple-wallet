@@ -14,7 +14,7 @@ import (
 type UserResource interface {
     Create(w http.ResponseWriter, r *http.Request)
     Login(w http.ResponseWriter, r *http.Request)
-    RegisterRoutes(r *chi.Mux) http.Handler
+    RegisterRoutes(r chi.Router) http.Handler
 }
 
 type userResource struct {
@@ -27,9 +27,9 @@ func NewUserResource(userSvc service.UserSvc) UserResource {
     }
 }
 
-func (u *userResource) RegisterRoutes(r *chi.Mux) http.Handler {
-    r.Post("/users", u.Create)
-    r.Post("/users/login", u.Login)
+func (u *userResource) RegisterRoutes(r chi.Router) http.Handler {
+    r.Post("/", u.Create)
+    r.Post("/login", u.Login)
 
     return r
 }

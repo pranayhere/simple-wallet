@@ -148,7 +148,7 @@ func TestCreateUser(t *testing.T) {
             router := chi.NewRouter()
 
             userApi := api.NewUserResource(mockUserSvc)
-            userApi.RegisterRoutes(router)
+            router.Mount("/users", userApi.RegisterRoutes(router))
 
             data, err := json.Marshal(tc.body)
             require.NoError(t, err)
@@ -276,7 +276,7 @@ func TestLoginUser(t *testing.T) {
             router := chi.NewRouter()
 
             userApi := api.NewUserResource(mockUserSvc)
-            userApi.RegisterRoutes(router)
+            router.Mount("/users", userApi.RegisterRoutes(router))
 
             data, err := json.Marshal(tc.body)
             require.NoError(t, err)

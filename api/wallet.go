@@ -17,7 +17,7 @@ type WalletResource interface {
     Deposit(w http.ResponseWriter, r *http.Request)
     Withdraw(w http.ResponseWriter, r *http.Request)
     Get(w http.ResponseWriter, r *http.Request)
-    RegisterRoutes(r *chi.Mux) http.Handler
+    RegisterRoutes(r chi.Router) http.Handler
 }
 
 type walletResource struct {
@@ -30,11 +30,11 @@ func NewWalletResource(walletSvc service.WalletSvc) WalletResource {
     }
 }
 
-func (wr *walletResource) RegisterRoutes(r *chi.Mux) http.Handler {
-    r.Get("/wallets/{walletID}", wr.Get)
-    r.Post("/wallets/send", wr.SendMoney)
-    r.Post("/wallets/deposit", wr.Deposit)
-    r.Post("/wallets/withdraw", wr.Withdraw)
+func (wr *walletResource) RegisterRoutes(r chi.Router) http.Handler {
+    r.Get("/{walletID}", wr.Get)
+    r.Post("/send", wr.SendMoney)
+    r.Post("/deposit", wr.Deposit)
+    r.Post("/withdraw", wr.Withdraw)
 
     return r
 }

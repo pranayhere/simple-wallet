@@ -3,14 +3,9 @@ package main
 import (
     "context"
     "database/sql"
-    "fmt"
     "github.com/go-chi/chi"
     "github.com/go-chi/chi/middleware"
-    "github.com/pranayhere/simple-wallet/api"
-    "github.com/pranayhere/simple-wallet/pkg/constant"
-    "github.com/pranayhere/simple-wallet/service"
-    "github.com/pranayhere/simple-wallet/store"
-    "github.com/pranayhere/simple-wallet/token"
+    "go.uber.org/zap"
     "log"
     "net/http"
     "os"
@@ -32,38 +27,7 @@ func main() {
     defer db.Close()
 
     r := CreateRouter()
-
-    // currency
-    currencyRepo := store.NewCurrencyRepo(db)
-    currencySvc := service.NewCurrencyService(currencyRepo)
-    currencyApi := api.NewCurrencyResource(currencySvc)
-    currencyApi.RegisterRoutes(r)
-
-    tokenMaker, err := token.NewJWTMaker(constant.SymmetricKey)
-    if err != nil {
-        panic(err)
-    }
-
-    userRepo := store.NewUserRepo(db)
-    userSvc := service.NewUserService(userRepo, tokenMaker)
-    userApi := api.NewUserResource(userSvc)
-    userApi.RegisterRoutes(r)
-
-    transferRepo := store.NewTransferRepo(db)
-    entryRepo := store.NewEntryRepo(db)
-    walletRepo := store.NewWalletRepo(db, transferRepo, entryRepo)
-    bankAccountRepo := store.NewBankAccountRepo(db, walletRepo, userRepo)
-    bankAcctSvc := service.NewBankAccountService(bankAccountRepo, currencySvc)
-    bankAcctApi := api.NewBankAccountResource(bankAcctSvc)
-    bankAcctApi.RegisterRoutes(r)
-
-    walletSvc := service.NewWalletService(walletRepo)
-    walletApi := api.NewWalletResource(walletSvc)
-    walletApi.RegisterRoutes(r)
-
-    r.Get("/health", func(w http.ResponseWriter, r *http.Request) {
-        w.Write([]byte(fmt.Sprintf("Sup!!!")))
-    })
+    r = inject(db, r)
 
     server := &http.Server{Addr: serverAddress, Handler: r}
     serverCtx, serverStopCtx := context.WithCancel(context.Background())
@@ -87,15 +51,16 @@ func main() {
         // Trigger graceful shutdown
         err := server.Shutdown(shutdownCtx)
         if err != nil {
-            log.Fatal(err)
+            log.Fatal("", zap.Error(err))
         }
         serverStopCtx()
     }()
 
     // Run the server
-    err = server.ListenAndServe()
+    err := server.ListenAndServe()
     if err != nil && err != http.ErrServerClosed {
-        log.Fatal(err)
+        log.Fatal("failed to start server", zap.Error(err))
+        os.Exit(1)
     }
 
     // Wait for server context to be stopped
@@ -105,7 +70,7 @@ func main() {
 func NewStore() *sql.DB {
     conn, err := sql.Open(dbDriver, dbSource)
     if err != nil {
-        log.Fatal("cannot connect to db", err)
+        log.Fatal("cannot connect to db", zap.Error(err))
     }
 
     return conn
@@ -119,4 +84,3 @@ func CreateRouter() *chi.Mux {
 
     return r
 }
-

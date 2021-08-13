@@ -122,7 +122,7 @@ func TestCreateBankAccount(t *testing.T) {
             router := chi.NewRouter()
 
             bankAcctApi := api.NewBankAccountResource(mockBankAcctSvc)
-            bankAcctApi.RegisterRoutes(router)
+            router.Mount("/bank-accounts", bankAcctApi.RegisterRoutes(router))
 
             data, err := json.Marshal(tc.body)
             require.NoError(t, err)
@@ -203,7 +203,7 @@ func TestGetBankAccount(t *testing.T) {
             router := chi.NewRouter()
 
             bankAcctApi := api.NewBankAccountResource(mockBankAcctSvc)
-            bankAcctApi.RegisterRoutes(router)
+            router.Mount("/bank-accounts", bankAcctApi.RegisterRoutes(router))
 
             url := tc.url
             request, err := http.NewRequest(http.MethodGet, url, nil)
@@ -280,7 +280,7 @@ func TestBankAccountVerificationSuccess(t *testing.T) {
             router := chi.NewRouter()
 
             bankAcctApi := api.NewBankAccountResource(mockBankAcctSvc)
-            bankAcctApi.RegisterRoutes(router)
+            router.Mount("/bank-accounts", bankAcctApi.RegisterRoutes(router))
 
             request, err := http.NewRequest(http.MethodPatch, tc.url, nil)
             require.NoError(t, err)
@@ -356,7 +356,7 @@ func TestBankAccountVerificationFailed(t *testing.T) {
             router := chi.NewRouter()
 
             bankAcctApi := api.NewBankAccountResource(mockBankAcctSvc)
-            bankAcctApi.RegisterRoutes(router)
+            router.Mount("/bank-accounts", bankAcctApi.RegisterRoutes(router))
 
             request, err := http.NewRequest(http.MethodPatch, tc.url, nil)
             require.NoError(t, err)
