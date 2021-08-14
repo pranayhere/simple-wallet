@@ -77,7 +77,7 @@ func (u *userService) LoginUser(ctx context.Context, loginCredentialsDto dto.Log
         return loggedInDto, errors.ErrIncorrectPassword
     }
 
-    accessToken, err := u.tokenMaker.CreateToken(user.Username, constant.AccessTokenDuration)
+    accessToken, err := u.tokenMaker.CreateToken(user.ID, constant.AccessTokenDuration)
     if err != nil {
         return loggedInDto, err
     }

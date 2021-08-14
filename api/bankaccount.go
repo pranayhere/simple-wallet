@@ -8,7 +8,6 @@ import (
     "github.com/pranayhere/simple-wallet/dto"
     types "github.com/pranayhere/simple-wallet/pkg/errors"
     "github.com/pranayhere/simple-wallet/service"
-    "github.com/sirupsen/logrus"
     "net/http"
     "strconv"
 )
@@ -111,7 +110,6 @@ func (b *bankAccountResource) VerificationFailed(w http.ResponseWriter, r *http.
 }
 
 func (b *bankAccountResource) Get(w http.ResponseWriter, r *http.Request) {
-    logrus.Println("another log added")
     ctx := r.Context()
     bankAcctID := chi.URLParam(r, "bankAcctID")
 
