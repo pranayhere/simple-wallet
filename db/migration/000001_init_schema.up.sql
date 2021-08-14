@@ -111,9 +111,9 @@ ALTER TABLE "transfers"
 ALTER TABLE "transfers"
     ADD FOREIGN KEY ("to_wallet_id") REFERENCES "wallets" ("id");
 
-CREATE INDEX ON "users" ("username");
+CREATE UNIQUE INDEX ON "users" ("username");
 
-CREATE INDEX ON "users" ("email");
+CREATE UNIQUE INDEX ON "users" ("email");
 
 CREATE INDEX ON "wallets" ("user_id");
 

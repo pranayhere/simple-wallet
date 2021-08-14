@@ -54,15 +54,15 @@ func NewWalletTransferDto(wtr store.WalletTransferResult) WalletTransferResultDt
 
 func NewWalletDto(wallet domain.Wallet) WalletDto {
     return WalletDto{
-        ID: wallet.ID,
-        Name: wallet.Name,
-        Address: wallet.Address,
-        Status: wallet.Status,
-        UserID: wallet.UserID,
+        ID:            wallet.ID,
+        Name:          wallet.Name,
+        Address:       wallet.Address,
+        Status:        wallet.Status,
+        UserID:        wallet.UserID,
         BankAccountID: wallet.BankAccountID,
-        Balance: wallet.Balance,
-        Currency: wallet.Currency,
-        CreatedAt: wallet.CreatedAt,
-        UpdatedAt: wallet.UpdatedAt,
+        Balance:       wallet.Balance,
+        Currency:      wallet.Currency,
+        CreatedAt:     wallet.CreatedAt,
+        UpdatedAt:     wallet.UpdatedAt,
     }
 }

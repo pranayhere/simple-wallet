@@ -21,17 +21,17 @@ import (
 func TestCreateCurrency(t *testing.T) {
     currencyDto := util.RandomCurrencyDto()
 
-    testcases := []struct{
-        name string
-        body map[string]interface{}
+    testcases := []struct {
+        name      string
+        body      map[string]interface{}
         buildStub func(mockCurrencySvc *mocksvc.MockCurrencySvc)
         checkResp func(recorder *httptest.ResponseRecorder)
     }{
         {
             name: "Ok",
             body: map[string]interface{}{
-                "code": currencyDto.Code,
-                "fraction" : currencyDto.Fraction,
+                "code":     currencyDto.Code,
+                "fraction": currencyDto.Fraction,
             },
             buildStub: func(mockCurrencySvc *mocksvc.MockCurrencySvc) {
                 mockCurrencySvc.EXPECT().CreateCurrency(gomock.Any(), currencyDto).Times(1).Return(currencyDto, nil)
@@ -43,8 +43,8 @@ func TestCreateCurrency(t *testing.T) {
         {
             name: "JsonInvalid",
             body: map[string]interface{}{
-                "code": currencyDto.Code,
-                "fraction" : "abc",
+                "code":     currencyDto.Code,
+                "fraction": "abc",
             },
             buildStub: func(mockCurrencySvc *mocksvc.MockCurrencySvc) {
                 mockCurrencySvc.EXPECT().CreateCurrency(gomock.Any(), currencyDto).Times(0)
@@ -56,7 +56,7 @@ func TestCreateCurrency(t *testing.T) {
         {
             name: "EmptyCurrencyCode",
             body: map[string]interface{}{
-                "fraction" : currencyDto.Fraction,
+                "fraction": currencyDto.Fraction,
             },
             buildStub: func(mockCurrencySvc *mocksvc.MockCurrencySvc) {
                 mockCurrencySvc.EXPECT().CreateCurrency(gomock.Any(), currencyDto).Times(0)
@@ -68,8 +68,8 @@ func TestCreateCurrency(t *testing.T) {
         {
             name: "InvalidFraction",
             body: map[string]interface{}{
-                "code": currencyDto.Code,
-                "fraction" : 8,
+                "code":     currencyDto.Code,
+                "fraction": 8,
             },
             buildStub: func(mockCurrencySvc *mocksvc.MockCurrencySvc) {
                 mockCurrencySvc.EXPECT().CreateCurrency(gomock.Any(), currencyDto).Times(0)
@@ -81,8 +81,8 @@ func TestCreateCurrency(t *testing.T) {
         {
             name: "DbConnectionClosed",
             body: map[string]interface{}{
-                "code": currencyDto.Code,
-                "fraction" : currencyDto.Fraction,
+                "code":     currencyDto.Code,
+                "fraction": currencyDto.Fraction,
             },
             buildStub: func(mockCurrencySvc *mocksvc.MockCurrencySvc) {
                 mockCurrencySvc.EXPECT().CreateCurrency(gomock.Any(), currencyDto).Times(1).Return(dto.CurrencyDto{}, sql.ErrConnDone)
@@ -105,7 +105,7 @@ func TestCreateCurrency(t *testing.T) {
             router := chi.NewRouter()
 
             currencyApi := api.NewCurrencyResource(mockCurrencySvc)
-            router.Mount("/currencies", currencyApi.RegisterRoutes(router))
+            currencyApi.RegisterRoutes(router)
 
             data, err := json.Marshal(tc.body)
             require.NoError(t, err)
@@ -124,8 +124,8 @@ func TestCreateCurrency(t *testing.T) {
 func TestGetCurrency(t *testing.T) {
     currencyDto := util.RandomCurrencyDto()
 
-    testcases := []struct{
-        name string
+    testcases := []struct {
+        name      string
         buildStub func(mockCurrencySvc *mocksvc.MockCurrencySvc)
         checkResp func(recorder *httptest.ResponseRecorder)
     }{
@@ -161,7 +161,7 @@ func TestGetCurrency(t *testing.T) {
             router := chi.NewRouter()
 
             currencyApi := api.NewCurrencyResource(mockCurrencySvc)
-            router.Mount("/currencies", currencyApi.RegisterRoutes(router))
+            currencyApi.RegisterRoutes(router)
 
             url := fmt.Sprintf("/currencies/%s", currencyDto.Code)
             request, err := http.NewRequest(http.MethodGet, url, nil)

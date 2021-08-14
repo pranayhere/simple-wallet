@@ -19,15 +19,15 @@ import (
 )
 
 func TestGetWallet(t *testing.T) {
-    testcases := []struct{
-        name string
-        url string
+    testcases := []struct {
+        name      string
+        url       string
         buildStub func(mockWalletSvc *mocksvc.MockWalletSvc)
         checkResp func(recorder *httptest.ResponseRecorder)
     }{
         {
             name: "Ok",
-            url: fmt.Sprintf("/wallets/%d", 1),
+            url:  fmt.Sprintf("/wallets/%d", 1),
             buildStub: func(mockWalletSvc *mocksvc.MockWalletSvc) {
                 mockWalletSvc.EXPECT().GetWalletById(gomock.Any(), gomock.Any()).Times(1)
             },
@@ -37,7 +37,7 @@ func TestGetWallet(t *testing.T) {
         },
         {
             name: "WalletNotFound",
-            url: fmt.Sprintf("/wallets/%d", 1),
+            url:  fmt.Sprintf("/wallets/%d", 1),
             buildStub: func(mockWalletSvc *mocksvc.MockWalletSvc) {
                 mockWalletSvc.EXPECT().GetWalletById(gomock.Any(), gomock.Any()).Times(1).Return(dto.WalletDto{}, errors.ErrWalletNotFound)
             },
@@ -47,7 +47,7 @@ func TestGetWallet(t *testing.T) {
         },
         {
             name: "InternalServerError",
-            url: fmt.Sprintf("/wallets/%d", 1),
+            url:  fmt.Sprintf("/wallets/%d", 1),
             buildStub: func(mockWalletSvc *mocksvc.MockWalletSvc) {
                 mockWalletSvc.EXPECT().GetWalletById(gomock.Any(), gomock.Any()).Times(1).Return(dto.WalletDto{}, sql.ErrConnDone)
             },
@@ -57,7 +57,7 @@ func TestGetWallet(t *testing.T) {
         },
         {
             name: "InvalidWalletID",
-            url: fmt.Sprintf("/wallets/%s", "invalid-id"),
+            url:  fmt.Sprintf("/wallets/%s", "invalid-id"),
             buildStub: func(mockWalletSvc *mocksvc.MockWalletSvc) {
                 mockWalletSvc.EXPECT().GetWalletById(gomock.Any(), gomock.Any()).Times(0)
             },
@@ -79,7 +79,7 @@ func TestGetWallet(t *testing.T) {
             router := chi.NewRouter()
 
             walletApi := api.NewWalletResource(mockWalletSvc)
-            router.Mount("/wallets", walletApi.RegisterRoutes(router))
+            walletApi.RegisterRoutes(router)
 
             url := tc.url
             request, err := http.NewRequest(http.MethodGet, url, nil)
@@ -94,9 +94,9 @@ func TestGetWallet(t *testing.T) {
 }
 
 func TestDepositToWallet(t *testing.T) {
-    testcases := []struct{
-        name string
-        body map[string]interface{}
+    testcases := []struct {
+        name      string
+        body      map[string]interface{}
         buildStub func(mockWalletSvc *mocksvc.MockWalletSvc)
         checkResp func(recorder *httptest.ResponseRecorder)
     }{
@@ -104,7 +104,7 @@ func TestDepositToWallet(t *testing.T) {
             name: "Ok",
             body: map[string]interface{}{
                 "wallet_id": util.RandomInt(1, 1000),
-                "amount": util.RandomInt(1, 1000),
+                "amount":    util.RandomInt(1, 1000),
             },
             buildStub: func(mockWalletSvc *mocksvc.MockWalletSvc) {
                 mockWalletSvc.EXPECT().Deposit(gomock.Any(), gomock.Any()).Times(1)
@@ -129,7 +129,7 @@ func TestDepositToWallet(t *testing.T) {
             name: "NegativeWalletAmount",
             body: map[string]interface{}{
                 "wallet_id": util.RandomInt(1, 1000),
-                "amount": -1,
+                "amount":    -1,
             },
             buildStub: func(mockWalletSvc *mocksvc.MockWalletSvc) {
                 mockWalletSvc.EXPECT().Deposit(gomock.Any(), gomock.Any()).Times(0)
@@ -142,7 +142,7 @@ func TestDepositToWallet(t *testing.T) {
             name: "JsonInvalid",
             body: map[string]interface{}{
                 "wallet_id": "invalid-json",
-                "amount": -1,
+                "amount":    -1,
             },
             buildStub: func(mockWalletSvc *mocksvc.MockWalletSvc) {
                 mockWalletSvc.EXPECT().Deposit(gomock.Any(), gomock.Any()).Times(0)
@@ -155,7 +155,7 @@ func TestDepositToWallet(t *testing.T) {
             name: "WalletNotFound",
             body: map[string]interface{}{
                 "wallet_id": util.RandomInt(1, 1000),
-                "amount": util.RandomInt(1, 1000),
+                "amount":    util.RandomInt(1, 1000),
             },
             buildStub: func(mockWalletSvc *mocksvc.MockWalletSvc) {
                 mockWalletSvc.EXPECT().Deposit(gomock.Any(), gomock.Any()).Times(1).Return(dto.WalletTransferResultDto{}, errors.ErrWalletNotFound)
@@ -179,7 +179,7 @@ func TestDepositToWallet(t *testing.T) {
             router := chi.NewRouter()
 
             walletApi := api.NewWalletResource(mockWalletSvc)
-            router.Mount("/wallets", walletApi.RegisterRoutes(router))
+            walletApi.RegisterRoutes(router)
 
             data, err := json.Marshal(body)
             require.NoError(t, err)
@@ -195,11 +195,10 @@ func TestDepositToWallet(t *testing.T) {
     }
 }
 
-
 func TestWithdrawFromWallet(t *testing.T) {
-    testcases := []struct{
-        name string
-        body map[string]interface{}
+    testcases := []struct {
+        name      string
+        body      map[string]interface{}
         buildStub func(mockWalletSvc *mocksvc.MockWalletSvc)
         checkResp func(recorder *httptest.ResponseRecorder)
     }{
@@ -207,8 +206,8 @@ func TestWithdrawFromWallet(t *testing.T) {
             name: "Ok",
             body: map[string]interface{}{
                 "wallet_id": util.RandomInt(1, 1000),
-                "amount": util.RandomInt(1, 1000),
-                "user_id": util.RandomInt(1, 1000),
+                "amount":    util.RandomInt(1, 1000),
+                "user_id":   util.RandomInt(1, 1000),
             },
             buildStub: func(mockWalletSvc *mocksvc.MockWalletSvc) {
                 mockWalletSvc.EXPECT().Withdraw(gomock.Any(), gomock.Any()).Times(1)
@@ -220,7 +219,7 @@ func TestWithdrawFromWallet(t *testing.T) {
         {
             name: "InvalidWalletID",
             body: map[string]interface{}{
-                "amount": util.RandomInt(1, 1000),
+                "amount":  util.RandomInt(1, 1000),
                 "user_id": util.RandomInt(1, 1000),
             },
             buildStub: func(mockWalletSvc *mocksvc.MockWalletSvc) {
@@ -234,8 +233,8 @@ func TestWithdrawFromWallet(t *testing.T) {
             name: "NegativeWalletAmount",
             body: map[string]interface{}{
                 "wallet_id": util.RandomInt(1, 1000),
-                "amount": -1,
-                "user_id": util.RandomInt(1, 1000),
+                "amount":    -1,
+                "user_id":   util.RandomInt(1, 1000),
             },
             buildStub: func(mockWalletSvc *mocksvc.MockWalletSvc) {
                 mockWalletSvc.EXPECT().Withdraw(gomock.Any(), gomock.Any()).Times(0)
@@ -248,8 +247,8 @@ func TestWithdrawFromWallet(t *testing.T) {
             name: "JsonInvalid",
             body: map[string]interface{}{
                 "wallet_id": "invalid-json",
-                "amount": -1,
-                "user_id": util.RandomInt(1, 1000),
+                "amount":    -1,
+                "user_id":   util.RandomInt(1, 1000),
             },
             buildStub: func(mockWalletSvc *mocksvc.MockWalletSvc) {
                 mockWalletSvc.EXPECT().Withdraw(gomock.Any(), gomock.Any()).Times(0)
@@ -262,8 +261,8 @@ func TestWithdrawFromWallet(t *testing.T) {
             name: "WalletNotFound",
             body: map[string]interface{}{
                 "wallet_id": util.RandomInt(1, 1000),
-                "amount": util.RandomInt(1, 1000),
-                "user_id": util.RandomInt(1, 1000),
+                "amount":    util.RandomInt(1, 1000),
+                "user_id":   util.RandomInt(1, 1000),
             },
             buildStub: func(mockWalletSvc *mocksvc.MockWalletSvc) {
                 mockWalletSvc.EXPECT().Withdraw(gomock.Any(), gomock.Any()).Times(1).Return(dto.WalletTransferResultDto{}, errors.ErrWalletNotFound)
@@ -287,7 +286,7 @@ func TestWithdrawFromWallet(t *testing.T) {
             router := chi.NewRouter()
 
             walletApi := api.NewWalletResource(mockWalletSvc)
-            router.Mount("/wallets", walletApi.RegisterRoutes(router))
+            walletApi.RegisterRoutes(router)
 
             data, err := json.Marshal(body)
             require.NoError(t, err)

@@ -23,9 +23,9 @@ func TestCreateBankAccount(t *testing.T) {
     bankAccount := util.RandomBankAccount(createBankAccountDto)
     bankAccountDto := dto.NewBankAccountDto(bankAccount)
 
-    testcases := []struct{
-        name string
-        body map[string]interface{}
+    testcases := []struct {
+        name      string
+        body      map[string]interface{}
         buildStub func(mockBankAcctSvc *mocksvc.MockBankAccountSvc)
         checkResp func(recorder *httptest.ResponseRecorder)
     }{
@@ -33,10 +33,10 @@ func TestCreateBankAccount(t *testing.T) {
             name: "Ok",
             body: map[string]interface{}{
                 "account_no": createBankAccountDto.AccountNo,
-                "ifsc": createBankAccountDto.Ifsc,
-                "bank_name": createBankAccountDto.BankName,
-                "currency": createBankAccountDto.Currency,
-                "user_id": createBankAccountDto.UserID,
+                "ifsc":       createBankAccountDto.Ifsc,
+                "bank_name":  createBankAccountDto.BankName,
+                "currency":   createBankAccountDto.Currency,
+                "user_id":    createBankAccountDto.UserID,
             },
             buildStub: func(mockBankAcctSvc *mocksvc.MockBankAccountSvc) {
                 mockBankAcctSvc.EXPECT().CreateBankAccount(gomock.Any(), createBankAccountDto).Times(1).Return(bankAccountDto, nil)
@@ -49,10 +49,10 @@ func TestCreateBankAccount(t *testing.T) {
             name: "InternalServerErr",
             body: map[string]interface{}{
                 "account_no": createBankAccountDto.AccountNo,
-                "ifsc": createBankAccountDto.Ifsc,
-                "bank_name": createBankAccountDto.BankName,
-                "currency": createBankAccountDto.Currency,
-                "user_id": createBankAccountDto.UserID,
+                "ifsc":       createBankAccountDto.Ifsc,
+                "bank_name":  createBankAccountDto.BankName,
+                "currency":   createBankAccountDto.Currency,
+                "user_id":    createBankAccountDto.UserID,
             },
             buildStub: func(mockBankAcctSvc *mocksvc.MockBankAccountSvc) {
                 mockBankAcctSvc.EXPECT().CreateBankAccount(gomock.Any(), createBankAccountDto).Times(1).Return(dto.BankAccountDto{}, sql.ErrConnDone)
@@ -65,10 +65,10 @@ func TestCreateBankAccount(t *testing.T) {
             name: "JsonInvalid",
             body: map[string]interface{}{
                 "account_no": 1,
-                "ifsc": createBankAccountDto.Ifsc,
-                "bank_name": createBankAccountDto.BankName,
-                "currency": createBankAccountDto.Currency,
-                "user_id": createBankAccountDto.UserID,
+                "ifsc":       createBankAccountDto.Ifsc,
+                "bank_name":  createBankAccountDto.BankName,
+                "currency":   createBankAccountDto.Currency,
+                "user_id":    createBankAccountDto.UserID,
             },
             buildStub: func(mockBankAcctSvc *mocksvc.MockBankAccountSvc) {
                 mockBankAcctSvc.EXPECT().CreateBankAccount(gomock.Any(), gomock.Any()).Times(0)
@@ -80,10 +80,10 @@ func TestCreateBankAccount(t *testing.T) {
         {
             name: "ValidationError",
             body: map[string]interface{}{
-                "ifsc": createBankAccountDto.Ifsc,
+                "ifsc":      createBankAccountDto.Ifsc,
                 "bank_name": createBankAccountDto.BankName,
-                "currency": createBankAccountDto.Currency,
-                "user_id": createBankAccountDto.UserID,
+                "currency":  createBankAccountDto.Currency,
+                "user_id":   createBankAccountDto.UserID,
             },
             buildStub: func(mockBankAcctSvc *mocksvc.MockBankAccountSvc) {
                 mockBankAcctSvc.EXPECT().CreateBankAccount(gomock.Any(), gomock.Any()).Times(0)
@@ -96,10 +96,10 @@ func TestCreateBankAccount(t *testing.T) {
             name: "DuplicateBankAccount",
             body: map[string]interface{}{
                 "account_no": createBankAccountDto.AccountNo,
-                "ifsc": createBankAccountDto.Ifsc,
-                "bank_name": createBankAccountDto.BankName,
-                "currency": createBankAccountDto.Currency,
-                "user_id": createBankAccountDto.UserID,
+                "ifsc":       createBankAccountDto.Ifsc,
+                "bank_name":  createBankAccountDto.BankName,
+                "currency":   createBankAccountDto.Currency,
+                "user_id":    createBankAccountDto.UserID,
             },
             buildStub: func(mockBankAcctSvc *mocksvc.MockBankAccountSvc) {
                 mockBankAcctSvc.EXPECT().CreateBankAccount(gomock.Any(), gomock.Any()).Times(1).Return(dto.BankAccountDto{}, errors.ErrBankAccountAlreadyExist)
@@ -122,7 +122,7 @@ func TestCreateBankAccount(t *testing.T) {
             router := chi.NewRouter()
 
             bankAcctApi := api.NewBankAccountResource(mockBankAcctSvc)
-            router.Mount("/bank-accounts", bankAcctApi.RegisterRoutes(router))
+            bankAcctApi.RegisterRoutes(router)
 
             data, err := json.Marshal(tc.body)
             require.NoError(t, err)
@@ -143,15 +143,15 @@ func TestGetBankAccount(t *testing.T) {
     bankAccount := util.RandomBankAccount(createBankAccountDto)
     bankAccountDto := dto.NewBankAccountDto(bankAccount)
 
-    testcases := []struct{
-        name string
-        url string
+    testcases := []struct {
+        name      string
+        url       string
         buildStub func(mockBankAcctSvc *mocksvc.MockBankAccountSvc)
         checkResp func(recorder *httptest.ResponseRecorder)
     }{
         {
-            name : "Ok",
-            url: fmt.Sprintf("/bank-accounts/%d", 1),
+            name: "Ok",
+            url:  fmt.Sprintf("/bank-accounts/%d", 1),
             buildStub: func(mockBankAcctSvc *mocksvc.MockBankAccountSvc) {
                 mockBankAcctSvc.EXPECT().GetBankAccount(gomock.Any(), int64(1)).Times(1).Return(bankAccountDto, nil)
             },
@@ -160,8 +160,8 @@ func TestGetBankAccount(t *testing.T) {
             },
         },
         {
-            name : "InternalServerError",
-            url: fmt.Sprintf("/bank-accounts/%d", 1),
+            name: "InternalServerError",
+            url:  fmt.Sprintf("/bank-accounts/%d", 1),
             buildStub: func(mockBankAcctSvc *mocksvc.MockBankAccountSvc) {
                 mockBankAcctSvc.EXPECT().GetBankAccount(gomock.Any(), int64(1)).Times(1).Return(bankAccountDto, sql.ErrConnDone)
             },
@@ -170,8 +170,8 @@ func TestGetBankAccount(t *testing.T) {
             },
         },
         {
-            name : "BankAccountNotFound",
-            url: fmt.Sprintf("/bank-accounts/%d", 1),
+            name: "BankAccountNotFound",
+            url:  fmt.Sprintf("/bank-accounts/%d", 1),
             buildStub: func(mockBankAcctSvc *mocksvc.MockBankAccountSvc) {
                 mockBankAcctSvc.EXPECT().GetBankAccount(gomock.Any(), gomock.Any()).Times(1).Return(dto.BankAccountDto{}, errors.ErrBankAccountNotFound)
             },
@@ -180,8 +180,8 @@ func TestGetBankAccount(t *testing.T) {
             },
         },
         {
-            name : "InvalidBankAccountId",
-            url: fmt.Sprintf("/bank-accounts/%s", "invalid-id"),
+            name: "InvalidBankAccountId",
+            url:  fmt.Sprintf("/bank-accounts/%s", "invalid-id"),
             buildStub: func(mockBankAcctSvc *mocksvc.MockBankAccountSvc) {
                 mockBankAcctSvc.EXPECT().GetBankAccount(gomock.Any(), gomock.Any()).Times(0)
             },
@@ -203,7 +203,7 @@ func TestGetBankAccount(t *testing.T) {
             router := chi.NewRouter()
 
             bankAcctApi := api.NewBankAccountResource(mockBankAcctSvc)
-            router.Mount("/bank-accounts", bankAcctApi.RegisterRoutes(router))
+            bankAcctApi.RegisterRoutes(router)
 
             url := tc.url
             request, err := http.NewRequest(http.MethodGet, url, nil)
@@ -220,15 +220,15 @@ func TestBankAccountVerificationSuccess(t *testing.T) {
     bankAccount := util.RandomBankAccount(createBankAccountDto)
     bankAccountDto := dto.NewBankAccountDto(bankAccount)
 
-    testcases := []struct{
-        name string
-        url string
+    testcases := []struct {
+        name      string
+        url       string
         buildStub func(mockBankAcctSvc *mocksvc.MockBankAccountSvc)
         checkResp func(recorder *httptest.ResponseRecorder)
     }{
         {
             name: "Ok",
-            url: fmt.Sprintf("/bank-accounts/%v/verification-success", 1),
+            url:  fmt.Sprintf("/bank-accounts/%v/verification-success", 1),
             buildStub: func(mockBankAcctSvc *mocksvc.MockBankAccountSvc) {
                 mockBankAcctSvc.EXPECT().VerificationSuccess(gomock.Any(), gomock.Any()).Times(1).Return(bankAccountDto, nil)
             },
@@ -238,7 +238,7 @@ func TestBankAccountVerificationSuccess(t *testing.T) {
         },
         {
             name: "InvalidBankAccountId",
-            url: fmt.Sprintf("/bank-accounts/%s/verification-success", "invalid-id"),
+            url:  fmt.Sprintf("/bank-accounts/%s/verification-success", "invalid-id"),
             buildStub: func(mockBankAcctSvc *mocksvc.MockBankAccountSvc) {
                 mockBankAcctSvc.EXPECT().VerificationSuccess(gomock.Any(), gomock.Any()).Times(0)
             },
@@ -248,7 +248,7 @@ func TestBankAccountVerificationSuccess(t *testing.T) {
         },
         {
             name: "InternalServerError",
-            url: fmt.Sprintf("/bank-accounts/%d/verification-success", 1),
+            url:  fmt.Sprintf("/bank-accounts/%d/verification-success", 1),
             buildStub: func(mockBankAcctSvc *mocksvc.MockBankAccountSvc) {
                 mockBankAcctSvc.EXPECT().VerificationSuccess(gomock.Any(), gomock.Any()).Times(1).Return(dto.BankAccountDto{}, sql.ErrConnDone)
             },
@@ -258,7 +258,7 @@ func TestBankAccountVerificationSuccess(t *testing.T) {
         },
         {
             name: "BankAccountNotFound",
-            url: fmt.Sprintf("/bank-accounts/%d/verification-success", 1),
+            url:  fmt.Sprintf("/bank-accounts/%d/verification-success", 1),
             buildStub: func(mockBankAcctSvc *mocksvc.MockBankAccountSvc) {
                 mockBankAcctSvc.EXPECT().VerificationSuccess(gomock.Any(), gomock.Any()).Times(1).Return(dto.BankAccountDto{}, errors.ErrBankAccountNotFound)
             },
@@ -280,7 +280,7 @@ func TestBankAccountVerificationSuccess(t *testing.T) {
             router := chi.NewRouter()
 
             bankAcctApi := api.NewBankAccountResource(mockBankAcctSvc)
-            router.Mount("/bank-accounts", bankAcctApi.RegisterRoutes(router))
+            bankAcctApi.RegisterRoutes(router)
 
             request, err := http.NewRequest(http.MethodPatch, tc.url, nil)
             require.NoError(t, err)
@@ -296,15 +296,15 @@ func TestBankAccountVerificationFailed(t *testing.T) {
     bankAccount := util.RandomBankAccount(createBankAccountDto)
     bankAccountDto := dto.NewBankAccountDto(bankAccount)
 
-    testcases := []struct{
-        name string
-        url string
+    testcases := []struct {
+        name      string
+        url       string
         buildStub func(mockBankAcctSvc *mocksvc.MockBankAccountSvc)
         checkResp func(recorder *httptest.ResponseRecorder)
     }{
         {
             name: "Ok",
-            url: fmt.Sprintf("/bank-accounts/%v/verification-failed", 1),
+            url:  fmt.Sprintf("/bank-accounts/%v/verification-failed", 1),
             buildStub: func(mockBankAcctSvc *mocksvc.MockBankAccountSvc) {
                 mockBankAcctSvc.EXPECT().VerificationFailed(gomock.Any(), gomock.Any()).Times(1).Return(bankAccountDto, nil)
             },
@@ -314,7 +314,7 @@ func TestBankAccountVerificationFailed(t *testing.T) {
         },
         {
             name: "InvalidBankAccountId",
-            url: fmt.Sprintf("/bank-accounts/%s/verification-failed", "invalid-id"),
+            url:  fmt.Sprintf("/bank-accounts/%s/verification-failed", "invalid-id"),
             buildStub: func(mockBankAcctSvc *mocksvc.MockBankAccountSvc) {
                 mockBankAcctSvc.EXPECT().VerificationFailed(gomock.Any(), gomock.Any()).Times(0)
             },
@@ -324,7 +324,7 @@ func TestBankAccountVerificationFailed(t *testing.T) {
         },
         {
             name: "InternalServerError",
-            url: fmt.Sprintf("/bank-accounts/%d/verification-failed", 1),
+            url:  fmt.Sprintf("/bank-accounts/%d/verification-failed", 1),
             buildStub: func(mockBankAcctSvc *mocksvc.MockBankAccountSvc) {
                 mockBankAcctSvc.EXPECT().VerificationFailed(gomock.Any(), gomock.Any()).Times(1).Return(dto.BankAccountDto{}, sql.ErrConnDone)
             },
@@ -334,7 +334,7 @@ func TestBankAccountVerificationFailed(t *testing.T) {
         },
         {
             name: "BankAccountNotFound",
-            url: fmt.Sprintf("/bank-accounts/%d/verification-failed", 1),
+            url:  fmt.Sprintf("/bank-accounts/%d/verification-failed", 1),
             buildStub: func(mockBankAcctSvc *mocksvc.MockBankAccountSvc) {
                 mockBankAcctSvc.EXPECT().VerificationFailed(gomock.Any(), gomock.Any()).Times(1).Return(dto.BankAccountDto{}, errors.ErrBankAccountNotFound)
             },
@@ -356,7 +356,7 @@ func TestBankAccountVerificationFailed(t *testing.T) {
             router := chi.NewRouter()
 
             bankAcctApi := api.NewBankAccountResource(mockBankAcctSvc)
-            router.Mount("/bank-accounts", bankAcctApi.RegisterRoutes(router))
+            bankAcctApi.RegisterRoutes(router)
 
             request, err := http.NewRequest(http.MethodPatch, tc.url, nil)
             require.NoError(t, err)

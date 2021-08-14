@@ -58,7 +58,7 @@ func RandomEmail() string {
 // RandomWalletAddress generate random wallet address
 func RandomWalletAddress(email string) string {
     walletAddress := strings.Split(email, "@")[0]
-    walletAddress = fmt.Sprintf("%s-%d@my.wallet", walletAddress, RandomInt(1,100))
+    walletAddress = fmt.Sprintf("%s-%d@my.wallet", walletAddress, RandomInt(1, 100))
     return walletAddress
 }
 
@@ -107,7 +107,7 @@ func RandomUserDto(createUserDto dto.CreateUserDto) dto.UserDto {
     return dto.UserDto{
         Username: createUserDto.Username,
         FullName: createUserDto.FullName,
-        Status: string(domain.UserStatusACTIVE),
+        Status:   string(domain.UserStatusACTIVE),
         Email:    createUserDto.Email,
     }
 }
@@ -128,7 +128,7 @@ func RandomBankAccount(createBankAcctDto dto.CreateBankAccountDto) domain.BankAc
         BankName:  createBankAcctDto.BankName,
         Ifsc:      createBankAcctDto.Ifsc,
         AccountNo: createBankAcctDto.AccountNo,
-        Status: domain.BankAccountStatusINVERIFICATION,
+        Status:    domain.BankAccountStatusINVERIFICATION,
         Currency:  createBankAcctDto.Currency,
     }
 }

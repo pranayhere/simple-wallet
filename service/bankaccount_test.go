@@ -334,7 +334,7 @@ func TestBankAccountVerificationFailed(t *testing.T) {
             mockCurrencyRepo := mockdb.NewMockCurrencyRepo(ctrl)
             mockBankAcctRepo := mockdb.NewMockBankAccountRepo(ctrl)
 
-            bankAcct := util.RandomBankAccount(util.RandomCreateBankAccountDto( "INR"))
+            bankAcct := util.RandomBankAccount(util.RandomCreateBankAccountDto("INR"))
             tc.buildStub(mockBankAcctRepo, bankAcct)
 
             ctx := context.TODO()

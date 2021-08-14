@@ -3,10 +3,7 @@ package main
 import (
     "context"
     "database/sql"
-    "github.com/go-chi/chi"
-    "github.com/go-chi/chi/middleware"
-    "go.uber.org/zap"
-    "log"
+    log "github.com/sirupsen/logrus"
     "net/http"
     "os"
     "os/signal"
@@ -21,13 +18,15 @@ const (
 )
 
 func main() {
+    log.SetFormatter(&log.TextFormatter{})
+
     log.Println("starting wallet service")
 
-    db := NewStore()
+    db := newStore()
     defer db.Close()
 
-    r := CreateRouter()
-    r = inject(db, r)
+    r := createRouter()
+    r = initRoutes(db, r)
 
     server := &http.Server{Addr: serverAddress, Handler: r}
     serverCtx, serverStopCtx := context.WithCancel(context.Background())
@@ -51,7 +50,7 @@ func main() {
         // Trigger graceful shutdown
         err := server.Shutdown(shutdownCtx)
         if err != nil {
-            log.Fatal("", zap.Error(err))
+            log.Fatal("", err)
         }
         serverStopCtx()
     }()
@@ -59,7 +58,7 @@ func main() {
     // Run the server
     err := server.ListenAndServe()
     if err != nil && err != http.ErrServerClosed {
-        log.Fatal("failed to start server", zap.Error(err))
+        log.Fatal("failed to start server", err)
         os.Exit(1)
     }
 
@@ -67,20 +66,11 @@ func main() {
     <-serverCtx.Done()
 }
 
-func NewStore() *sql.DB {
+func newStore() *sql.DB {
     conn, err := sql.Open(dbDriver, dbSource)
     if err != nil {
-        log.Fatal("cannot connect to db", zap.Error(err))
+        log.Fatal("cannot connect to db", err)
     }
 
     return conn
-}
-
-func CreateRouter() *chi.Mux {
-    r := chi.NewRouter()
-
-    r.Use(middleware.Recoverer)
-    r.Use(middleware.Logger)
-
-    return r
 }

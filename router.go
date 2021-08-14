@@ -3,6 +3,8 @@ package main
 import (
     "database/sql"
     "github.com/go-chi/chi"
+    "github.com/go-chi/chi/middleware"
+    "github.com/go-chi/httprate"
     "github.com/go-chi/render"
     "github.com/pranayhere/simple-wallet/api"
     m "github.com/pranayhere/simple-wallet/middleware"
@@ -11,10 +13,22 @@ import (
     "github.com/pranayhere/simple-wallet/store"
     "github.com/pranayhere/simple-wallet/token"
     "net/http"
+    "time"
 )
 
-func inject(db *sql.DB, r *chi.Mux) *chi.Mux {
-    // currency
+func createRouter() *chi.Mux {
+    r := chi.NewRouter()
+
+    r.Use(middleware.RequestID)
+    r.Use(middleware.RealIP)
+    r.Use(middleware.Recoverer)
+    r.Use(middleware.Logger)
+    r.Use(httprate.LimitByIP(100, 1*time.Minute))
+
+    return r
+}
+
+func initRoutes(db *sql.DB, r *chi.Mux) *chi.Mux {
     currencyRepo := store.NewCurrencyRepo(db)
     currencySvc := service.NewCurrencyService(currencyRepo)
     currencyApi := api.NewCurrencyResource(currencySvc)
@@ -38,13 +52,16 @@ func inject(db *sql.DB, r *chi.Mux) *chi.Mux {
     walletSvc := service.NewWalletService(walletRepo)
     walletApi := api.NewWalletResource(walletSvc)
 
-    r.Mount("/users", userApi.RegisterRoutes(r))
+    // Routes
+    // public
+    userApi.RegisterRoutes(r.With(httprate.LimitByIP(10, 1*time.Minute)))
 
+    // authorized
     r.Group(func(r chi.Router) {
         r.Use(m.Auth(tokenMaker))
-        r.Mount("/bank-accounts", bankAcctApi.RegisterRoutes(r))
-        r.Mount("/currencies", currencyApi.RegisterRoutes(r))
-        r.Mount("/wallets", walletApi.RegisterRoutes(r))
+        bankAcctApi.RegisterRoutes(r)
+        currencyApi.RegisterRoutes(r)
+        walletApi.RegisterRoutes(r)
     })
 
     r.Get("/health", func(w http.ResponseWriter, r *http.Request) {

@@ -22,19 +22,19 @@ func TestCreateUser(t *testing.T) {
     createUserDto := util.RandomCreateUserDto()
     userDto := util.RandomUserDto(createUserDto)
 
-    testcases := []struct{
-        name string
-        body map[string]interface{}
+    testcases := []struct {
+        name      string
+        body      map[string]interface{}
         buildStub func(mockUserSvc *mocksvc.MockUserSvc)
-        checkRes func(recorder *httptest.ResponseRecorder)
+        checkRes  func(recorder *httptest.ResponseRecorder)
     }{
         {
             name: "Ok",
             body: map[string]interface{}{
-                "username": createUserDto.Username,
-                "password": createUserDto.Password,
+                "username":  createUserDto.Username,
+                "password":  createUserDto.Password,
                 "full_name": createUserDto.FullName,
-                "email": createUserDto.Email,
+                "email":     createUserDto.Email,
             },
             buildStub: func(mockUserSvc *mocksvc.MockUserSvc) {
                 mockUserSvc.EXPECT().CreateUser(gomock.Any(), createUserDto).Times(1).Return(userDto, nil)
@@ -46,10 +46,10 @@ func TestCreateUser(t *testing.T) {
         {
             name: "JsonInvalid",
             body: map[string]interface{}{
-                "username": 1,
-                "password": createUserDto.Password,
+                "username":  1,
+                "password":  createUserDto.Password,
                 "full_name": createUserDto.FullName,
-                "email": createUserDto.Email,
+                "email":     createUserDto.Email,
             },
             buildStub: func(mockUserSvc *mocksvc.MockUserSvc) {
                 mockUserSvc.EXPECT().CreateUser(gomock.Any(), createUserDto).Times(0)
@@ -62,10 +62,10 @@ func TestCreateUser(t *testing.T) {
         {
             name: "InternalErr",
             body: map[string]interface{}{
-                "username": createUserDto.Username,
-                "password": createUserDto.Password,
+                "username":  createUserDto.Username,
+                "password":  createUserDto.Password,
                 "full_name": createUserDto.FullName,
-                "email": createUserDto.Email,
+                "email":     createUserDto.Email,
             },
             buildStub: func(mockUserSvc *mocksvc.MockUserSvc) {
                 mockUserSvc.EXPECT().CreateUser(gomock.Any(), createUserDto).Times(1).Return(dto.UserDto{}, sql.ErrConnDone)
@@ -77,10 +77,10 @@ func TestCreateUser(t *testing.T) {
         {
             name: "DuplicateUser",
             body: map[string]interface{}{
-                "username": createUserDto.Username,
-                "password": createUserDto.Password,
+                "username":  createUserDto.Username,
+                "password":  createUserDto.Password,
                 "full_name": createUserDto.FullName,
-                "email": createUserDto.Email,
+                "email":     createUserDto.Email,
             },
             buildStub: func(mockUserSvc *mocksvc.MockUserSvc) {
                 mockUserSvc.EXPECT().CreateUser(gomock.Any(), createUserDto).Times(1).Return(dto.UserDto{}, errors.ErrUserAlreadyExist)
@@ -92,10 +92,10 @@ func TestCreateUser(t *testing.T) {
         {
             name: "InvalidUsername",
             body: map[string]interface{}{
-                "username": "invalid-user#1",
-                "password": createUserDto.Password,
+                "username":  "invalid-user#1",
+                "password":  createUserDto.Password,
                 "full_name": createUserDto.FullName,
-                "email": createUserDto.Email,
+                "email":     createUserDto.Email,
             },
             buildStub: func(mockUserSvc *mocksvc.MockUserSvc) {
                 mockUserSvc.EXPECT().CreateUser(gomock.Any(), gomock.Any()).Times(0)
@@ -107,10 +107,10 @@ func TestCreateUser(t *testing.T) {
         {
             name: "InvalidEmail",
             body: map[string]interface{}{
-                "username": createUserDto.Username,
-                "password": createUserDto.Password,
+                "username":  createUserDto.Username,
+                "password":  createUserDto.Password,
                 "full_name": createUserDto.FullName,
-                "email": "invalid-email",
+                "email":     "invalid-email",
             },
             buildStub: func(mockUserSvc *mocksvc.MockUserSvc) {
                 mockUserSvc.EXPECT().CreateUser(gomock.Any(), gomock.Any()).Times(0)
@@ -122,10 +122,10 @@ func TestCreateUser(t *testing.T) {
         {
             name: "TooShortPassword",
             body: map[string]interface{}{
-                "username": createUserDto.Username,
-                "password": "123",
+                "username":  createUserDto.Username,
+                "password":  "123",
                 "full_name": createUserDto.FullName,
-                "email": createUserDto.Email,
+                "email":     createUserDto.Email,
             },
             buildStub: func(mockUserSvc *mocksvc.MockUserSvc) {
                 mockUserSvc.EXPECT().CreateUser(gomock.Any(), gomock.Any()).Times(0)
@@ -148,7 +148,7 @@ func TestCreateUser(t *testing.T) {
             router := chi.NewRouter()
 
             userApi := api.NewUserResource(mockUserSvc)
-            router.Mount("/users", userApi.RegisterRoutes(router))
+            userApi.RegisterRoutes(router)
 
             data, err := json.Marshal(tc.body)
             require.NoError(t, err)
@@ -170,15 +170,14 @@ func TestLoginUser(t *testing.T) {
 
     loggedInUserDto := dto.LoggedInUserDto{
         AccessToken: util.RandomString(10),
-        User: userDto,
+        User:        userDto,
     }
 
-
-    testcases := []struct{
-        name string
-        body map[string]interface{}
+    testcases := []struct {
+        name      string
+        body      map[string]interface{}
         buildStub func(mockUserSvc *mocksvc.MockUserSvc)
-        checkRes func(recorder *httptest.ResponseRecorder)
+        checkRes  func(recorder *httptest.ResponseRecorder)
     }{
         {
             name: "Ok",
@@ -276,7 +275,7 @@ func TestLoginUser(t *testing.T) {
             router := chi.NewRouter()
 
             userApi := api.NewUserResource(mockUserSvc)
-            router.Mount("/users", userApi.RegisterRoutes(router))
+            userApi.RegisterRoutes(router)
 
             data, err := json.Marshal(tc.body)
             require.NoError(t, err)

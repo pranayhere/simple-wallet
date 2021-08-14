@@ -8,6 +8,7 @@ import (
     "github.com/pranayhere/simple-wallet/dto"
     types "github.com/pranayhere/simple-wallet/pkg/errors"
     "github.com/pranayhere/simple-wallet/service"
+    "github.com/sirupsen/logrus"
     "net/http"
     "strconv"
 )
@@ -17,7 +18,7 @@ type BankAccountResource interface {
     VerificationSuccess(w http.ResponseWriter, r *http.Request)
     VerificationFailed(w http.ResponseWriter, r *http.Request)
     Get(w http.ResponseWriter, r *http.Request)
-    RegisterRoutes(r chi.Router) http.Handler
+    RegisterRoutes(r chi.Router)
 }
 
 type bankAccountResource struct {
@@ -30,13 +31,11 @@ func NewBankAccountResource(bankAcctSvc service.BankAccountSvc) BankAccountResou
     }
 }
 
-func (b *bankAccountResource) RegisterRoutes(r chi.Router) http.Handler {
-    r.Get("/{bankAcctID}", b.Get)
-    r.Post("/", b.Create)
-    r.Patch("/{bankAcctID}/verification-success", b.VerificationSuccess)
-    r.Patch("/{bankAcctID}/verification-failed", b.VerificationFailed)
-
-    return r
+func (b *bankAccountResource) RegisterRoutes(r chi.Router) {
+    r.Get("/bank-accounts/{bankAcctID}", b.Get)
+    r.Post("/bank-accounts", b.Create)
+    r.Patch("/bank-accounts/{bankAcctID}/verification-success", b.VerificationSuccess)
+    r.Patch("/bank-accounts/{bankAcctID}/verification-failed", b.VerificationFailed)
 }
 
 func (b *bankAccountResource) Create(w http.ResponseWriter, r *http.Request) {
@@ -112,6 +111,7 @@ func (b *bankAccountResource) VerificationFailed(w http.ResponseWriter, r *http.
 }
 
 func (b *bankAccountResource) Get(w http.ResponseWriter, r *http.Request) {
+    logrus.Println("another log added")
     ctx := r.Context()
     bankAcctID := chi.URLParam(r, "bankAcctID")
 

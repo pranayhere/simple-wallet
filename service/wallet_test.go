@@ -15,11 +15,11 @@ import (
     "testing"
 )
 
-func TestSendMoney(t *testing.T)  {
+func TestSendMoney(t *testing.T) {
     amount := int64(10)
 
-    testcases := []struct{
-        name string
+    testcases := []struct {
+        name      string
         buildStub func(mockWalletRepo *mockdb.MockWalletRepo)
         checkResp func(t *testing.T, err error)
     }{
@@ -57,8 +57,8 @@ func TestSendMoney(t *testing.T)  {
 
             sendMoneyDto := dto.SendMoneyDto{
                 FromWalletAddress: util.RandomWalletAddress(util.RandomEmail()),
-                ToWalletAddress: util.RandomWalletAddress(util.RandomEmail()),
-                Amount: amount,
+                ToWalletAddress:   util.RandomWalletAddress(util.RandomEmail()),
+                Amount:            amount,
             }
             _, err := walletSvc.SendMoney(ctx, sendMoneyDto)
             tc.checkResp(t, err)
@@ -69,8 +69,8 @@ func TestSendMoney(t *testing.T)  {
 func TestDeposit(t *testing.T) {
     amount := int64(10)
 
-    testcases := []struct{
-        name string
+    testcases := []struct {
+        name      string
         buildStub func(mockWalletRepo *mockdb.MockWalletRepo)
         checkResp func(t *testing.T, err error)
     }{
@@ -107,7 +107,7 @@ func TestDeposit(t *testing.T) {
             walletSvc := service.NewWalletService(mockWalletRepo)
             depositDto := dto.DepositDto{
                 WalletID: util.RandomInt(1, 1000),
-                Amount: amount,
+                Amount:   amount,
             }
 
             _, err := walletSvc.Deposit(ctx, depositDto)
@@ -119,8 +119,8 @@ func TestDeposit(t *testing.T) {
 func TestWithdraw(t *testing.T) {
     amount := int64(10)
 
-    testcases := []struct{
-        name string
+    testcases := []struct {
+        name      string
         buildStub func(mockWalletRepo *mockdb.MockWalletRepo)
         checkResp func(t *testing.T, err error)
     }{
@@ -158,8 +158,8 @@ func TestWithdraw(t *testing.T) {
 
             withdrawDto := dto.WithdrawDto{
                 WalletID: util.RandomInt(1, 1000),
-                Amount: amount,
-                UserId: util.RandomInt(1, 1000),
+                Amount:   amount,
+                UserId:   util.RandomInt(1, 1000),
             }
 
             _, err := walletSvc.Withdraw(ctx, withdrawDto)
@@ -172,8 +172,8 @@ func TestGetWalletById(t *testing.T) {
     walletDto := randomWalletDto(util.RandomInt(1, 1000), util.RandomEmail())
     wallet := randomWallet(t, walletDto)
 
-    testcases := []struct{
-        name string
+    testcases := []struct {
+        name      string
         buildStub func(mockWalletRepo *mockdb.MockWalletRepo)
         checkResp func(t *testing.T, res dto.WalletDto, err error)
     }{
@@ -234,26 +234,26 @@ func TestGetWalletById(t *testing.T) {
 
 func randomWalletDto(userId int64, email string) dto.WalletDto {
     return dto.WalletDto{
-        ID: util.RandomInt(1, 1000),
-        Name: util.RandomString(6),
-        Address: util.RandomWalletAddress(email),
-        Status: domain.WalletStatusACTIVE,
-        UserID: userId,
+        ID:            util.RandomInt(1, 1000),
+        Name:          util.RandomString(6),
+        Address:       util.RandomWalletAddress(email),
+        Status:        domain.WalletStatusACTIVE,
+        UserID:        userId,
         BankAccountID: util.RandomInt(1, 1000),
-        Balance: util.RandomMoney(),
-        Currency: util.RandomString(3),
+        Balance:       util.RandomMoney(),
+        Currency:      util.RandomString(3),
     }
 }
 
 func randomWallet(t *testing.T, walletDto dto.WalletDto) domain.Wallet {
     return domain.Wallet{
-        ID: walletDto.ID,
-        Name: walletDto.Name,
-        Address: walletDto.Address,
-        Status: walletDto.Status,
-        UserID: walletDto.UserID,
+        ID:            walletDto.ID,
+        Name:          walletDto.Name,
+        Address:       walletDto.Address,
+        Status:        walletDto.Status,
+        UserID:        walletDto.UserID,
         BankAccountID: walletDto.BankAccountID,
-        Balance: walletDto.Balance,
-        Currency: walletDto.Currency,
+        Balance:       walletDto.Balance,
+        Currency:      walletDto.Currency,
     }
 }

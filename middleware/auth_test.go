@@ -23,9 +23,9 @@ func AddAuthorization(t *testing.T, request *http.Request, tokenMaker token.Make
 }
 
 func TestAuthMiddleware(t *testing.T) {
-    testCases := []struct{
-        name string
-        setupAuth func(t *testing.T, request *http.Request, tokenMaker token.Maker)
+    testCases := []struct {
+        name          string
+        setupAuth     func(t *testing.T, request *http.Request, tokenMaker token.Maker)
         checkResponse func(t *testing.T, recorder *httptest.ResponseRecorder)
     }{
         {
@@ -85,7 +85,7 @@ func TestAuthMiddleware(t *testing.T) {
             authPath := "/auth"
             r.With(middleware.Auth(tokenMaker)).Get(
                 authPath,
-                func (w http.ResponseWriter, r *http.Request) {
+                func(w http.ResponseWriter, r *http.Request) {
                     render.JSON(w, r, "Ok")
                 })
 

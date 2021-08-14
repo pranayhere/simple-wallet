@@ -14,18 +14,16 @@ import (
 type CurrencyResource interface {
     Get(w http.ResponseWriter, r *http.Request)
     Create(w http.ResponseWriter, r *http.Request)
-    RegisterRoutes(r chi.Router) http.Handler
+    RegisterRoutes(r chi.Router)
 }
 
 type currencyResource struct {
     currencySvc service.CurrencySvc
 }
 
-func (s *currencyResource) RegisterRoutes(r chi.Router) http.Handler {
-    r.Get("/{currencyCode}", s.Get)
-    r.Post("/", s.Create)
-
-    return r
+func (s *currencyResource) RegisterRoutes(r chi.Router) {
+    r.Get("/currencies/{currencyCode}", s.Get)
+    r.Post("/currencies", s.Create)
 }
 
 func NewCurrencyResource(currencySvc service.CurrencySvc) CurrencyResource {

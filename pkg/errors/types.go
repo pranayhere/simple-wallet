@@ -22,12 +22,11 @@ var (
     ErrUnauthorized            = errors.New("unauthorized user")
 )
 
-
 // Error renderer type for handling all sorts of errors.
 type Error struct {
-    Err            error `json:"-"` // low-level runtime error
-    HTTPStatusCode int   `json:"-"` // http response status code
-    ErrorText  string `json:"error,omitempty" example:"The requested resource was not found on the server"` // application-level error message, for debugging
+    Err            error  `json:"-"`                                                                            // low-level runtime error
+    HTTPStatusCode int    `json:"-"`                                                                            // http response status code
+    ErrorText      string `json:"error,omitempty" example:"The requested resource was not found on the server"` // application-level error message, for debugging
 }
 
 // Render implements the github.com/go-chi/render.Renderer interface for ErrResponse
@@ -77,8 +76,8 @@ func ErrResponse(err error) render.Renderer {
 
 func ErrBadRequest(err error) render.Renderer {
     return &Error{
-        Err: err,
+        Err:            err,
         HTTPStatusCode: http.StatusBadRequest,
-        ErrorText: err.Error(),
+        ErrorText:      err.Error(),
     }
 }
