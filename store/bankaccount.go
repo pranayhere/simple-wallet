@@ -223,8 +223,9 @@ func (q *bankAccountRepository) CreateBankAccountWithWallet(ctx context.Context,
             return err
         }
 
+        bankAcctPostfix := arg.AccountNo[len(arg.AccountNo)-4:]
         walletAddress := strings.Split(user.Email, "@")[0]
-        walletAddress = fmt.Sprintf("%s@my.wallet", walletAddress)
+        walletAddress = fmt.Sprintf("%s_%s@my.wallet", walletAddress, bankAcctPostfix)
 
         result.Wallet, err = q.walletRepo.CreateWallet(ctx, CreateWalletParams{
             UserID:        user.ID,

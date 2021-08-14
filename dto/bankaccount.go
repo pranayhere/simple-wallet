@@ -10,7 +10,7 @@ type CreateBankAccountDto struct {
     Ifsc      string `json:"ifsc" validate:"required"`
     BankName  string `json:"bank_name" validate:"required"`
     Currency  string `json:"currency" validate:"required"`
-    UserID    int64  `json:"user_id" validate:"required"`
+    UserID    int64  `json:"-"`
 }
 
 type BankAccountDto struct {

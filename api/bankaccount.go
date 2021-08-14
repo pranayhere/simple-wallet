@@ -6,8 +6,10 @@ import (
     "github.com/go-chi/render"
     "github.com/go-playground/validator/v10"
     "github.com/pranayhere/simple-wallet/dto"
+    "github.com/pranayhere/simple-wallet/pkg/constant"
     types "github.com/pranayhere/simple-wallet/pkg/errors"
     "github.com/pranayhere/simple-wallet/service"
+    "github.com/pranayhere/simple-wallet/token"
     "net/http"
     "strconv"
 )
@@ -40,6 +42,9 @@ func (b *bankAccountResource) RegisterRoutes(r chi.Router) {
 func (b *bankAccountResource) Create(w http.ResponseWriter, r *http.Request) {
     var req dto.CreateBankAccountDto
     ctx := r.Context()
+
+    authPayload := ctx.Value(constant.AuthorizationPayloadKey).(*token.Payload)
+    req.UserID = authPayload.UserID
 
     if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
         _ = render.Render(w, r, types.ErrBadRequest(err))

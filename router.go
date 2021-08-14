@@ -7,7 +7,7 @@ import (
     "github.com/go-chi/httprate"
     "github.com/go-chi/render"
     "github.com/pranayhere/simple-wallet/api"
-    m "github.com/pranayhere/simple-wallet/middleware"
+    middleware2 "github.com/pranayhere/simple-wallet/middleware"
     "github.com/pranayhere/simple-wallet/pkg/constant"
     "github.com/pranayhere/simple-wallet/service"
     "github.com/pranayhere/simple-wallet/store"
@@ -58,7 +58,7 @@ func initRoutes(db *sql.DB, r *chi.Mux) *chi.Mux {
 
     // authorized
     r.Group(func(r chi.Router) {
-        r.Use(m.Auth(tokenMaker))
+        r.Use(middleware2.Auth(tokenMaker))
         bankAcctApi.RegisterRoutes(r)
         currencyApi.RegisterRoutes(r)
         walletApi.RegisterRoutes(r)

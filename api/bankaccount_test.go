@@ -9,14 +9,26 @@ import (
     "github.com/golang/mock/gomock"
     "github.com/pranayhere/simple-wallet/api"
     "github.com/pranayhere/simple-wallet/dto"
+    "github.com/pranayhere/simple-wallet/middleware"
+    "github.com/pranayhere/simple-wallet/pkg/constant"
     "github.com/pranayhere/simple-wallet/pkg/errors"
     mocksvc "github.com/pranayhere/simple-wallet/service/mock"
+    "github.com/pranayhere/simple-wallet/token"
     "github.com/pranayhere/simple-wallet/util"
     "github.com/stretchr/testify/require"
     "net/http"
     "net/http/httptest"
     "testing"
+    "time"
 )
+
+func AddAuthorization(t *testing.T, request *http.Request, tokenMaker token.Maker, authorizationType string, userID int64, duration time.Duration) {
+    accessToken, err := tokenMaker.CreateToken(userID, duration)
+    require.NoError(t, err)
+
+    authorizationHeader := fmt.Sprintf("%s %s", authorizationType, accessToken)
+    request.Header.Set(constant.AuthorizationHeaderKey, authorizationHeader)
+}
 
 func TestCreateBankAccount(t *testing.T) {
     createBankAccountDto := util.RandomCreateBankAccountDto("INR")
@@ -26,6 +38,7 @@ func TestCreateBankAccount(t *testing.T) {
     testcases := []struct {
         name      string
         body      map[string]interface{}
+        setupAuth func(t *testing.T, request *http.Request, tokenMaker token.Maker)
         buildStub func(mockBankAcctSvc *mocksvc.MockBankAccountSvc)
         checkResp func(recorder *httptest.ResponseRecorder)
     }{
@@ -36,7 +49,9 @@ func TestCreateBankAccount(t *testing.T) {
                 "ifsc":       createBankAccountDto.Ifsc,
                 "bank_name":  createBankAccountDto.BankName,
                 "currency":   createBankAccountDto.Currency,
-                "user_id":    createBankAccountDto.UserID,
+            },
+            setupAuth: func(t *testing.T, request *http.Request, tokenMaker token.Maker) {
+                AddAuthorization(t, request, tokenMaker, constant.AuthorizationTypeBearer, bankAccount.UserID, time.Minute)
             },
             buildStub: func(mockBankAcctSvc *mocksvc.MockBankAccountSvc) {
                 mockBankAcctSvc.EXPECT().CreateBankAccount(gomock.Any(), createBankAccountDto).Times(1).Return(bankAccountDto, nil)
@@ -52,7 +67,9 @@ func TestCreateBankAccount(t *testing.T) {
                 "ifsc":       createBankAccountDto.Ifsc,
                 "bank_name":  createBankAccountDto.BankName,
                 "currency":   createBankAccountDto.Currency,
-                "user_id":    createBankAccountDto.UserID,
+            },
+            setupAuth: func(t *testing.T, request *http.Request, tokenMaker token.Maker) {
+                AddAuthorization(t, request, tokenMaker, constant.AuthorizationTypeBearer, bankAccount.UserID, time.Minute)
             },
             buildStub: func(mockBankAcctSvc *mocksvc.MockBankAccountSvc) {
                 mockBankAcctSvc.EXPECT().CreateBankAccount(gomock.Any(), createBankAccountDto).Times(1).Return(dto.BankAccountDto{}, sql.ErrConnDone)
@@ -68,7 +85,9 @@ func TestCreateBankAccount(t *testing.T) {
                 "ifsc":       createBankAccountDto.Ifsc,
                 "bank_name":  createBankAccountDto.BankName,
                 "currency":   createBankAccountDto.Currency,
-                "user_id":    createBankAccountDto.UserID,
+            },
+            setupAuth: func(t *testing.T, request *http.Request, tokenMaker token.Maker) {
+                AddAuthorization(t, request, tokenMaker, constant.AuthorizationTypeBearer, bankAccount.UserID, time.Minute)
             },
             buildStub: func(mockBankAcctSvc *mocksvc.MockBankAccountSvc) {
                 mockBankAcctSvc.EXPECT().CreateBankAccount(gomock.Any(), gomock.Any()).Times(0)
@@ -83,7 +102,9 @@ func TestCreateBankAccount(t *testing.T) {
                 "ifsc":      createBankAccountDto.Ifsc,
                 "bank_name": createBankAccountDto.BankName,
                 "currency":  createBankAccountDto.Currency,
-                "user_id":   createBankAccountDto.UserID,
+            },
+            setupAuth: func(t *testing.T, request *http.Request, tokenMaker token.Maker) {
+                AddAuthorization(t, request, tokenMaker, constant.AuthorizationTypeBearer, bankAccount.UserID, time.Minute)
             },
             buildStub: func(mockBankAcctSvc *mocksvc.MockBankAccountSvc) {
                 mockBankAcctSvc.EXPECT().CreateBankAccount(gomock.Any(), gomock.Any()).Times(0)
@@ -99,7 +120,9 @@ func TestCreateBankAccount(t *testing.T) {
                 "ifsc":       createBankAccountDto.Ifsc,
                 "bank_name":  createBankAccountDto.BankName,
                 "currency":   createBankAccountDto.Currency,
-                "user_id":    createBankAccountDto.UserID,
+            },
+            setupAuth: func(t *testing.T, request *http.Request, tokenMaker token.Maker) {
+                AddAuthorization(t, request, tokenMaker, constant.AuthorizationTypeBearer, bankAccount.UserID, time.Minute)
             },
             buildStub: func(mockBankAcctSvc *mocksvc.MockBankAccountSvc) {
                 mockBankAcctSvc.EXPECT().CreateBankAccount(gomock.Any(), gomock.Any()).Times(1).Return(dto.BankAccountDto{}, errors.ErrBankAccountAlreadyExist)
@@ -115,11 +138,12 @@ func TestCreateBankAccount(t *testing.T) {
             ctrl := gomock.NewController(t)
             defer ctrl.Finish()
 
+            tokenMaker, _ := token.NewJWTMaker(constant.SymmetricKey)
             mockBankAcctSvc := mocksvc.NewMockBankAccountSvc(ctrl)
             tc.buildStub(mockBankAcctSvc)
 
             recorder := httptest.NewRecorder()
-            router := chi.NewRouter()
+            router := chi.NewRouter().With(middleware.Auth(tokenMaker))
 
             bankAcctApi := api.NewBankAccountResource(mockBankAcctSvc)
             bankAcctApi.RegisterRoutes(router)
@@ -130,6 +154,7 @@ func TestCreateBankAccount(t *testing.T) {
             url := "/bank-accounts"
             request, err := http.NewRequest(http.MethodPost, url, bytes.NewReader(data))
             require.NoError(t, err)
+            tc.setupAuth(t, request, tokenMaker)
 
             router.ServeHTTP(recorder, request)
 
