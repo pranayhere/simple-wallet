@@ -10,6 +10,7 @@ import (
 
 type BankAccountSvc interface {
     CreateBankAccount(ctx context.Context, newBankAcctDto dto.CreateBankAccountDto) (dto.BankAccountDto, error)
+    CreateBankAccountOld(ctx context.Context, newBankAcctDto dto.CreateBankAccountDto) (dto.BankAccountDto, error)
     VerificationSuccess(ctx context.Context, verificationDto dto.BankAccountVerificationDto) (dto.BankAccountDto, error)
     VerificationFailed(ctx context.Context, verificationDto dto.BankAccountVerificationDto) (dto.BankAccountDto, error)
     GetBankAccount(ctx context.Context, bankAccountId int64) (dto.BankAccountDto, error)
@@ -18,16 +19,31 @@ type BankAccountSvc interface {
 type bankAccountService struct {
     bankAcctRepo store.BankAccountRepo
     currencySvc  CurrencySvc
+    userSvc UserSvc
+    walletSvc WalletSvc
 }
 
-func NewBankAccountService(bankAcctRepo store.BankAccountRepo, currencySvc CurrencySvc) BankAccountSvc {
+func NewBankAccountService(bankAcctRepo store.BankAccountRepo, currencySvc CurrencySvc, userSvc UserSvc, walletSvc WalletSvc) BankAccountSvc {
     return &bankAccountService{
         bankAcctRepo: bankAcctRepo,
         currencySvc:  currencySvc,
+        userSvc: userSvc,
+        walletSvc: walletSvc,
     }
 }
 
 func (b *bankAccountService) CreateBankAccount(ctx context.Context, newBankAcctDto dto.CreateBankAccountDto) (dto.BankAccountDto, error) {
+    var bankAcctDto dto.BankAccountDto
+
+    _, err := b.currencySvc.GetCurrency(ctx, newBankAcctDto.Currency)
+    if err != nil {
+        return bankAcctDto, err
+    }
+
+    return dto.BankAccountDto{}, err
+}
+
+func (b *bankAccountService) CreateBankAccountOld(ctx context.Context, newBankAcctDto dto.CreateBankAccountDto) (dto.BankAccountDto, error) {
     var bankAcctDto dto.BankAccountDto
 
     currency, err := b.currencySvc.GetCurrency(ctx, newBankAcctDto.Currency)

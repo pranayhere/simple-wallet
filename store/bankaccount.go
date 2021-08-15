@@ -15,6 +15,8 @@ type BankAccountRepo interface {
     GetBankAccount(ctx context.Context, id int64) (domain.BankAccount, error)
     ListBankAccounts(ctx context.Context, arg ListBankAccountsParams) ([]domain.BankAccount, error)
     UpdateBankAccountStatus(ctx context.Context, arg UpdateBankAccountStatusParams) (domain.BankAccount, error)
+    WithTransaction(ctx context.Context, fn func() error) error
+
     CreateBankAccountWithWallet(ctx context.Context, arg CreateBankAccountWithWalletParams) (BankAccountWithWalletResult, error)
     BankAccountVerificationSuccess(ctx context.Context, arg BankAccountVerificationParams) (BankAccountVerificationResult, error)
     BankAccountVerificationFailed(ctx context.Context, arg BankAccountVerificationParams) (BankAccountVerificationResult, error)
@@ -24,6 +26,14 @@ type bankAccountRepository struct {
     db         *sql.DB
     walletRepo WalletRepo
     userRepo   UserRepo
+}
+
+func (q *bankAccountRepository) WithTransaction(ctx context.Context, fn func() error) error {
+    err := ExecTx(q.db, func(tx Tx) error {
+        return fn()
+    })
+
+    return err
 }
 
 func NewBankAccountRepo(db *sql.DB, walletRepo WalletRepo, userRepo UserRepo) BankAccountRepo {

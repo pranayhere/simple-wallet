@@ -233,3 +233,25 @@ func TestLoginUser(t *testing.T) {
         })
     }
 }
+
+func TestGetUser(t *testing.T) {
+    createUserDto := util.RandomCreateUserDto()
+    user, _ := util.RandomNewUser(createUserDto)
+
+    ctrl := gomock.NewController(t)
+    defer ctrl.Finish()
+
+    mockUserRepo := mockdb.NewMockUserRepo(ctrl)
+    mockUserRepo.EXPECT().GetUser(gomock.Any(), gomock.Any()).Times(1).Return(user, nil)
+
+    tokenMaker, err := token.NewJWTMaker(constant.SymmetricKey)
+    require.NoError(t, err)
+
+    ctx := context.TODO()
+    userSvc := service.NewUserService(mockUserRepo, tokenMaker)
+    userDto, err := userSvc.GetUser(ctx, user.ID)
+
+    require.NoError(t, err)
+    require.NotEmpty(t, userDto)
+
+}

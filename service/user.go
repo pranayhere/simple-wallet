@@ -16,6 +16,7 @@ import (
 type UserSvc interface {
     CreateUser(ctx context.Context, createUserDto dto.CreateUserDto) (dto.UserDto, error)
     LoginUser(ctx context.Context, loginCredsDto dto.LoginCredentialsDto) (dto.LoggedInUserDto, error)
+    GetUser(ctx context.Context, userId int64) (dto.UserDto, error)
 }
 
 type userService struct {
@@ -88,4 +89,19 @@ func (u *userService) LoginUser(ctx context.Context, loginCredentialsDto dto.Log
     }
 
     return loggedInDto, nil
+}
+
+func (u *userService) GetUser(ctx context.Context, userId int64) (dto.UserDto, error) {
+    var userDto dto.UserDto
+
+    user, err := u.userRepo.GetUser(ctx, userId)
+    if err != nil {
+        if err == sql.ErrNoRows {
+            return userDto, errors.ErrUserNotFound
+        }
+        return userDto, err
+    }
+
+    userDto = dto.NewUserDto(user)
+    return userDto, nil
 }
