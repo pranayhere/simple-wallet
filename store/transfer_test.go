@@ -15,7 +15,6 @@ func createRandomTransfer(t *testing.T, wallet1, wallet2 domain.Wallet) domain.T
         FromWalletID: wallet1.ID,
         ToWalletID:   wallet2.ID,
         Amount:       util.RandomMoney(),
-        TransferType: domain.TransferTypeSENDMONEY,
     }
 
     transfer, err := transferRepo.CreateTransfer(context.Background(), arg)

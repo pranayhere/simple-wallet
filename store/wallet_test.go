@@ -5,7 +5,6 @@ import (
     "fmt"
     "github.com/pranayhere/simple-wallet/domain"
     "github.com/pranayhere/simple-wallet/store"
-    "github.com/pranayhere/simple-wallet/util"
     "github.com/stretchr/testify/require"
     "strings"
     "testing"
@@ -28,15 +27,21 @@ func createRandomWallet(t *testing.T) domain.Wallet {
 
     user := createRandomUser(t)
     bankAccount := createRandomBankAccount(t)
-    currency := createRandomCurrency(t, util.RandomString(3))
+    currency := createRandomCurrency(t, "INR")
     walletAddress := strings.Split(user.Email, "@")[0]
     walletAddress = fmt.Sprintf("%s@my.wallet", walletAddress)
 
+    orgWalletAddress := fmt.Sprintf("mywallet%s@my.wallet", strings.ToLower(currency.Code))
+
+    orgWallet, err := walletRepo.GetWalletByAddress(context.Background(), orgWalletAddress)
+    require.NoError(t, err)
+    require.NotEmpty(t, orgWallet)
+
     args := store.CreateWalletParams{
-        Name:          util.RandomString(6),
         Status:        domain.WalletStatusINACTIVE,
         UserID:        user.ID,
         BankAccountID: bankAccount.ID,
+        OrganizationWalletID: orgWallet.ID,
         Balance:       0,
         Currency:      currency.Code,
         Address:       walletAddress,
@@ -46,11 +51,11 @@ func createRandomWallet(t *testing.T) domain.Wallet {
     require.NoError(t, err)
     require.NotEmpty(t, wallet)
 
-    require.Equal(t, args.Name, wallet.Name)
     require.Equal(t, args.Address, wallet.Address)
     require.Equal(t, args.Currency, wallet.Currency)
     require.Equal(t, args.UserID, wallet.UserID)
     require.Equal(t, args.BankAccountID, wallet.BankAccountID)
+    require.Equal(t, args.OrganizationWalletID, wallet.OrganizationWalletID)
     require.Equal(t, args.Balance, wallet.Balance)
     require.Equal(t, args.Status, wallet.Status)
 
@@ -74,11 +79,11 @@ func TestGetWallet(t *testing.T) {
     require.NotEmpty(t, wallet2)
 
     require.Equal(t, wallet1.ID, wallet2.ID)
-    require.Equal(t, wallet1.Name, wallet2.Name)
     require.Equal(t, wallet1.Address, wallet2.Address)
     require.Equal(t, wallet1.Currency, wallet2.Currency)
     require.Equal(t, wallet1.UserID, wallet2.UserID)
     require.Equal(t, wallet1.BankAccountID, wallet2.BankAccountID)
+    require.Equal(t, wallet1.OrganizationWalletID, wallet2.OrganizationWalletID)
     require.Equal(t, wallet1.Balance, wallet2.Balance)
     require.Equal(t, wallet1.Status, wallet2.Status)
     require.Equal(t, wallet1.CreatedAt, wallet2.CreatedAt)
@@ -94,11 +99,11 @@ func TestGetWalletByAddress(t *testing.T) {
     require.NotEmpty(t, wallet2)
 
     require.Equal(t, wallet1.ID, wallet2.ID)
-    require.Equal(t, wallet1.Name, wallet2.Name)
     require.Equal(t, wallet1.Address, wallet2.Address)
     require.Equal(t, wallet1.Currency, wallet2.Currency)
     require.Equal(t, wallet1.UserID, wallet2.UserID)
     require.Equal(t, wallet1.BankAccountID, wallet2.BankAccountID)
+    require.Equal(t, wallet1.OrganizationWalletID, wallet2.OrganizationWalletID)
     require.Equal(t, wallet1.Balance, wallet2.Balance)
     require.Equal(t, wallet1.Status, wallet2.Status)
     require.Equal(t, wallet1.CreatedAt, wallet2.CreatedAt)
@@ -153,11 +158,11 @@ func TestGetWalletByBankAccountID(t *testing.T) {
     require.NotEmpty(t, wallet2)
 
     require.Equal(t, wallet1.ID, wallet2.ID)
-    require.Equal(t, wallet1.Name, wallet2.Name)
     require.Equal(t, wallet1.Address, wallet2.Address)
     require.Equal(t, wallet1.Currency, wallet2.Currency)
     require.Equal(t, wallet1.UserID, wallet2.UserID)
     require.Equal(t, wallet1.BankAccountID, wallet2.BankAccountID)
+    require.Equal(t, wallet1.OrganizationWalletID, wallet2.OrganizationWalletID)
     require.Equal(t, wallet1.Balance, wallet2.Balance)
     require.Equal(t, wallet1.Status, wallet2.Status)
     require.Equal(t, wallet1.CreatedAt, wallet2.CreatedAt)

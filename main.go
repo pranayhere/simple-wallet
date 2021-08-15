@@ -19,7 +19,6 @@ const (
 
 func main() {
     log.SetFormatter(&log.TextFormatter{})
-
     log.Println("starting wallet service")
 
     db := newStore()

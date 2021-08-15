@@ -27,7 +27,7 @@ type Money struct {
 // NewMoney creates and returns new instance of Money.
 func NewMoney(amount int64, currency *Currency) *Money {
     return &Money{
-        amount: &Amount{val: amount},
+        amount:   &Amount{val: amount},
         currency: currency,
     }
 }

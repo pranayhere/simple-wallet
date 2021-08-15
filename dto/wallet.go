@@ -22,25 +22,26 @@ type WalletTransferResultDto struct {
 type DepositDto struct {
     WalletID int64 `json:"wallet_id" validate:"required"`
     Amount   int64 `json:"amount" validate:"required,gt=0"`
+    UserID   int64 `json:"user_id"`
 }
 
 type WithdrawDto struct {
     WalletID int64 `json:"wallet_id" validate:"required"`
     Amount   int64 `json:"amount" validate:"required,gt=0"`
-    UserId   int64 `json:"user_id" validate:"required"`
+    UserId   int64 `json:"user_id"`
 }
 
 type WalletDto struct {
-    ID            int64               `json:"id" validate:"required"`
-    Name          string              `json:"name" validate:"required"`
-    Address       string              `json:"address" validate:"required"`
-    Status        domain.WalletStatus `json:"status" validate:"required"`
-    UserID        int64               `json:"user_id" validate:"required"`
-    BankAccountID int64               `json:"bank_account_id" validate:"required"`
-    Balance       int64               `json:"balance" validate:"required"`
-    Currency      string              `json:"currency" validate:"required"`
-    CreatedAt     time.Time           `json:"created_at" validate:"required"`
-    UpdatedAt     time.Time           `json:"updated_at" validate:"required"`
+    ID                   int64               `json:"id" validate:"required"`
+    Address              string              `json:"address" validate:"required"`
+    Status               domain.WalletStatus `json:"status" validate:"required"`
+    UserID               int64               `json:"user_id" validate:"required"`
+    BankAccountID        int64               `json:"bank_account_id" validate:"required"`
+    OrganizationWalletID int64               `json:"organization_wallet_id" validate:"required"`
+    Balance              int64               `json:"balance" validate:"required"`
+    Currency             string              `json:"currency" validate:"required"`
+    CreatedAt            time.Time           `json:"created_at" validate:"required"`
+    UpdatedAt            time.Time           `json:"updated_at" validate:"required"`
 }
 
 func NewWalletTransferDto(wtr store.WalletTransferResult) WalletTransferResultDto {
@@ -54,15 +55,15 @@ func NewWalletTransferDto(wtr store.WalletTransferResult) WalletTransferResultDt
 
 func NewWalletDto(wallet domain.Wallet) WalletDto {
     return WalletDto{
-        ID:            wallet.ID,
-        Name:          wallet.Name,
-        Address:       wallet.Address,
-        Status:        wallet.Status,
-        UserID:        wallet.UserID,
-        BankAccountID: wallet.BankAccountID,
-        Balance:       wallet.Balance,
-        Currency:      wallet.Currency,
-        CreatedAt:     wallet.CreatedAt,
-        UpdatedAt:     wallet.UpdatedAt,
+        ID:                   wallet.ID,
+        Address:              wallet.Address,
+        Status:               wallet.Status,
+        UserID:               wallet.UserID,
+        BankAccountID:        wallet.BankAccountID,
+        OrganizationWalletID: wallet.OrganizationWalletID,
+        Balance:              wallet.Balance,
+        Currency:             wallet.Currency,
+        CreatedAt:            wallet.CreatedAt,
+        UpdatedAt:            wallet.UpdatedAt,
     }
 }

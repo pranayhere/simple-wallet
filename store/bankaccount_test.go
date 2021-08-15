@@ -140,7 +140,7 @@ func TestCreateBankAccountWithWallet(t *testing.T) {
     bankAcctRepo := InitBankAccountRepo(t)
 
     user := createRandomUser(t)
-    currency := createRandomCurrency(t, util.RandomString(3))
+    currency := createRandomCurrency(t, "INR")
 
     res, err := bankAcctRepo.CreateBankAccountWithWallet(context.Background(), store.CreateBankAccountWithWalletParams{
         AccountNo: util.RandomString(10),
@@ -171,7 +171,7 @@ func TestBankAccountVerificationSuccess(t *testing.T) {
     bankAcctRepo := InitBankAccountRepo(t)
 
     user := createRandomUser(t)
-    currency := createRandomCurrency(t, util.RandomString(3))
+    currency := createRandomCurrency(t, "INR")
 
     res, err := bankAcctRepo.CreateBankAccountWithWallet(context.Background(), store.CreateBankAccountWithWalletParams{
         AccountNo: util.RandomString(10),
@@ -210,7 +210,7 @@ func TestAccountVerificationFailed(t *testing.T) {
     bankAcctRepo := InitBankAccountRepo(t)
 
     user := createRandomUser(t)
-    currency := createRandomCurrency(t, util.RandomString(3))
+    currency := createRandomCurrency(t, "INR")
 
     res, err := bankAcctRepo.CreateBankAccountWithWallet(context.Background(), store.CreateBankAccountWithWalletParams{
         AccountNo: util.RandomString(10),

@@ -40,7 +40,7 @@ func NewWalletRepo(client *sql.DB, transferRepo TransferRepo, entryRepo EntryRep
 const addWalletBalance = `-- name: AddWalletBalance :one
 UPDATE wallets
 SET balance = balance + $1
-WHERE id = $2 RETURNING id, name, address, status, user_id, bank_account_id, balance, currency, created_at, updated_at
+WHERE id = $2 RETURNING id, address, status, user_id, bank_account_id, organization_wallet_id, balance, currency, created_at, updated_at
 `
 
 type AddWalletBalanceParams struct {
@@ -53,11 +53,11 @@ func (q *walletRepository) AddWalletBalance(ctx context.Context, arg AddWalletBa
     var i domain.Wallet
     err := row.Scan(
         &i.ID,
-        &i.Name,
         &i.Address,
         &i.Status,
         &i.UserID,
         &i.BankAccountID,
+        &i.OrganizationWalletID,
         &i.Balance,
         &i.Currency,
         &i.CreatedAt,
@@ -67,44 +67,44 @@ func (q *walletRepository) AddWalletBalance(ctx context.Context, arg AddWalletBa
 }
 
 const createWallet = `-- name: CreateWallet :one
-INSERT INTO wallets (name,
-                     address,
+INSERT INTO wallets (address,
                      status,
                      user_id,
                      bank_account_id,
+                     organization_wallet_id,
                      balance,
                      currency)
-VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING id, name, address, status, user_id, bank_account_id, balance, currency, created_at, updated_at
+VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING id, address, status, user_id, bank_account_id, organization_wallet_id, balance, currency, created_at, updated_at
 `
 
 type CreateWalletParams struct {
-    Name          string              `json:"name"`
-    Address       string              `json:"address"`
-    Status        domain.WalletStatus `json:"status"`
-    UserID        int64               `json:"user_id"`
-    BankAccountID int64               `json:"bank_account_id"`
-    Balance       int64               `json:"balance"`
-    Currency      string              `json:"currency"`
+    Address              string              `json:"address"`
+    Status               domain.WalletStatus `json:"status"`
+    UserID               int64               `json:"user_id"`
+    BankAccountID        int64               `json:"bank_account_id"`
+    OrganizationWalletID int64               `json:"organization_wallet_id"`
+    Balance              int64               `json:"balance"`
+    Currency             string              `json:"currency"`
 }
 
 func (q *walletRepository) CreateWallet(ctx context.Context, arg CreateWalletParams) (domain.Wallet, error) {
     row := q.db.QueryRowContext(ctx, createWallet,
-        arg.Name,
         arg.Address,
         arg.Status,
         arg.UserID,
         arg.BankAccountID,
+        arg.OrganizationWalletID,
         arg.Balance,
         arg.Currency,
     )
     var i domain.Wallet
     err := row.Scan(
         &i.ID,
-        &i.Name,
         &i.Address,
         &i.Status,
         &i.UserID,
         &i.BankAccountID,
+        &i.OrganizationWalletID,
         &i.Balance,
         &i.Currency,
         &i.CreatedAt,
@@ -114,7 +114,7 @@ func (q *walletRepository) CreateWallet(ctx context.Context, arg CreateWalletPar
 }
 
 const getWallet = `-- name: GetWallet :one
-SELECT id, name, address, status, user_id, bank_account_id, balance, currency, created_at, updated_at
+SELECT id, address, status, user_id, bank_account_id, organization_wallet_id, balance, currency, created_at, updated_at
 FROM wallets
 WHERE id = $1 LIMIT 1
 `
@@ -124,11 +124,11 @@ func (q *walletRepository) GetWallet(ctx context.Context, id int64) (domain.Wall
     var i domain.Wallet
     err := row.Scan(
         &i.ID,
-        &i.Name,
         &i.Address,
         &i.Status,
         &i.UserID,
         &i.BankAccountID,
+        &i.OrganizationWalletID,
         &i.Balance,
         &i.Currency,
         &i.CreatedAt,
@@ -138,7 +138,7 @@ func (q *walletRepository) GetWallet(ctx context.Context, id int64) (domain.Wall
 }
 
 const getWalletByAddress = `-- name: GetWalletByAddress :one
-SELECT id, name, address, status, user_id, bank_account_id, balance, currency, created_at, updated_at
+SELECT id, address, status, user_id, bank_account_id, organization_wallet_id, balance, currency, created_at, updated_at
 FROM wallets
 WHERE address = $1 LIMIT 1
 `
@@ -148,11 +148,11 @@ func (q *walletRepository) GetWalletByAddress(ctx context.Context, address strin
     var i domain.Wallet
     err := row.Scan(
         &i.ID,
-        &i.Name,
         &i.Address,
         &i.Status,
         &i.UserID,
         &i.BankAccountID,
+        &i.OrganizationWalletID,
         &i.Balance,
         &i.Currency,
         &i.CreatedAt,
@@ -162,7 +162,7 @@ func (q *walletRepository) GetWalletByAddress(ctx context.Context, address strin
 }
 
 const getWalletByAddressForUpdate = `-- name: GetWalletByAddressForUpdate :one
-SELECT id, name, address, status, user_id, bank_account_id, balance, currency, created_at, updated_at
+SELECT id, address, status, user_id, bank_account_id, organization_wallet_id, balance, currency, created_at, updated_at
 FROM wallets
 WHERE address = $1 LIMIT 1
 FOR NO KEY
@@ -174,11 +174,11 @@ func (q *walletRepository) GetWalletByAddressForUpdate(ctx context.Context, addr
     var i domain.Wallet
     err := row.Scan(
         &i.ID,
-        &i.Name,
         &i.Address,
         &i.Status,
         &i.UserID,
         &i.BankAccountID,
+        &i.OrganizationWalletID,
         &i.Balance,
         &i.Currency,
         &i.CreatedAt,
@@ -188,7 +188,7 @@ func (q *walletRepository) GetWalletByAddressForUpdate(ctx context.Context, addr
 }
 
 const getWalletForUpdate = `-- name: GetWalletForUpdate :one
-SELECT id, name, address, status, user_id, bank_account_id, balance, currency, created_at, updated_at
+SELECT id, address, status, user_id, bank_account_id, organization_wallet_id, balance, currency, created_at, updated_at
 FROM wallets
 WHERE id = $1 LIMIT 1
 FOR NO KEY
@@ -200,11 +200,11 @@ func (q *walletRepository) GetWalletForUpdate(ctx context.Context, id int64) (do
     var i domain.Wallet
     err := row.Scan(
         &i.ID,
-        &i.Name,
         &i.Address,
         &i.Status,
         &i.UserID,
         &i.BankAccountID,
+        &i.OrganizationWalletID,
         &i.Balance,
         &i.Currency,
         &i.CreatedAt,
@@ -214,7 +214,7 @@ func (q *walletRepository) GetWalletForUpdate(ctx context.Context, id int64) (do
 }
 
 const listWallets = `-- name: ListWallets :many
-SELECT id, name, address, status, user_id, bank_account_id, balance, currency, created_at, updated_at
+SELECT id, address, status, user_id, bank_account_id, organization_wallet_id, balance, currency, created_at, updated_at
 FROM wallets
 WHERE user_id = $1
 ORDER BY id LIMIT $2
@@ -238,11 +238,11 @@ func (q *walletRepository) ListWallets(ctx context.Context, arg ListWalletsParam
         var i domain.Wallet
         if err := rows.Scan(
             &i.ID,
-            &i.Name,
             &i.Address,
             &i.Status,
             &i.UserID,
             &i.BankAccountID,
+            &i.OrganizationWalletID,
             &i.Balance,
             &i.Currency,
             &i.CreatedAt,
@@ -265,7 +265,7 @@ const updateWalletStatus = `-- name: UpdateWalletStatus :one
 UPDATE wallets
 set Status = $1
 where id = $2
-RETURNING id, name, address, status, user_id, bank_account_id, balance, currency, created_at, updated_at
+RETURNING id, address, status, user_id, bank_account_id, organization_wallet_id, balance, currency, created_at, updated_at
 `
 
 type UpdateWalletStatusParams struct {
@@ -278,11 +278,11 @@ func (q *walletRepository) UpdateWalletStatus(ctx context.Context, arg UpdateWal
     var i domain.Wallet
     err := row.Scan(
         &i.ID,
-        &i.Name,
         &i.Address,
         &i.Status,
         &i.UserID,
         &i.BankAccountID,
+        &i.OrganizationWalletID,
         &i.Balance,
         &i.Currency,
         &i.CreatedAt,
@@ -292,7 +292,7 @@ func (q *walletRepository) UpdateWalletStatus(ctx context.Context, arg UpdateWal
 }
 
 const getWalletByBankAccountID = `-- name: GetWalletByBankAccountID :one
-SELECT id, name, address, status, user_id, bank_account_id, balance, currency, created_at, updated_at
+SELECT id, address, status, user_id, bank_account_id, organization_wallet_id, balance, currency, created_at, updated_at
 FROM wallets
 WHERE bank_account_id = $1 LIMIT 1
 `
@@ -302,11 +302,11 @@ func (q *walletRepository) GetWalletByBankAccountID(ctx context.Context, bankAcc
     var i domain.Wallet
     err := row.Scan(
         &i.ID,
-        &i.Name,
         &i.Address,
         &i.Status,
         &i.UserID,
         &i.BankAccountID,
+        &i.OrganizationWalletID,
         &i.Balance,
         &i.Currency,
         &i.CreatedAt,
@@ -316,7 +316,7 @@ func (q *walletRepository) GetWalletByBankAccountID(ctx context.Context, bankAcc
 }
 
 const getWalletByBankAccountIDForUpdate = `-- name: GetWalletByBankAccountIDForUpdate :one
-SELECT id, name, address, status, user_id, bank_account_id, balance, currency, created_at, updated_at
+SELECT id, address, status, user_id, bank_account_id, organization_wallet_id, balance, currency, created_at, updated_at
 FROM wallets
 WHERE bank_account_id = $1 LIMIT 1
 FOR NO KEY
@@ -328,11 +328,11 @@ func (q *walletRepository) GetWalletByBankAccountIDForUpdate(ctx context.Context
     var i domain.Wallet
     err := row.Scan(
         &i.ID,
-        &i.Name,
         &i.Address,
         &i.Status,
         &i.UserID,
         &i.BankAccountID,
+        &i.OrganizationWalletID,
         &i.Balance,
         &i.Currency,
         &i.CreatedAt,
@@ -374,7 +374,6 @@ func (q *walletRepository) DepositToWallet(ctx context.Context, arg DepositeToWa
         })
 
         res.Transfer, err = q.transferRepo.CreateTransfer(ctx, CreateTransferParams{
-            TransferType: domain.TransferTypeDEPOSITTOWALLET,
             Amount:       arg.Amount,
             FromWalletID: wallet.ID,
             ToWalletID:   wallet.ID,
@@ -431,7 +430,6 @@ func (q *walletRepository) WithdrawFromWallet(ctx context.Context, arg WithdrawF
         })
 
         res.Transfer, err = q.transferRepo.CreateTransfer(ctx, CreateTransferParams{
-            TransferType: domain.TransferTypeWITHDRAWFROMWALLET,
             Amount:       arg.Amount,
             FromWalletID: wallet.ID,
             ToWalletID:   wallet.ID,
@@ -492,7 +490,6 @@ func (q *walletRepository) SendMoney(ctx context.Context, arg SendMoneyParams) (
         }
 
         res.Transfer, err = q.transferRepo.CreateTransfer(ctx, CreateTransferParams{
-            TransferType: domain.TransferTypeSENDMONEY,
             FromWalletID: fromWallet.ID,
             ToWalletID:   toWallet.ID,
             Amount:       arg.Amount,

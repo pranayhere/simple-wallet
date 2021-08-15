@@ -14,7 +14,7 @@ var (
 // Payload contains the payload data of the token
 type Payload struct {
     ID        uuid.UUID `json:"id"`
-    UserID    int64    `json:"userID"`
+    UserID    int64     `json:"userID"`
     IssuedAt  time.Time `json:"issued_at"`
     ExpiredAt time.Time `json:"expire_at"`
 }

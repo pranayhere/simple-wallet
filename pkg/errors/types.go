@@ -7,19 +7,20 @@ import (
 )
 
 var (
-    ErrUserNotFound            = errors.New("user not found")
-    ErrIncorrectPassword       = errors.New("incorrect password")
-    ErrUserAlreadyExist        = errors.New("user already exist")
-    ErrCurrencyNotFound        = errors.New("currency not found")
-    ErrBankAccountAlreadyExist = errors.New("bank account already exist")
-    ErrBankAccountNotFound     = errors.New("bank account not found")
-    ErrSomethingWrong          = errors.New("something went wrong")
-    ErrCurrencyMismatch        = errors.New("currency mismatch")
-    ErrWalletNotFound          = errors.New("wallet not found")
-    ErrMissingAuthHeader       = errors.New("missing authorization header")
-    ErrInvalidAuthHeaderFormat = errors.New("invalid auth header format")
-    ErrUnsupportedAuth         = errors.New("auth type not supported")
-    ErrUnauthorized            = errors.New("unauthorized user")
+    ErrUserNotFound               = errors.New("user not found")
+    ErrIncorrectPassword          = errors.New("incorrect password")
+    ErrUserAlreadyExist           = errors.New("user already exist")
+    ErrCurrencyNotFound           = errors.New("currency not found")
+    ErrBankAccountAlreadyExist    = errors.New("bank account already exist")
+    ErrBankAccountNotFound        = errors.New("bank account not found")
+    ErrSomethingWrong             = errors.New("something went wrong")
+    ErrCurrencyMismatch           = errors.New("currency mismatch")
+    ErrWalletNotFound             = errors.New("wallet not found")
+    ErrMissingAuthHeader          = errors.New("missing authorization header")
+    ErrInvalidAuthHeaderFormat    = errors.New("invalid auth header format")
+    ErrUnsupportedAuth            = errors.New("auth type not supported")
+    ErrUnauthorized               = errors.New("unauthorized user")
+    ErrOrganizationWalletNotFound = errors.New("organization wallet with the currency doesn't exist")
 )
 
 // Error renderer type for handling all sorts of errors.
@@ -39,7 +40,7 @@ func Status(err error) int {
     switch err {
     case ErrUserNotFound, ErrWalletNotFound, ErrBankAccountNotFound, ErrCurrencyNotFound:
         return http.StatusNotFound
-    case ErrUserAlreadyExist, ErrBankAccountAlreadyExist:
+    case ErrUserAlreadyExist, ErrBankAccountAlreadyExist, ErrOrganizationWalletNotFound:
         return http.StatusForbidden
     case ErrCurrencyMismatch:
         return http.StatusConflict

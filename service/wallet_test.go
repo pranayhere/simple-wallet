@@ -185,7 +185,6 @@ func TestGetWalletById(t *testing.T) {
             checkResp: func(t *testing.T, res dto.WalletDto, err error) {
                 require.NoError(t, err)
                 require.NotEmpty(t, res)
-                require.Equal(t, walletDto.Name, res.Name)
                 require.Equal(t, walletDto.Address, res.Address)
                 require.Equal(t, walletDto.Status, res.Status)
                 require.Equal(t, walletDto.UserID, res.UserID)
@@ -235,7 +234,6 @@ func TestGetWalletById(t *testing.T) {
 func randomWalletDto(userId int64, email string) dto.WalletDto {
     return dto.WalletDto{
         ID:            util.RandomInt(1, 1000),
-        Name:          util.RandomString(6),
         Address:       util.RandomWalletAddress(email),
         Status:        domain.WalletStatusACTIVE,
         UserID:        userId,
@@ -248,7 +246,6 @@ func randomWalletDto(userId int64, email string) dto.WalletDto {
 func randomWallet(t *testing.T, walletDto dto.WalletDto) domain.Wallet {
     return domain.Wallet{
         ID:            walletDto.ID,
-        Name:          walletDto.Name,
         Address:       walletDto.Address,
         Status:        walletDto.Status,
         UserID:        walletDto.UserID,

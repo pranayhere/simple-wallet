@@ -192,7 +192,16 @@ type BankAccountWithWalletResult struct {
 func (q *bankAccountRepository) CreateBankAccountWithWallet(ctx context.Context, arg CreateBankAccountWithWalletParams) (BankAccountWithWalletResult, error) {
     var result BankAccountWithWalletResult
 
-    err := ExecTx(q.db, func(tx Tx) error {
+    orgWalletAddress := fmt.Sprintf("mywallet%s@my.wallet", strings.ToLower(arg.Currency))
+    orgWallet, err := q.walletRepo.GetWalletByAddress(ctx, orgWalletAddress)
+    if err != nil {
+        if err == sql.ErrNoRows {
+            return result, errors.ErrOrganizationWalletNotFound
+        }
+        return result, err
+    }
+
+    err = ExecTx(q.db, func(tx Tx) error {
         var err error
 
         user, err := q.userRepo.GetUser(ctx, arg.UserID)
@@ -228,12 +237,13 @@ func (q *bankAccountRepository) CreateBankAccountWithWallet(ctx context.Context,
         walletAddress = fmt.Sprintf("%s_%s@my.wallet", walletAddress, bankAcctPostfix)
 
         result.Wallet, err = q.walletRepo.CreateWallet(ctx, CreateWalletParams{
-            UserID:        user.ID,
-            Currency:      arg.Currency,
-            Balance:       0,
-            Address:       walletAddress,
-            BankAccountID: result.BankAccount.ID,
-            Status:        domain.WalletStatusINACTIVE,
+            UserID:               user.ID,
+            Currency:             arg.Currency,
+            Balance:              0,
+            Address:              walletAddress,
+            BankAccountID:        result.BankAccount.ID,
+            OrganizationWalletID: orgWallet.ID,
+            Status:               domain.WalletStatusINACTIVE,
         })
 
         if err != nil {
