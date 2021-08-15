@@ -24,9 +24,9 @@ var (
 
 // Error renderer type for handling all sorts of errors.
 type Error struct {
-    Err            error  `json:"-"`                                                                            // low-level runtime error
-    HTTPStatusCode int    `json:"-"`                                                                            // http response status code
-    ErrorText      string `json:"error,omitempty" example:"The requested resource was not found on the server"` // application-level error message, for debugging
+    Err            error  `json:"-"`
+    HTTPStatusCode int    `json:"-"`
+    ErrorText      string `json:"error,omitempty" example:"The requested resource was not found on the server"`
 }
 
 // Render implements the github.com/go-chi/render.Renderer interface for ErrResponse
@@ -37,30 +37,16 @@ func (e *Error) Render(w http.ResponseWriter, r *http.Request) error {
 
 func Status(err error) int {
     switch err {
-    case ErrUserNotFound:
+    case ErrUserNotFound, ErrWalletNotFound, ErrBankAccountNotFound, ErrCurrencyNotFound:
         return http.StatusNotFound
-    case ErrIncorrectPassword:
-        return http.StatusUnauthorized
-    case ErrUserAlreadyExist:
+    case ErrUserAlreadyExist, ErrBankAccountAlreadyExist:
         return http.StatusForbidden
-    case ErrCurrencyNotFound:
-        return http.StatusNotFound
-    case ErrBankAccountAlreadyExist:
-        return http.StatusForbidden
-    case ErrBankAccountNotFound:
-        return http.StatusNotFound
     case ErrCurrencyMismatch:
         return http.StatusConflict
-    case ErrWalletNotFound:
-        return http.StatusNotFound
-    case ErrMissingAuthHeader:
+    case ErrMissingAuthHeader, ErrInvalidAuthHeaderFormat, ErrUnsupportedAuth, ErrUnauthorized, ErrIncorrectPassword:
         return http.StatusUnauthorized
-    case ErrInvalidAuthHeaderFormat:
-        return http.StatusUnauthorized
-    case ErrUnsupportedAuth:
-        return http.StatusUnauthorized
-    case ErrUnauthorized:
-        return http.StatusUnauthorized
+    case ErrSomethingWrong:
+        return http.StatusInternalServerError
     default:
         return http.StatusInternalServerError
     }
