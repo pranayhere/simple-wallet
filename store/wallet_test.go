@@ -38,13 +38,13 @@ func createRandomWallet(t *testing.T) domain.Wallet {
     require.NotEmpty(t, orgWallet)
 
     args := store.CreateWalletParams{
-        Status:        domain.WalletStatusINACTIVE,
-        UserID:        user.ID,
-        BankAccountID: bankAccount.ID,
+        Status:               domain.WalletStatusINACTIVE,
+        UserID:               user.ID,
+        BankAccountID:        bankAccount.ID,
         OrganizationWalletID: orgWallet.ID,
-        Balance:       0,
-        Currency:      currency.Code,
-        Address:       walletAddress,
+        Balance:              0,
+        Currency:             currency.Code,
+        Address:              walletAddress,
     }
 
     wallet, err := walletRepo.CreateWallet(context.Background(), args)

@@ -21,6 +21,8 @@ var (
     ErrUnsupportedAuth            = errors.New("auth type not supported")
     ErrUnauthorized               = errors.New("unauthorized user")
     ErrOrganizationWalletNotFound = errors.New("organization wallet with the currency doesn't exist")
+    ErrInsufficientBalance        = errors.New("insufficient balance")
+    ErrWalletInactive             = errors.New("wallet is inactive")
 )
 
 // Error renderer type for handling all sorts of errors.
@@ -40,7 +42,7 @@ func Status(err error) int {
     switch err {
     case ErrUserNotFound, ErrWalletNotFound, ErrBankAccountNotFound, ErrCurrencyNotFound:
         return http.StatusNotFound
-    case ErrUserAlreadyExist, ErrBankAccountAlreadyExist, ErrOrganizationWalletNotFound:
+    case ErrUserAlreadyExist, ErrBankAccountAlreadyExist, ErrOrganizationWalletNotFound, ErrInsufficientBalance, ErrWalletInactive:
         return http.StatusForbidden
     case ErrCurrencyMismatch:
         return http.StatusConflict

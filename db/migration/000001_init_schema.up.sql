@@ -73,10 +73,10 @@ CREATE TABLE "entries"
 CREATE TABLE "transfers"
 (
     "id"             bigserial PRIMARY KEY,
-    "from_wallet_id" bigint        NOT NULL,
-    "to_wallet_id"   bigint        NOT NULL,
-    "amount"         bigint        NOT NULL,
-    "created_at"     timestamp     NOT NULL DEFAULT 'now()'
+    "from_wallet_id" bigint    NOT NULL,
+    "to_wallet_id"   bigint    NOT NULL,
+    "amount"         bigint    NOT NULL,
+    "created_at"     timestamp NOT NULL DEFAULT 'now()'
 );
 
 ALTER TABLE "wallets"

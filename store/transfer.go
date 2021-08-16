@@ -30,9 +30,9 @@ VALUES ($1, $2, $3) RETURNING id, from_wallet_id, to_wallet_id, amount, created_
 `
 
 type CreateTransferParams struct {
-    FromWalletID int64               `json:"from_wallet_id"`
-    ToWalletID   int64               `json:"to_wallet_id"`
-    Amount       int64               `json:"amount"`
+    FromWalletID int64 `json:"from_wallet_id"`
+    ToWalletID   int64 `json:"to_wallet_id"`
+    Amount       int64 `json:"amount"`
 }
 
 func (q *transferRepository) CreateTransfer(ctx context.Context, arg CreateTransferParams) (domain.Transfer, error) {

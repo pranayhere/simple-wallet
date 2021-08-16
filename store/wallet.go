@@ -5,6 +5,7 @@ import (
     "database/sql"
     "fmt"
     "github.com/pranayhere/simple-wallet/domain"
+    "github.com/pranayhere/simple-wallet/pkg/errors"
 )
 
 type WalletRepo interface {
@@ -365,7 +366,7 @@ func (q *walletRepository) DepositToWallet(ctx context.Context, arg DepositeToWa
         }
 
         if wallet.Status != domain.WalletStatusACTIVE {
-            return fmt.Errorf("inactive wallet")
+            return errors.ErrWalletInactive
         }
 
         res.Wallet, err = q.AddWalletBalance(ctx, AddWalletBalanceParams{
@@ -417,11 +418,11 @@ func (q *walletRepository) WithdrawFromWallet(ctx context.Context, arg WithdrawF
         }
 
         if wallet.Status != domain.WalletStatusACTIVE {
-            return fmt.Errorf("inactive wallet")
+            return errors.ErrWalletInactive
         }
 
         if !wallet.IsBalanceSufficient(arg.Amount) {
-            return fmt.Errorf("insufficient wallet balance")
+            return errors.ErrInsufficientBalance
         }
 
         res.Wallet, err = q.AddWalletBalance(ctx, AddWalletBalanceParams{
