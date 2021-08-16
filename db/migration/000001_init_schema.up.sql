@@ -139,7 +139,7 @@ INSERT INTO bank_accounts (account_no, ifsc, bank_name, currency, user_id, statu
 VALUES ('1234567890', 'HDFC000076', 'HDFC BANK', 'INR', '1', 'VERIFIED');
 
 INSERT INTO wallets (address, status, user_id, bank_account_id, organization_wallet_id, balance, currency)
-VALUES ('mywalletinr@my.wallet', 'ACTIVE', 1, 1, 1, 0, 'INR');
+VALUES ('mywalletinr@my.wallet', 'ACTIVE', 1, 1, 1, 100000, 'INR');
 
 INSERT INTO currencies (code, fraction)
 values ('USD', 2);
@@ -152,7 +152,7 @@ INSERT INTO bank_accounts (account_no, ifsc, bank_name, currency, user_id, statu
 VALUES ('1234567891', 'HDFC000076', 'HDFC BANK', 'USD', '2', 'VERIFIED');
 
 INSERT INTO wallets (address, status, user_id, bank_account_id, organization_wallet_id, balance, currency)
-VALUES ('mywalletusd@my.wallet', 'ACTIVE', 2, 2, 2, 0, 'USD');
+VALUES ('mywalletusd@my.wallet', 'ACTIVE', 2, 2, 2, 100000, 'USD');
 
 INSERT INTO currencies (code, fraction)
 values ('EUR', 2);
@@ -165,4 +165,4 @@ INSERT INTO bank_accounts (account_no, ifsc, bank_name, currency, user_id, statu
 VALUES ('1234567892', 'HDFC000076', 'HDFC BANK', 'EUR', '3', 'VERIFIED');
 
 INSERT INTO wallets (address, status, user_id, bank_account_id, organization_wallet_id, balance, currency)
-VALUES ('mywalleteur@my.wallet', 'ACTIVE', 3, 3, 3, 0, 'EUR');
+VALUES ('mywalleteur@my.wallet', 'ACTIVE', 3, 3, 3, 100000, 'EUR');
