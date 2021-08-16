@@ -66,21 +66,6 @@ func (mr *MockWalletRepoMockRecorder) CreateWallet(ctx, arg interface{}) *gomock
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateWallet", reflect.TypeOf((*MockWalletRepo)(nil).CreateWallet), ctx, arg)
 }
 
-// DepositToWallet mocks base method.
-func (m *MockWalletRepo) DepositToWallet(ctx context.Context, arg store.DepositeToWalletParams) (store.WalletTransferResult, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "DepositToWallet", ctx, arg)
-	ret0, _ := ret[0].(store.WalletTransferResult)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// DepositToWallet indicates an expected call of DepositToWallet.
-func (mr *MockWalletRepoMockRecorder) DepositToWallet(ctx, arg interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DepositToWallet", reflect.TypeOf((*MockWalletRepo)(nil).DepositToWallet), ctx, arg)
-}
-
 // GetWallet mocks base method.
 func (m *MockWalletRepo) GetWallet(ctx context.Context, id int64) (domain.Wallet, error) {
 	m.ctrl.T.Helper()
@@ -214,19 +199,4 @@ func (m *MockWalletRepo) UpdateWalletStatus(ctx context.Context, arg store.Updat
 func (mr *MockWalletRepoMockRecorder) UpdateWalletStatus(ctx, arg interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateWalletStatus", reflect.TypeOf((*MockWalletRepo)(nil).UpdateWalletStatus), ctx, arg)
-}
-
-// WithdrawFromWallet mocks base method.
-func (m *MockWalletRepo) WithdrawFromWallet(ctx context.Context, arg store.WithdrawFromWalletParams) (store.WalletTransferResult, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "WithdrawFromWallet", ctx, arg)
-	ret0, _ := ret[0].(store.WalletTransferResult)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// WithdrawFromWallet indicates an expected call of WithdrawFromWallet.
-func (mr *MockWalletRepoMockRecorder) WithdrawFromWallet(ctx, arg interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "WithdrawFromWallet", reflect.TypeOf((*MockWalletRepo)(nil).WithdrawFromWallet), ctx, arg)
 }

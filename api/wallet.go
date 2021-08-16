@@ -14,8 +14,6 @@ import (
 
 type WalletResource interface {
     SendMoney(w http.ResponseWriter, r *http.Request)
-    Deposit(w http.ResponseWriter, r *http.Request)
-    Withdraw(w http.ResponseWriter, r *http.Request)
     Get(w http.ResponseWriter, r *http.Request)
     RegisterRoutes(r chi.Router)
 }
@@ -33,8 +31,6 @@ func NewWalletResource(walletSvc service.WalletSvc) WalletResource {
 func (wr *walletResource) RegisterRoutes(r chi.Router) {
     r.Get("/wallets/{walletID}", wr.Get)
     r.Post("/wallets/send", wr.SendMoney)
-    r.Post("/wallets/deposit", wr.Deposit)
-    r.Post("/wallets/withdraw", wr.Withdraw)
 }
 
 func (wr *walletResource) Get(w http.ResponseWriter, r *http.Request) {
@@ -72,54 +68,6 @@ func (wr *walletResource) SendMoney(w http.ResponseWriter, r *http.Request) {
     }
 
     res, err := wr.walletSvc.SendMoney(ctx, req)
-    if err != nil {
-        _ = render.Render(w, r, types.ErrResponse(err))
-        return
-    }
-
-    render.JSON(w, r, res)
-}
-
-func (wr *walletResource) Deposit(w http.ResponseWriter, r *http.Request) {
-    var req dto.DepositDto
-    ctx := r.Context()
-
-    if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-        _ = render.Render(w, r, types.ErrBadRequest(err))
-        return
-    }
-    defer r.Body.Close()
-
-    if err := validator.New().Struct(req); err != nil {
-        _ = render.Render(w, r, types.ErrBadRequest(err))
-        return
-    }
-
-    res, err := wr.walletSvc.Deposit(ctx, req)
-    if err != nil {
-        _ = render.Render(w, r, types.ErrResponse(err))
-        return
-    }
-
-    render.JSON(w, r, res)
-}
-
-func (wr *walletResource) Withdraw(w http.ResponseWriter, r *http.Request) {
-    var req dto.WithdrawDto
-    ctx := r.Context()
-
-    if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-        _ = render.Render(w, r, types.ErrBadRequest(err))
-        return
-    }
-    defer r.Body.Close()
-
-    if err := validator.New().Struct(req); err != nil {
-        _ = render.Render(w, r, types.ErrBadRequest(err))
-        return
-    }
-
-    res, err := wr.walletSvc.Withdraw(ctx, req)
     if err != nil {
         _ = render.Render(w, r, types.ErrResponse(err))
         return

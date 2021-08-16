@@ -5,7 +5,6 @@ import (
     "database/sql"
     "fmt"
     "github.com/pranayhere/simple-wallet/domain"
-    "github.com/pranayhere/simple-wallet/pkg/errors"
 )
 
 type WalletRepo interface {
@@ -19,8 +18,6 @@ type WalletRepo interface {
     UpdateWalletStatus(ctx context.Context, arg UpdateWalletStatusParams) (domain.Wallet, error)
     GetWalletByBankAccountID(ctx context.Context, bankAccountID int64) (domain.Wallet, error)
     GetWalletByBankAccountIDForUpdate(ctx context.Context, bankAccountID int64) (domain.Wallet, error)
-    DepositToWallet(ctx context.Context, arg DepositeToWalletParams) (WalletTransferResult, error)
-    WithdrawFromWallet(ctx context.Context, arg WithdrawFromWalletParams) (WalletTransferResult, error)
     SendMoney(ctx context.Context, arg SendMoneyParams) (WalletTransferResult, error)
 }
 
@@ -342,118 +339,11 @@ func (q *walletRepository) GetWalletByBankAccountIDForUpdate(ctx context.Context
     return i, err
 }
 
-type DepositeToWalletParams struct {
-    WalletID int64 `json:"wallet_id"`
-    Amount   int64 `json:"amount"`
-}
-
 type WalletTransferResult struct {
     Wallet    domain.Wallet   `json:"wallet"`
     FromEntry domain.Entry    `json:"from_entry"`
     ToEntry   domain.Entry    `json:"to_entry"`
     Transfer  domain.Transfer `json:"transfer"`
-}
-
-// DepositToWallet transfer money from linked bank account to the wallet
-func (q *walletRepository) DepositToWallet(ctx context.Context, arg DepositeToWalletParams) (WalletTransferResult, error) {
-    var res WalletTransferResult
-    err := ExecTx(q.db, func(tx Tx) error {
-        var err error
-
-        wallet, err := q.GetWalletForUpdate(ctx, arg.WalletID)
-        if err != nil {
-            return err
-        }
-
-        if wallet.Status != domain.WalletStatusACTIVE {
-            return errors.ErrWalletInactive
-        }
-
-        res.Wallet, err = q.AddWalletBalance(ctx, AddWalletBalanceParams{
-            ID:     wallet.ID,
-            Amount: arg.Amount,
-        })
-
-        res.Transfer, err = q.transferRepo.CreateTransfer(ctx, CreateTransferParams{
-            Amount:       arg.Amount,
-            FromWalletID: wallet.ID,
-            ToWalletID:   wallet.ID,
-        })
-
-        if err != nil {
-            return err
-        }
-
-        res.ToEntry, err = q.entryRepo.CreateEntry(ctx, CreateEntryParams{
-            WalletID:   wallet.ID,
-            TransferID: res.Transfer.ID,
-            Amount:     arg.Amount,
-        })
-
-        if err != nil {
-            return err
-        }
-
-        return nil
-    })
-
-    return res, err
-}
-
-type WithdrawFromWalletParams struct {
-    WalletID int64 `json:"wallet_id"`
-    Amount   int64 `json:"amount"`
-    UserId   int64 `json:"user_id"`
-}
-
-// WithdrawFromWallet transfer money from wallet to the linked bank account
-func (q *walletRepository) WithdrawFromWallet(ctx context.Context, arg WithdrawFromWalletParams) (WalletTransferResult, error) {
-    var res WalletTransferResult
-    err := ExecTx(q.db, func(tx Tx) error {
-        var err error
-
-        wallet, err := q.GetWalletForUpdate(ctx, arg.WalletID)
-        if err != nil {
-            return err
-        }
-
-        if wallet.Status != domain.WalletStatusACTIVE {
-            return errors.ErrWalletInactive
-        }
-
-        if !wallet.IsBalanceSufficient(arg.Amount) {
-            return errors.ErrInsufficientBalance
-        }
-
-        res.Wallet, err = q.AddWalletBalance(ctx, AddWalletBalanceParams{
-            ID:     wallet.ID,
-            Amount: arg.Amount * -1,
-        })
-
-        res.Transfer, err = q.transferRepo.CreateTransfer(ctx, CreateTransferParams{
-            Amount:       arg.Amount,
-            FromWalletID: wallet.ID,
-            ToWalletID:   wallet.ID,
-        })
-
-        if err != nil {
-            return err
-        }
-
-        res.ToEntry, err = q.entryRepo.CreateEntry(ctx, CreateEntryParams{
-            WalletID:   wallet.ID,
-            TransferID: res.Transfer.ID,
-            Amount:     arg.Amount * -1,
-        })
-
-        if err != nil {
-            return err
-        }
-
-        return nil
-    })
-
-    return res, err
 }
 
 type SendMoneyParams struct {

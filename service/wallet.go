@@ -10,8 +10,6 @@ import (
 
 type WalletSvc interface {
     SendMoney(ctx context.Context, sendMoneyDto dto.SendMoneyDto) (dto.WalletTransferResultDto, error)
-    Deposit(ctx context.Context, depositDto dto.DepositDto) (dto.WalletTransferResultDto, error)
-    Withdraw(ctx context.Context, withdrawDto dto.WithdrawDto) (dto.WalletTransferResultDto, error)
     GetWalletById(ctx context.Context, id int64) (dto.WalletDto, error)
 }
 
@@ -35,40 +33,6 @@ func (w *walletService) SendMoney(ctx context.Context, sendMoneyDto dto.SendMone
     }
 
     res, err := w.walletRepo.SendMoney(ctx, arg)
-    if err != nil {
-        return txnResDto, err
-    }
-
-    txnResDto = dto.NewWalletTransferDto(res)
-    return txnResDto, nil
-}
-
-func (w *walletService) Deposit(ctx context.Context, depositDto dto.DepositDto) (dto.WalletTransferResultDto, error) {
-    var txnResDto dto.WalletTransferResultDto
-
-    arg := store.DepositeToWalletParams{
-        WalletID: depositDto.WalletID,
-        Amount:   depositDto.Amount,
-    }
-
-    res, err := w.walletRepo.DepositToWallet(ctx, arg)
-    if err != nil {
-        return txnResDto, err
-    }
-
-    txnResDto = dto.NewWalletTransferDto(res)
-    return txnResDto, nil
-}
-
-func (w *walletService) Withdraw(ctx context.Context, withdrawDto dto.WithdrawDto) (dto.WalletTransferResultDto, error) {
-    var txnResDto dto.WalletTransferResultDto
-
-    arg := store.WithdrawFromWalletParams{
-        WalletID: withdrawDto.WalletID,
-        Amount:   withdrawDto.Amount,
-    }
-
-    res, err := w.walletRepo.WithdrawFromWallet(ctx, arg)
     if err != nil {
         return txnResDto, err
     }
