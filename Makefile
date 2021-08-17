@@ -16,9 +16,6 @@ migrateup:
 migratedown:
 	migrate -path db/migration -database "postgresql://root:secret@localhost:5555/simple_wallet?sslmode=disable" -verbose down
 
-sqlc:
-	sqlc generate
-
 test:
 	go test -v -cover ./...
 

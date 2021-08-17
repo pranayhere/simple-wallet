@@ -22,7 +22,7 @@ func InitWalletRepo(t *testing.T) store.WalletRepo {
     return walletRepo
 }
 
-func createRandomWallet(t *testing.T) domain.Wallet {
+func createRandomWalletWithAmount(t *testing.T, amount int64) domain.Wallet {
     walletRepo := InitWalletRepo(t)
 
     user := createRandomUser(t)
@@ -31,7 +31,7 @@ func createRandomWallet(t *testing.T) domain.Wallet {
     walletAddress := strings.Split(user.Email, "@")[0]
     walletAddress = fmt.Sprintf("%s@my.wallet", walletAddress)
 
-    orgWalletAddress := fmt.Sprintf("mywallet%s@my.wallet", strings.ToLower(currency.Code))
+    orgWalletAddress := fmt.Sprintf("grab%s@my.wallet", strings.ToLower(currency.Code))
 
     orgWallet, err := walletRepo.GetWalletByAddress(context.Background(), orgWalletAddress)
     require.NoError(t, err)
@@ -42,7 +42,7 @@ func createRandomWallet(t *testing.T) domain.Wallet {
         UserID:               user.ID,
         BankAccountID:        bankAccount.ID,
         OrganizationWalletID: orgWallet.ID,
-        Balance:              0,
+        Balance:              amount,
         Currency:             currency.Code,
         Address:              walletAddress,
     }
@@ -64,6 +64,10 @@ func createRandomWallet(t *testing.T) domain.Wallet {
     require.NotZero(t, wallet.UpdatedAt)
 
     return wallet
+}
+
+func createRandomWallet(t *testing.T) domain.Wallet {
+    return createRandomWalletWithAmount(t, 0)
 }
 
 func TestCreateWallet(t *testing.T) {
@@ -169,112 +173,15 @@ func TestGetWalletByBankAccountID(t *testing.T) {
     require.Equal(t, wallet1.UpdatedAt, wallet2.UpdatedAt)
 }
 
-func TestDepositToWallet(t *testing.T) {
-    walletRepo := InitWalletRepo(t)
-    wallet := createRandomWallet(t)
-
-    verifyBankAccount(t, wallet.BankAccountID)
-
-    n := 5
-    amount := int64(100)
-
-    errs := make(chan error)
-    results := make(chan store.WalletTransferResult)
-
-    for i := 0; i < n; i++ {
-        txName := fmt.Sprintf("tx %d", i+1)
-        go func() {
-            ctx := context.WithValue(context.Background(), store.TxKey, txName)
-
-            result, err := walletRepo.DepositToWallet(ctx, store.DepositeToWalletParams{
-                WalletID: wallet.ID,
-                Amount:   amount,
-            })
-            errs <- err
-            results <- result
-        }()
-    }
-
-    for i := 0; i < n; i++ {
-        err := <-errs
-        require.NoError(t, err)
-
-        res := <-results
-        require.NotEmpty(t, res)
-    }
-
-    updatedWallet, err := walletRepo.GetWallet(context.Background(), wallet.ID)
-    require.NoError(t, err)
-    require.NotEmpty(t, updatedWallet)
-
-    require.Equal(t, wallet.Balance+int64(n)*amount, updatedWallet.Balance)
-}
-
-func TestWithdrawFromWallet(t *testing.T) {
-    walletRepo := InitWalletRepo(t)
-    wallet := createRandomWallet(t)
-
-    verifyBankAccount(t, wallet.BankAccountID)
-
-    initAmount := int64(2000)
-    result, err := walletRepo.DepositToWallet(context.Background(), store.DepositeToWalletParams{
-        WalletID: wallet.ID,
-        Amount:   initAmount,
-    })
-
-    wallet = result.Wallet
-
-    n := 5
-    amount := int64(100)
-
-    errs := make(chan error)
-    results := make(chan store.WalletTransferResult)
-
-    for i := 0; i < n; i++ {
-        txName := fmt.Sprintf("tx %d", i+1)
-        go func() {
-            ctx := context.WithValue(context.Background(), store.TxKey, txName)
-
-            result, err := walletRepo.WithdrawFromWallet(ctx, store.WithdrawFromWalletParams{
-                WalletID: wallet.ID,
-                Amount:   amount,
-            })
-            errs <- err
-            results <- result
-        }()
-    }
-
-    for i := 0; i < n; i++ {
-        err := <-errs
-        require.NoError(t, err)
-
-        res := <-results
-        require.NotEmpty(t, res)
-    }
-
-    updatedWallet, err := walletRepo.GetWallet(context.Background(), wallet.ID)
-    require.NoError(t, err)
-    require.NotEmpty(t, updatedWallet)
-
-    require.Equal(t, wallet.Balance-int64(n)*amount, updatedWallet.Balance)
-}
-
 func TestSendMoney(t *testing.T) {
     walletRepo := InitWalletRepo(t)
 
-    fromWallet := createRandomWallet(t)
+    initAmount := int64(50)
+    fromWallet := createRandomWalletWithAmount(t, initAmount)
     verifyBankAccount(t, fromWallet.BankAccountID)
 
     toWallet := createRandomWallet(t)
     verifyBankAccount(t, toWallet.BankAccountID)
-
-    initAmount := int64(50)
-    result, err := walletRepo.DepositToWallet(context.Background(), store.DepositeToWalletParams{
-        WalletID: fromWallet.ID,
-        Amount:   initAmount,
-    })
-
-    fromWallet = result.Wallet
 
     n := 5
     amount := int64(10)

@@ -23,6 +23,7 @@ var (
     ErrOrganizationWalletNotFound = errors.New("organization wallet with the currency doesn't exist")
     ErrInsufficientBalance        = errors.New("insufficient balance")
     ErrWalletInactive             = errors.New("wallet is inactive")
+    ErrPaymentRequestNotFound     = errors.New("payment request not found")
 )
 
 // Error renderer type for handling all sorts of errors.
@@ -40,7 +41,7 @@ func (e *Error) Render(w http.ResponseWriter, r *http.Request) error {
 
 func Status(err error) int {
     switch err {
-    case ErrUserNotFound, ErrWalletNotFound, ErrBankAccountNotFound, ErrCurrencyNotFound:
+    case ErrUserNotFound, ErrWalletNotFound, ErrBankAccountNotFound, ErrCurrencyNotFound, ErrPaymentRequestNotFound:
         return http.StatusNotFound
     case ErrUserAlreadyExist, ErrBankAccountAlreadyExist, ErrOrganizationWalletNotFound, ErrInsufficientBalance, ErrWalletInactive:
         return http.StatusForbidden

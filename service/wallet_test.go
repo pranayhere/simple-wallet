@@ -55,114 +55,12 @@ func TestSendMoney(t *testing.T) {
             ctx := context.TODO()
             walletSvc := service.NewWalletService(mockWalletRepo)
 
-            sendMoneyDto := dto.SendMoneyDto{
+            sendMoneyDto := dto.TransferMoneyDto{
                 FromWalletAddress: util.RandomWalletAddress(util.RandomEmail()),
                 ToWalletAddress:   util.RandomWalletAddress(util.RandomEmail()),
                 Amount:            amount,
             }
-            _, err := walletSvc.SendMoney(ctx, sendMoneyDto)
-            tc.checkResp(t, err)
-        })
-    }
-}
-
-func TestDeposit(t *testing.T) {
-    amount := int64(10)
-
-    testcases := []struct {
-        name      string
-        buildStub func(mockWalletRepo *mockdb.MockWalletRepo)
-        checkResp func(t *testing.T, err error)
-    }{
-        {
-            name: "Ok",
-            buildStub: func(mockWalletRepo *mockdb.MockWalletRepo) {
-                mockWalletRepo.EXPECT().DepositToWallet(gomock.Any(), gomock.Any()).Times(1)
-            },
-            checkResp: func(t *testing.T, err error) {
-                require.NoError(t, err)
-            },
-        },
-        {
-            name: "DepositTxErr",
-            buildStub: func(mockWalletRepo *mockdb.MockWalletRepo) {
-                mockWalletRepo.EXPECT().DepositToWallet(gomock.Any(), gomock.Any()).Times(1).Return(store.WalletTransferResult{}, sql.ErrTxDone)
-            },
-            checkResp: func(t *testing.T, err error) {
-                require.Error(t, err)
-                require.EqualError(t, err, sql.ErrTxDone.Error())
-            },
-        },
-    }
-
-    for _, tc := range testcases {
-        t.Run(tc.name, func(t *testing.T) {
-            ctrl := gomock.NewController(t)
-            defer ctrl.Finish()
-
-            mockWalletRepo := mockdb.NewMockWalletRepo(ctrl)
-            tc.buildStub(mockWalletRepo)
-
-            ctx := context.TODO()
-            walletSvc := service.NewWalletService(mockWalletRepo)
-            depositDto := dto.DepositDto{
-                WalletID: util.RandomInt(1, 1000),
-                Amount:   amount,
-            }
-
-            _, err := walletSvc.Deposit(ctx, depositDto)
-            tc.checkResp(t, err)
-        })
-    }
-}
-
-func TestWithdraw(t *testing.T) {
-    amount := int64(10)
-
-    testcases := []struct {
-        name      string
-        buildStub func(mockWalletRepo *mockdb.MockWalletRepo)
-        checkResp func(t *testing.T, err error)
-    }{
-        {
-            name: "Ok",
-            buildStub: func(mockWalletRepo *mockdb.MockWalletRepo) {
-                mockWalletRepo.EXPECT().WithdrawFromWallet(gomock.Any(), gomock.Any()).Times(1)
-            },
-            checkResp: func(t *testing.T, err error) {
-                require.NoError(t, err)
-            },
-        },
-        {
-            name: "DepositTxErr",
-            buildStub: func(mockWalletRepo *mockdb.MockWalletRepo) {
-                mockWalletRepo.EXPECT().WithdrawFromWallet(gomock.Any(), gomock.Any()).Times(1).Return(store.WalletTransferResult{}, sql.ErrTxDone)
-            },
-            checkResp: func(t *testing.T, err error) {
-                require.Error(t, err)
-                require.EqualError(t, err, sql.ErrTxDone.Error())
-            },
-        },
-    }
-
-    for _, tc := range testcases {
-        t.Run(tc.name, func(t *testing.T) {
-            ctrl := gomock.NewController(t)
-            defer ctrl.Finish()
-
-            mockWalletRepo := mockdb.NewMockWalletRepo(ctrl)
-            tc.buildStub(mockWalletRepo)
-
-            ctx := context.TODO()
-            walletSvc := service.NewWalletService(mockWalletRepo)
-
-            withdrawDto := dto.WithdrawDto{
-                WalletID: util.RandomInt(1, 1000),
-                Amount:   amount,
-                UserId:   util.RandomInt(1, 1000),
-            }
-
-            _, err := walletSvc.Withdraw(ctx, withdrawDto)
+            _, err := walletSvc.Pay(ctx, sendMoneyDto)
             tc.checkResp(t, err)
         })
     }
