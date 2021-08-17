@@ -401,7 +401,7 @@ func (q *walletRepository) SendMoney(ctx context.Context, arg SendMoneyParams) (
         }
 
         res.ToEntry, err = q.entryRepo.CreateEntry(ctx, CreateEntryParams{
-            WalletID:   fromWallet.ID,
+            WalletID:   toWallet.ID,
             Amount:     arg.Amount,
             TransferID: res.Transfer.ID,
         })

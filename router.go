@@ -52,6 +52,10 @@ func initRoutes(db *sql.DB, r *chi.Mux) *chi.Mux {
     walletSvc := service.NewWalletService(walletRepo)
     walletApi := api.NewWalletResource(walletSvc)
 
+    paymentRequestRepo := store.NewPaymentRequestRepo(db)
+    paymentRequestSvc := service.NewPaymentRequestService(paymentRequestRepo, walletSvc)
+    paymentRequestApi := api.NewPaymentRequestResource(paymentRequestSvc)
+
     // Routes
     // public
     userApi.RegisterRoutes(r.With(httprate.LimitByIP(10, 1*time.Minute)))
@@ -62,6 +66,7 @@ func initRoutes(db *sql.DB, r *chi.Mux) *chi.Mux {
         bankAcctApi.RegisterRoutes(r)
         currencyApi.RegisterRoutes(r)
         walletApi.RegisterRoutes(r)
+        paymentRequestApi.RegisterRoutes(r)
     })
 
     r.Get("/health", func(w http.ResponseWriter, r *http.Request) {

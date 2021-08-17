@@ -55,7 +55,7 @@ func TestSendMoney(t *testing.T) {
             ctx := context.TODO()
             walletSvc := service.NewWalletService(mockWalletRepo)
 
-            sendMoneyDto := dto.SendMoneyDto{
+            sendMoneyDto := dto.TransferMoneyDto{
                 FromWalletAddress: util.RandomWalletAddress(util.RandomEmail()),
                 ToWalletAddress:   util.RandomWalletAddress(util.RandomEmail()),
                 Amount:            amount,

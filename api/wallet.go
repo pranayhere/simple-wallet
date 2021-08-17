@@ -13,7 +13,7 @@ import (
 )
 
 type WalletResource interface {
-    SendMoney(w http.ResponseWriter, r *http.Request)
+    Pay(w http.ResponseWriter, r *http.Request)
     Get(w http.ResponseWriter, r *http.Request)
     RegisterRoutes(r chi.Router)
 }
@@ -30,7 +30,7 @@ func NewWalletResource(walletSvc service.WalletSvc) WalletResource {
 
 func (wr *walletResource) RegisterRoutes(r chi.Router) {
     r.Get("/wallets/{walletID}", wr.Get)
-    r.Post("/wallets/send", wr.SendMoney)
+    r.Post("/wallets/pay", wr.Pay)
 }
 
 func (wr *walletResource) Get(w http.ResponseWriter, r *http.Request) {
@@ -52,8 +52,8 @@ func (wr *walletResource) Get(w http.ResponseWriter, r *http.Request) {
     render.JSON(w, r, res)
 }
 
-func (wr *walletResource) SendMoney(w http.ResponseWriter, r *http.Request) {
-    var req dto.SendMoneyDto
+func (wr *walletResource) Pay(w http.ResponseWriter, r *http.Request) {
+    var req dto.TransferMoneyDto
     ctx := r.Context()
 
     if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
@@ -67,7 +67,7 @@ func (wr *walletResource) SendMoney(w http.ResponseWriter, r *http.Request) {
         return
     }
 
-    res, err := wr.walletSvc.SendMoney(ctx, req)
+    res, err := wr.walletSvc.Pay(ctx, req)
     if err != nil {
         _ = render.Render(w, r, types.ErrResponse(err))
         return

@@ -192,7 +192,7 @@ type BankAccountWithWalletResult struct {
 func (q *bankAccountRepository) CreateBankAccountWithWallet(ctx context.Context, arg CreateBankAccountWithWalletParams) (BankAccountWithWalletResult, error) {
     var result BankAccountWithWalletResult
 
-    orgWalletAddress := fmt.Sprintf("mywallet%s@my.wallet", strings.ToLower(arg.Currency))
+    orgWalletAddress := fmt.Sprintf("grab%s@my.wallet", strings.ToLower(arg.Currency))
     orgWallet, err := q.walletRepo.GetWalletByAddress(ctx, orgWalletAddress)
     if err != nil {
         if err == sql.ErrNoRows {

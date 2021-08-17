@@ -2,7 +2,7 @@
 INSERT INTO transfers (from_wallet_id,
                        to_wallet_id,
                        amount)
-VALUES ($1, $2, $3, $4)
+VALUES ($1, $2, $3)
 RETURNING *;
 
 -- name: GetTransfer :one

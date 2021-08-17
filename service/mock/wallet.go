@@ -51,7 +51,7 @@ func (mr *MockWalletSvcMockRecorder) GetWalletById(ctx, id interface{}) *gomock.
 }
 
 // SendMoney mocks base method.
-func (m *MockWalletSvc) SendMoney(ctx context.Context, sendMoneyDto dto.SendMoneyDto) (dto.WalletTransferResultDto, error) {
+func (m *MockWalletSvc) SendMoney(ctx context.Context, sendMoneyDto dto.TransferMoneyDto) (dto.WalletTransferResultDto, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "SendMoney", ctx, sendMoneyDto)
 	ret0, _ := ret[0].(dto.WalletTransferResultDto)

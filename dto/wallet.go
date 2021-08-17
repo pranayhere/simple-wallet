@@ -6,10 +6,16 @@ import (
     "time"
 )
 
-type SendMoneyDto struct {
-    FromWalletAddress string `json:"from_account_address" validate:"required"`
-    ToWalletAddress   string `json:"to_account_address" validate:"required"`
+type TransferMoneyDto struct {
+    FromWalletAddress string `json:"from_wallet_address" validate:"required"`
+    ToWalletAddress   string `json:"to_wallet_address" validate:"required"`
     Amount            int64  `json:"amount" validate:"required,gt=0"`
+}
+
+type TransferMoneyByWalletIDDto struct {
+    FromWalletID int64 `json:"from_wallet_id" validate:"required"`
+    ToWalletID   int64 `json:"to_wallet_address" validate:"required"`
+    Amount       int64 `json:"amount" validate:"required,gt=0"`
 }
 
 type WalletTransferResultDto struct {
@@ -17,18 +23,6 @@ type WalletTransferResultDto struct {
     FromEntry domain.Entry    `json:"from_entry" validate:"required"`
     ToEntry   domain.Entry    `json:"to_entry" validate:"required"`
     Transfer  domain.Transfer `json:"transfer" validate:"required"`
-}
-
-type DepositDto struct {
-    WalletID int64 `json:"wallet_id" validate:"required"`
-    Amount   int64 `json:"amount" validate:"required,gt=0"`
-    UserID   int64 `json:"user_id"`
-}
-
-type WithdrawDto struct {
-    WalletID int64 `json:"wallet_id" validate:"required"`
-    Amount   int64 `json:"amount" validate:"required,gt=0"`
-    UserId   int64 `json:"user_id"`
 }
 
 type WalletDto struct {
