@@ -35,6 +35,21 @@ func (m *MockWalletSvc) EXPECT() *MockWalletSvcMockRecorder {
 	return m.recorder
 }
 
+// GetWalletByAddress mocks base method.
+func (m *MockWalletSvc) GetWalletByAddress(ctx context.Context, address string) (dto.WalletDto, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetWalletByAddress", ctx, address)
+	ret0, _ := ret[0].(dto.WalletDto)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetWalletByAddress indicates an expected call of GetWalletByAddress.
+func (mr *MockWalletSvcMockRecorder) GetWalletByAddress(ctx, address interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetWalletByAddress", reflect.TypeOf((*MockWalletSvc)(nil).GetWalletByAddress), ctx, address)
+}
+
 // GetWalletById mocks base method.
 func (m *MockWalletSvc) GetWalletById(ctx context.Context, id int64) (dto.WalletDto, error) {
 	m.ctrl.T.Helper()
@@ -50,17 +65,32 @@ func (mr *MockWalletSvcMockRecorder) GetWalletById(ctx, id interface{}) *gomock.
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetWalletById", reflect.TypeOf((*MockWalletSvc)(nil).GetWalletById), ctx, id)
 }
 
-// SendMoney mocks base method.
-func (m *MockWalletSvc) SendMoney(ctx context.Context, sendMoneyDto dto.TransferMoneyDto) (dto.WalletTransferResultDto, error) {
+// Pay mocks base method.
+func (m *MockWalletSvc) Pay(ctx context.Context, transferMoneyDto dto.TransferMoneyDto) (dto.WalletTransferResultDto, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "SendMoney", ctx, sendMoneyDto)
+	ret := m.ctrl.Call(m, "Pay", ctx, transferMoneyDto)
 	ret0, _ := ret[0].(dto.WalletTransferResultDto)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
-// SendMoney indicates an expected call of SendMoney.
-func (mr *MockWalletSvcMockRecorder) SendMoney(ctx, sendMoneyDto interface{}) *gomock.Call {
+// Pay indicates an expected call of Pay.
+func (mr *MockWalletSvcMockRecorder) Pay(ctx, transferMoneyDto interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SendMoney", reflect.TypeOf((*MockWalletSvc)(nil).SendMoney), ctx, sendMoneyDto)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Pay", reflect.TypeOf((*MockWalletSvc)(nil).Pay), ctx, transferMoneyDto)
+}
+
+// PayByWalletID mocks base method.
+func (m *MockWalletSvc) PayByWalletID(ctx context.Context, transferMoneyDto dto.TransferMoneyByWalletIDDto) (dto.WalletTransferResultDto, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "PayByWalletID", ctx, transferMoneyDto)
+	ret0, _ := ret[0].(dto.WalletTransferResultDto)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// PayByWalletID indicates an expected call of PayByWalletID.
+func (mr *MockWalletSvcMockRecorder) PayByWalletID(ctx, transferMoneyDto interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "PayByWalletID", reflect.TypeOf((*MockWalletSvc)(nil).PayByWalletID), ctx, transferMoneyDto)
 }

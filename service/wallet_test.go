@@ -60,7 +60,7 @@ func TestSendMoney(t *testing.T) {
                 ToWalletAddress:   util.RandomWalletAddress(util.RandomEmail()),
                 Amount:            amount,
             }
-            _, err := walletSvc.SendMoney(ctx, sendMoneyDto)
+            _, err := walletSvc.Pay(ctx, sendMoneyDto)
             tc.checkResp(t, err)
         })
     }

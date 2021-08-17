@@ -31,7 +31,7 @@ func createRandomWalletWithAmount(t *testing.T, amount int64) domain.Wallet {
     walletAddress := strings.Split(user.Email, "@")[0]
     walletAddress = fmt.Sprintf("%s@my.wallet", walletAddress)
 
-    orgWalletAddress := fmt.Sprintf("mywallet%s@my.wallet", strings.ToLower(currency.Code))
+    orgWalletAddress := fmt.Sprintf("grab%s@my.wallet", strings.ToLower(currency.Code))
 
     orgWallet, err := walletRepo.GetWalletByAddress(context.Background(), orgWalletAddress)
     require.NoError(t, err)
