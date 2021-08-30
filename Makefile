@@ -22,6 +22,9 @@ test:
 sleep:
 	sleep 5s
 
+mock:
+	sh generate-mocks
+
 reinit: postgresdrop postgres sleep createdb migrateup
 
 init: postgres sleep createdb migrateup
