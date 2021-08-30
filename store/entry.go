@@ -10,6 +10,7 @@ type EntryRepo interface {
     CreateEntry(ctx context.Context, arg CreateEntryParams) (domain.Entry, error)
     GetEntry(ctx context.Context, id int64) (domain.Entry, error)
     ListEntries(ctx context.Context, arg ListEntriesParams) ([]domain.Entry, error)
+    GetEntriesByTransferID(ctx context.Context, transferID int64) ([]domain.Entry, error)
 }
 
 type entryRepository struct {

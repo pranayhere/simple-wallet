@@ -2,6 +2,7 @@ package store_test
 
 import (
     "context"
+    "fmt"
     "github.com/pranayhere/simple-wallet/domain"
     "github.com/pranayhere/simple-wallet/store"
     "github.com/stretchr/testify/require"
@@ -54,6 +55,19 @@ func TestGetEntry(t *testing.T) {
     require.Equal(t, entry1.Amount, entry2.Amount)
 
     require.WithinDuration(t, entry1.CreatedAt, entry2.CreatedAt, time.Second)
+}
+
+func TestGetEntriesByTransferID(t *testing.T) {
+    entryRepo := store.NewEntryRepo(testDb)
+    wallet1 := createRandomWallet(t)
+    wallet2 := createRandomWallet(t)
+    entry := createRandomEntry(t, wallet1, wallet2)
+
+    entries, err := entryRepo.GetEntriesByTransferID(context.Background(), entry.TransferID)
+    require.NoError(t, err)
+    require.NotEmpty(t, entries)
+    fmt.Println(entries)
+    require.Equal(t, 1, len(entries))
 }
 
 func TestListEntries(t *testing.T) {

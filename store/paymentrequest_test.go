@@ -84,3 +84,20 @@ func TestPaymentRequestStatus(t *testing.T) {
 
     require.Equal(t, domain.PaymentRequestStatusAPPROVED, payReq2.Status)
 }
+
+func TestGetPaymentRequest(t *testing.T) {
+    payReqRepo := store.NewPaymentRequestRepo(testDb)
+    wallet1 := createRandomWallet(t)
+    wallet2 := createRandomWallet(t)
+
+    payReq := createRandomPaymentRequest(t, wallet1, wallet2)
+
+    savedPayReq, err := payReqRepo.GetPaymentRequest(context.Background(), payReq.ID)
+    require.NoError(t, err)
+    require.NotEmpty(t, savedPayReq)
+    require.Equal(t, payReq.ID, savedPayReq.ID)
+    require.Equal(t, payReq.FromWalletID, savedPayReq.FromWalletID)
+    require.Equal(t, payReq.ToWalletID, savedPayReq.ToWalletID)
+    require.Equal(t, payReq.Amount, savedPayReq.Amount)
+    require.Equal(t, payReq.Status, savedPayReq.Status)
+}
